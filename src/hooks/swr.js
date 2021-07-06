@@ -14,8 +14,20 @@ function useSearchMulti(query) {
   return {
     data: data?.results,
     isLoading: !error && !data,
-    isError: error,
+    error,
   };
 }
 
-export { useSearchMulti };
+function useMovieCast(id, releaseDate) {
+  const { data, error } = useSWR(
+    id && releaseDate && `${BASE}/movie/${id}?releaseDate=${releaseDate}`,
+  );
+
+  return {
+    cast: data,
+    isLoading: !error && !data,
+    error,
+  };
+}
+
+export { useSearchMulti, useMovieCast };

@@ -24,5 +24,6 @@ module.exports = {
     'capitalized-comments': 'off',
     'arrow-body-style': 'off',
     'no-negated-condition': 'off',
+    camelcase: 'off',
   },
 };

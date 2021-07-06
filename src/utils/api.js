@@ -1,3 +1,12 @@
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
+
+function getDiffInYears(date1, date2) {
+  return dayjs.duration(dayjs(date1).diff(dayjs(date2)));
+}
+
 const fetcher = async url => {
   const res = await fetch(url);
 
@@ -16,7 +25,7 @@ const fetcher = async url => {
 
 const BASE_URL = 'https://api.themoviedb.org/3';
 
-function generateUrl(endpoint, params) {
+function generateUrl(endpoint, params = []) {
   const url = new URL(`${BASE_URL}${endpoint}`);
   url.searchParams.append('api_key', process.env.apiKey);
   params.forEach(({ name, value }) => {
@@ -25,7 +34,7 @@ function generateUrl(endpoint, params) {
   return url;
 }
 
-async function client(endpoint, params) {
+async function client(endpoint, params = []) {
   try {
     const res = await fetch(generateUrl(endpoint, params));
     if (!res.ok) {
@@ -50,4 +59,40 @@ async function searchMulti(query) {
   return data;
 }
 
-export { fetcher, searchMulti };
+async function getPerson(id) {
+  const data = await client(`/person/${id}`);
+
+  return data;
+}
+
+async function getMovieCredits(id) {
+  const data = await client(`/movie/${id}/credits`);
+
+  return data;
+}
+
+async function getMovieCastAge(id, releaseDate) {
+  const { cast } = await getMovieCredits(id);
+
+  const promises = cast.slice(0, 3).map(person => () => getPerson(person.id));
+  const result = await Promise.allSettled(promises.map(f => f()));
+  console.log('RESULT', result);
+  const persons = result.map(({ value }) => {
+    const { id, name, birthday, profile_path } = value;
+    const { character } = cast.find(person => person.id === id);
+
+    return {
+      id,
+      name,
+      character,
+      birthday,
+      profile_path,
+      age: getDiffInYears(dayjs(), birthday).$d.years,
+      ageOnRelease: getDiffInYears(dayjs(releaseDate), birthday).$d.years,
+    };
+  });
+
+  return persons;
+}
+
+export { fetcher, searchMulti, getMovieCastAge, getPerson };

@@ -71,7 +71,9 @@ export default function Search() {
 
     onSelectedItemChange: ({ selectedItem }) => {
       if (selectedItem.media_type === 'movie') {
-        router.push(`/movie/${selectedItem.id}`);
+        router.push(
+          `/movie/${selectedItem.id}?releaseDate=${selectedItem.release_date}`,
+        );
       }
 
       if (selectedItem.media_type === 'tv') {
