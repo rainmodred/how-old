@@ -52,9 +52,7 @@ async function client(endpoint, params = []) {
 }
 
 async function searchMulti(query) {
-  const data = await client('/search/multi', [
-    { name: 'query', value: encodeURIComponent(query) },
-  ]);
+  const data = await client('/search/multi', [{ name: 'query', value: query }]);
 
   return data;
 }
