@@ -40,4 +40,28 @@ function useMovieCast(id, releaseDate) {
   };
 }
 
-export { useSearchMulti, useMovieCast };
+function useTvShowCast(id, releaseDate, season) {
+  const shouldFetch = id && releaseDate && season;
+  const { data, error } = useSWR(
+    shouldFetch &&
+      `${BASE}/credits/tv?id=${id}&releaseDate=${releaseDate}&season=${season}`,
+  );
+
+  return {
+    cast: data,
+    isLoading: !error && !data,
+    error,
+  };
+}
+
+function useTvShow(id) {
+  const { data, error } = useSWR(id && `${BASE}/tv/${id}`);
+
+  return {
+    tvShow: data,
+    isLoading: !error && !data,
+    error,
+  };
+}
+
+export { useSearchMulti, useMovieCast, useTvShow, useTvShowCast };

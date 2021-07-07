@@ -72,7 +72,8 @@ export default function Search() {
       }
 
       if (selectedItem.media_type === 'tv') {
-        router.push(`/tv/${selectedItem.id}`);
+        // get seasons list?
+        router.push(`/tv/${selectedItem.id}?season=1`);
       }
     },
   });
