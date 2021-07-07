@@ -1,11 +1,5 @@
-import { Button } from '@chakra-ui/react';
-
-import Hello from '../components/Hello';
+import Layout from '@/components/Layout';
 
 export default function Home() {
-  return (
-    <div>
-      <Hello /> <Button>test</Button>
-    </div>
-  );
+  return <Layout></Layout>;
 }

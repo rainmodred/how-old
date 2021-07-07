@@ -20,5 +20,10 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['react'],
-  rules: {},
+  rules: {
+    'capitalized-comments': 'off',
+    'arrow-body-style': 'off',
+    'no-negated-condition': 'off',
+    camelcase: 'off',
+  },
 };
