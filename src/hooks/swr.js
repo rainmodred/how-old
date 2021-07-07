@@ -1,19 +1,29 @@
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
+import { useDebounce } from 'use-debounce';
 
 const BASE = '/api';
 
 function useSearchMulti(query) {
+  const [queried, setQueried] = useState(false);
+  const [debouncedQuery] = useDebounce(query, 500);
   const { data, error } = useSWR(
-    query
-      ? `${BASE}/search/multi?query=${encodeURIComponent(
-          query.trim().toLowerCase(),
-        )}`
+    debouncedQuery !== ''
+      ? `${BASE}/search/multi?query=${encodeURIComponent(debouncedQuery)}`
       : null,
   );
 
+  useEffect(() => {
+    if (query !== '') {
+      setQueried(true);
+    } else {
+      setQueried(false);
+    }
+  }, [query]);
+
   return {
     data: data?.results,
-    isLoading: !error && !data,
+    isLoading: !error && !data && queried,
     error,
   };
 }
