@@ -1,5 +1,27 @@
 import { searchMulti } from '@/utils/api';
 
+function formatData(data = []) {
+  const movies = {
+    title: 'Movies',
+    items: [],
+  };
+  const tvShows = {
+    title: 'Tv Shows',
+    items: [],
+  };
+
+  data.forEach(item => {
+    if (item.media_type === 'movie') movies.items.push(item);
+    if (item.media_type === 'tv') tvShows.items.push(item);
+  });
+
+  const formattedData = [];
+  if (movies.items.length > 0) formattedData.push(movies);
+  if (tvShows.items.length > 0) formattedData.push(tvShows);
+
+  return formattedData;
+}
+
 export default async function handler(req, res) {
   const { query } = req.query;
 
@@ -16,28 +38,5 @@ export default async function handler(req, res) {
     });
   }
 
-  const { results } = data;
-
-  let formattedData = [];
-  if (results) {
-    const movies = results.filter(result => result.media_type === 'movie');
-    const tvShows = results.filter(result => result.media_type === 'tv');
-
-    formattedData = [
-      {
-        title: 'Movies',
-        items: movies,
-      },
-      {
-        title: 'TV Shows',
-        items: tvShows,
-      },
-    ];
-
-    if (movies.length === 0 && tvShows.length === 0) {
-      formattedData = [];
-    }
-  }
-
-  return res.json({ results: formattedData });
+  return res.json({ results: formatData(data.results) });
 }
