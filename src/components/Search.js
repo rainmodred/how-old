@@ -15,7 +15,6 @@ import {
 import { SearchIcon, CloseIcon } from '@chakra-ui/icons';
 import router from 'next/router';
 import { useCombobox } from 'downshift';
-import { useDebouncedCallback } from 'use-debounce';
 
 import { useSearchMulti } from '@/hooks/swr';
 
@@ -38,35 +37,31 @@ const flattenGroupOptions = options =>
 
 export default function Search() {
   const [inputValue, setInputValue] = useState('');
-  const { data, isLoading: isFetching, error } = useSearchMulti(inputValue);
-  const [queried, setQueried] = useState(false);
-
-  const debounce = useDebouncedCallback(value => {
-    setInputValue(value);
-  }, 500);
-
+  const { data, isLoading, error } = useSearchMulti(
+    inputValue ? inputValue?.trim()?.toLowerCase() : '',
+  );
   const {
     isOpen,
-    closeMenu,
     openMenu,
     getComboboxProps,
     getInputProps,
     getMenuProps,
     getItemProps,
     highlightedIndex,
-    selectItem,
+    reset,
   } = useCombobox({
     id: 'Search',
     items: data ? flattenGroupOptions(data) : [],
-    itemToString: item =>
-      item.media_type === 'movie' ? item.title : item.name,
-
-    onInputValueChange: ({ inputValue }) => {
-      if (inputValue !== '' && !queried) {
-        setQueried(true);
+    itemToString: item => {
+      if (item === null) {
+        return;
       }
 
-      debounce(inputValue);
+      return item.media_type === 'movie' ? item.title : item.name;
+    },
+
+    onInputValueChange: ({ inputValue }) => {
+      setInputValue(inputValue);
     },
 
     onSelectedItemChange: ({ selectedItem }) => {
@@ -81,15 +76,6 @@ export default function Search() {
       }
     },
   });
-
-  function handleReset() {
-    closeMenu();
-    setInputValue('');
-    setQueried(false);
-    selectItem(null);
-  }
-
-  const isLoading = queried && isFetching;
 
   function renderSuggestions() {
     if (isOpen) {
@@ -185,7 +171,7 @@ export default function Search() {
             placeholder="Search for a movie or tv show"
           />
           {inputValue !== '' && (
-            <InputRightElement onClick={handleReset} cursor="pointer">
+            <InputRightElement onClick={reset} cursor="pointer">
               <CloseIcon color="teal.100" />
             </InputRightElement>
           )}
@@ -202,7 +188,7 @@ export default function Search() {
         bg="white"
         boxShadow="0 4px 6px hsl(225deg 6% 13% / 28%)"
         borderRadius="10px"
-        display={isOpen && data ? null : 'none'}
+        display={isOpen && (data || error) ? 'block' : 'none'}
         {...getMenuProps()}
       >
         {renderSuggestions()}
