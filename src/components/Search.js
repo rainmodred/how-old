@@ -35,11 +35,27 @@ const flattenGroupOptions = options =>
     return [...prev, ...curr.items];
   }, []);
 
+function stateReducer(_state, actionAndChanges) {
+  const { type, changes } = actionAndChanges;
+
+  switch (type) {
+    case useCombobox.stateChangeTypes.InputKeyDownEnter:
+    case useCombobox.stateChangeTypes.ItemClick:
+      return {
+        ...changes,
+        inputValue: '',
+      };
+    default:
+      return changes;
+  }
+}
+
 export default function Search() {
   const [inputValue, setInputValue] = useState('');
   const { data, isLoading, error } = useSearchMulti(
     inputValue ? inputValue?.trim()?.toLowerCase() : '',
   );
+
   const {
     isOpen,
     openMenu,
@@ -52,6 +68,7 @@ export default function Search() {
   } = useCombobox({
     id: 'Search',
     items: data ? flattenGroupOptions(data) : [],
+    stateReducer,
     itemToString: item => {
       if (item === null) {
         return;
@@ -65,14 +82,14 @@ export default function Search() {
     },
 
     onSelectedItemChange: ({ selectedItem }) => {
-      if (selectedItem.media_type === 'movie') {
-        router.push(
-          `/movie/${selectedItem.id}?releaseDate=${selectedItem.release_date}`,
-        );
+      const { media_type, id, release_date, title, name } = selectedItem;
+      if (media_type === 'movie') {
+        router.push(`/movie/${id}?releaseDate=${release_date}&title=${title}`);
       }
 
-      if (selectedItem.media_type === 'tv') {
-        router.push(`/tv/${selectedItem.id}`);
+      if (media_type === 'tv') {
+        // get seasons list?
+        router.push(`/tv/${id}?season=1&title=${name}`);
       }
     },
   });
@@ -160,28 +177,33 @@ export default function Search() {
   }
 
   return (
-    <Flex flexDir="column" alignItems="center" position="relative" w="500px">
-      <Flex width="100%" minW="400px" {...getComboboxProps()}>
-        <InputGroup>
-          <InputLeftElement>
-            {isLoading ? <Spinner /> : <SearchIcon color="green.500" />}
-          </InputLeftElement>
-          <Input
-            {...getInputProps({ onFocus: openMenu })}
-            placeholder="Search for a movie or tv show"
-          />
-          {inputValue !== '' && (
-            <InputRightElement onClick={reset} cursor="pointer">
-              <CloseIcon color="teal.100" />
-            </InputRightElement>
-          )}
-        </InputGroup>
-      </Flex>
+    <Flex
+      flexDir="column"
+      alignItems="center"
+      position="relative"
+      w="100%"
+      maxW="564px"
+    >
+      <InputGroup w="100%" {...getComboboxProps()}>
+        <InputLeftElement>
+          {isLoading ? <Spinner /> : <SearchIcon color="green.500" />}
+        </InputLeftElement>
+        <Input
+          {...getInputProps({ onFocus: openMenu })}
+          placeholder="Search for a movie or tv show"
+        />
+        {inputValue !== '' && (
+          <InputRightElement onClick={reset} cursor="pointer">
+            <CloseIcon color="teal.100" />
+          </InputRightElement>
+        )}
+      </InputGroup>
+
       <List
         position="absolute"
         top="0"
         mt="50px"
-        z-index="1"
+        zIndex="1"
         w="100%"
         overflowY="auto"
         p="5"

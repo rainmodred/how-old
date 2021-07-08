@@ -4,7 +4,7 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 
 function getDiffInYears(date1, date2) {
-  return dayjs.duration(dayjs(date1).diff(dayjs(date2)));
+  return dayjs.duration(dayjs(date1).diff(dayjs(date2))).$d.years;
 }
 
 const fetcher = async url => {
@@ -37,6 +37,7 @@ function generateUrl(endpoint, params = []) {
 async function client(endpoint, params = []) {
   try {
     const res = await fetch(generateUrl(endpoint, params));
+
     if (!res.ok) {
       const error = new Error('An error occurred while fetching the data.');
 
@@ -69,12 +70,15 @@ async function getMovieCredits(id) {
   return data;
 }
 
-async function getMovieCastAge(id, releaseDate) {
-  const { cast } = await getMovieCredits(id);
+async function getTvShowCredits(id, season) {
+  const data = await client(`/tv/${id}/season/${season}/credits`);
 
+  return data;
+}
+
+async function getPersonsFromCast(cast, releaseDate) {
   const promises = cast.slice(0, 3).map(person => () => getPerson(person.id));
   const result = await Promise.allSettled(promises.map(f => f()));
-  console.log('RESULT', result);
   const persons = result.map(({ value }) => {
     const { id, name, birthday, profile_path } = value;
     const { character } = cast.find(person => person.id === id);
@@ -85,12 +89,37 @@ async function getMovieCastAge(id, releaseDate) {
       character,
       birthday,
       profile_path,
-      age: getDiffInYears(dayjs(), birthday).$d.years,
-      ageOnRelease: getDiffInYears(dayjs(releaseDate), birthday).$d.years,
+      age: getDiffInYears(dayjs(), birthday),
+      ageOnRelease: getDiffInYears(dayjs(releaseDate), birthday),
     };
   });
 
   return persons;
 }
 
-export { fetcher, searchMulti, getMovieCastAge, getPerson };
+async function getMovieCastAge(id, releaseDate) {
+  const { cast } = await getMovieCredits(id);
+
+  return getPersonsFromCast(cast, releaseDate);
+}
+
+async function getTvShow(id) {
+  const data = await client(`/tv/${id}`);
+
+  return data;
+}
+
+async function getTvShowCastAge(id, releaseDate, season) {
+  const { cast } = await getTvShowCredits(id, season);
+
+  return getPersonsFromCast(cast, releaseDate);
+}
+
+export {
+  fetcher,
+  searchMulti,
+  getMovieCastAge,
+  getPerson,
+  getTvShow,
+  getTvShowCastAge,
+};

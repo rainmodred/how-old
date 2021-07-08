@@ -5,7 +5,7 @@ import Search from './Search';
 export default function Layout({ children }) {
   return (
     <Flex
-      padding="2rem"
+      p={['10px', '1rem', '2rem']}
       height="100vh"
       flexDirection="column"
       alignItems="center"

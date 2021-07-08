@@ -16,8 +16,7 @@ export default function Person({ person }) {
 
   return (
     <Box
-      p="2"
-      h="140px"
+      p="1"
       w="100%"
       border="2px solid"
       borderColor="gray.200"
@@ -29,12 +28,16 @@ export default function Person({ person }) {
           w={{ base: '62px', md: '72px' }}
           minW="62px"
           src={`https://image.tmdb.org/t/p/w300${profile_path}`}
-          alt="meow"
+          alt={`${name} image`}
           borderRadius="10px"
           overflow="hidden"
         ></ChakraNextImage>
         <Box p="4">
-          <Text whiteSpace="nowrap" fontWeight="bold" data-testid="name">
+          <Text
+            whiteSpace={['wrap', 'nowrap']}
+            fontWeight="bold"
+            data-testid="name"
+          >
             {name} / {character}
           </Text>
           <Text whiteSpace="nowrap">{age} years old</Text>
