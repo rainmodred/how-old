@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 
 import Person from '@/components/Person';
 
+// eslint-disable-next-line
 jest.mock('next/image', () => () => <></>);
 
 describe('Person', () => {

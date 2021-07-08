@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { Heading, Select, Spinner } from '@chakra-ui/react';
+import { Heading, Select } from '@chakra-ui/react';
 
 import Layout from '@/components/Layout';
 import { useTvShow, useTvShowCast } from '@/hooks/swr';
@@ -17,7 +17,7 @@ export default function TvShow() {
 
   const { tvShow } = useTvShow(id);
 
-  const { cast, isLoading, error } = useTvShowCast(
+  const { cast, isLoading } = useTvShowCast(
     id,
     getSeasonAirDate(tvShow?.seasons, season),
     season,

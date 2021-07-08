@@ -9,7 +9,7 @@ export default function Movie() {
   const router = useRouter();
   const { id, releaseDate, title } = router.query;
 
-  const { cast, isLoading, error } = useMovieCast(id, releaseDate);
+  const { cast, isLoading } = useMovieCast(id, releaseDate);
 
   return (
     <Layout>
