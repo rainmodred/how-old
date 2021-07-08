@@ -77,7 +77,7 @@ async function getTvShowCredits(id, season) {
 }
 
 async function getPersonsFromCast(cast, releaseDate) {
-  const promises = cast.slice(0, 3).map(person => () => getPerson(person.id));
+  const promises = cast.map(person => () => getPerson(person.id));
   const result = await Promise.allSettled(promises.map(f => f()));
   const persons = result.map(({ value }) => {
     const { id, name, birthday, profile_path } = value;
