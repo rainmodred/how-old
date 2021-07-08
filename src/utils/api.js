@@ -76,37 +76,7 @@ async function getTvShowCredits(id, season) {
   return data;
 }
 
-async function getMovieCastAge(id, releaseDate) {
-  const { cast } = await getMovieCredits(id);
-  const promises = cast.slice(0, 3).map(person => () => getPerson(person.id));
-  const result = await Promise.allSettled(promises.map(f => f()));
-  const persons = result.map(({ value }) => {
-    const { id, name, birthday, profile_path } = value;
-    const { character } = cast.find(person => person.id === id);
-
-    return {
-      id,
-      name,
-      character,
-      birthday,
-      profile_path,
-      age: getDiffInYears(dayjs(), birthday).$d.years,
-      ageOnRelease: getDiffInYears(dayjs(releaseDate), birthday).$d.years,
-    };
-  });
-
-  return persons;
-}
-
-async function getTvShow(id) {
-  const data = await client(`/tv/${id}`);
-
-  return data;
-}
-
-async function getTvShowCastAge(id, releaseDate, season) {
-  const { cast } = await getTvShowCredits(id, season);
-
+async function getPersonsFromCast(cast, releaseDate) {
   const promises = cast.slice(0, 3).map(person => () => getPerson(person.id));
   const result = await Promise.allSettled(promises.map(f => f()));
   const persons = result.map(({ value }) => {
@@ -125,6 +95,24 @@ async function getTvShowCastAge(id, releaseDate, season) {
   });
 
   return persons;
+}
+
+async function getMovieCastAge(id, releaseDate) {
+  const { cast } = await getMovieCredits(id);
+
+  return getPersonsFromCast(cast, releaseDate);
+}
+
+async function getTvShow(id) {
+  const data = await client(`/tv/${id}`);
+
+  return data;
+}
+
+async function getTvShowCastAge(id, releaseDate, season) {
+  const { cast } = await getTvShowCredits(id, season);
+
+  return getPersonsFromCast(cast, releaseDate);
 }
 
 export {
