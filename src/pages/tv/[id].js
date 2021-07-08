@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
-import { Select } from '@chakra-ui/react';
+import { Heading, Select, Spinner } from '@chakra-ui/react';
 
 import Layout from '@/components/Layout';
-import Person from '@/components/Person';
 import { useTvShow, useTvShowCast } from '@/hooks/swr';
+import Persons from '@/components/Persons';
 
 function getSeasonAirDate(seasons, season = 1) {
   return seasons?.find(({ season_number }) => season_number === Number(season))
@@ -13,7 +13,7 @@ function getSeasonAirDate(seasons, season = 1) {
 export default function TvShow() {
   const router = useRouter();
 
-  const { id, season } = router.query;
+  const { id, season, title } = router.query;
 
   const { tvShow } = useTvShow(id);
 
@@ -29,18 +29,15 @@ export default function TvShow() {
     }
   }
 
-  if (error) {
-    return <p>{error}</p>;
-  }
-
-  if (isLoading) {
-    return <p>loading...</p>;
-  }
-
   const seasons =
     tvShow?.seasons.filter(season => season.season_number > 0) || [];
+
   return (
     <Layout>
+      <Heading size="lg" mt="6">
+        {title}
+      </Heading>
+
       <Select onChange={handleSelect} placeholder="Select season">
         {seasons.map(({ id, season_number, name }) => {
           if (season_number === Number(season)) {
@@ -58,9 +55,8 @@ export default function TvShow() {
           );
         })}
       </Select>
-      {cast.map(person => (
-        <Person key={person.id} person={person} />
-      ))}
+
+      <Persons persons={cast} isLoading={isLoading} />
     </Layout>
   );
 }
