@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 import Layout from '@/components/Layout';
 import Persons from '@/components/Persons';
@@ -12,11 +13,16 @@ export default function Movie() {
   const { cast, isLoading } = useMovieCast(id, releaseDate);
 
   return (
-    <Layout>
-      <Heading size="lg" mt="4">
-        {title} ({releaseDate?.slice(0, 4)})
-      </Heading>
-      <Persons persons={cast} isLoading={isLoading} />
-    </Layout>
+    <>
+      <Head>
+        <title>{title}</title>
+      </Head>
+      <Layout>
+        <Heading size="lg" mt="4">
+          {title} ({releaseDate?.slice(0, 4)})
+        </Heading>
+        <Persons persons={cast} isLoading={isLoading} />
+      </Layout>
+    </>
   );
 }

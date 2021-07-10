@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import { Heading, Select } from '@chakra-ui/react';
 
 import Layout from '@/components/Layout';
@@ -33,30 +34,35 @@ export default function TvShow() {
     tvShow?.seasons.filter(season => season.season_number > 0) || [];
 
   return (
-    <Layout>
-      <Heading size="lg" mt="6">
-        {title}
-      </Heading>
+    <>
+      <Head>
+        <title>{title}</title>
+      </Head>
+      <Layout>
+        <Heading size="lg" mt="6">
+          {title}
+        </Heading>
 
-      <Select onChange={handleSelect} placeholder="Select season">
-        {seasons.map(({ id, season_number, name }) => {
-          if (season_number === Number(season)) {
+        <Select onChange={handleSelect} placeholder="Select season">
+          {seasons.map(({ id, season_number, name }) => {
+            if (season_number === Number(season)) {
+              return (
+                <option key={id} value={season_number} selected>
+                  {name}
+                </option>
+              );
+            }
+
             return (
-              <option key={id} value={season_number} selected>
+              <option key={id} value={season_number}>
                 {name}
               </option>
             );
-          }
+          })}
+        </Select>
 
-          return (
-            <option key={id} value={season_number}>
-              {name}
-            </option>
-          );
-        })}
-      </Select>
-
-      <Persons persons={cast} isLoading={isLoading} />
-    </Layout>
+        <Persons persons={cast} isLoading={isLoading} />
+      </Layout>
+    </>
   );
 }
