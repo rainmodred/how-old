@@ -1,20 +1,21 @@
-import { Flex } from '@chakra-ui/react';
+import { Box, Grid } from '@chakra-ui/react';
 
-import Search from './Search';
+import Footer from '@/components/Footer';
+import Search from '@/components/Search';
 
 export default function Layout({ children }) {
   return (
-    <Flex
-      p={['10px', '1rem', '2rem']}
+    <Grid
+      templateRows="50px 1fr 50px"
+      padding={['10px', '1rem']}
       height="100vh"
-      flexDirection="column"
-      alignItems="center"
-      justifyItems="center"
-      maxW="5xl"
+      maxWidth="5xl"
       margin="auto"
+      justifyItems="center"
     >
       <Search />
-      {children}
-    </Flex>
+      <Box>{children}</Box>
+      <Footer />
+    </Grid>
   );
 }
