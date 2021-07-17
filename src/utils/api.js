@@ -90,7 +90,7 @@ async function getPersonsFromCast(cast, releaseDate) {
       birthday,
       profile_path,
       age: getDiffInYears(dayjs(), birthday),
-      ageOnRelease: getDiffInYears(dayjs(releaseDate), birthday),
+      ageOnRelease: getDiffInYears(releaseDate, birthday),
     };
   });
 
@@ -122,4 +122,5 @@ export {
   getPerson,
   getTvShow,
   getTvShowCastAge,
+  getDiffInYears,
 };
