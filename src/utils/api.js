@@ -80,7 +80,7 @@ async function getPersonsFromCast(cast, releaseDate) {
   const promises = cast.map(person => () => getPerson(person.id));
   const result = await Promise.allSettled(promises.map(f => f()));
   const persons = result
-    .filter(({ value }) => value.birthday)
+    .filter(({ value }) => value?.birthday)
     .map(({ value }) => {
       const { id, name, birthday, profile_path } = value;
       const { character } = cast.find(person => person.id === id);
