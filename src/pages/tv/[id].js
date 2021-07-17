@@ -24,7 +24,7 @@ export default function TvShow() {
         <title>{title}</title>
       </Head>
       <Layout>
-        <Heading size="lg" mt="6">
+        <Heading size="lg" m="4" textAlign="center">
           {title}
         </Heading>
 
