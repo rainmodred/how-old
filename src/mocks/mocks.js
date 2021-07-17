@@ -11738,6 +11738,7 @@ export const mockedApiMovie = [
     ageOnRelease: 30,
   },
 ];
+
 export const mockedApiTvShow = [
   {
     id: 4491,
@@ -12025,3 +12026,110 @@ export const mockedTvShowSeasonCredits = {
     id: 4573,
   },
 };
+
+export const mockedSeasons = [
+  {
+    air_date: '2001-02-15',
+    episode_count: 39,
+    id: 4583,
+    name: 'Specials',
+    overview:
+      'The cast of the celebrated hit series "Friends" reunites to dish on the success of the series following the iconic sitcom\'s 25th anniversary.',
+    poster_path: '/nZft2oL2tvE9LqBpQGJODdBlkml.jpg',
+    season_number: 0,
+  },
+  {
+    air_date: '1994-09-22',
+    episode_count: 24,
+    id: 4573,
+    name: 'Season 1',
+    overview: '',
+    poster_path: '/odCW88Cq5hAF0ZFVOkeJmeQv1nV.jpg',
+    season_number: 1,
+  },
+  {
+    air_date: '1995-09-21',
+    episode_count: 24,
+    id: 4574,
+    name: 'Season 2',
+    overview:
+      "Rachel gets jealous of Ross's new girlfriend, Monica dates an older man, and Joey stars on a soap opera as the hit sitcom hits its stride in Season 2.",
+    poster_path: '/kC9VHoMh1KkoAYfsY3QlHpZRxDy.jpg',
+    season_number: 2,
+  },
+  {
+    air_date: '1996-09-16',
+    episode_count: 25,
+    id: 4575,
+    name: 'Season 3',
+    overview:
+      'Season 3 takes on a significantly more serialized format. Chandler and Janice date for several episodes until Joey catches Janice kissing her soon-to-be ex-husband. Not wanting to destroy her family, Chandler urges Janice to go back to her husband, then becomes depressed over the breakup for several episodes',
+    poster_path: '/n9u4pslqb6tpiLc8soldL5IbAyG.jpg',
+    season_number: 3,
+  },
+  {
+    air_date: '1997-09-25',
+    episode_count: 24,
+    id: 4576,
+    name: 'Season 4',
+    overview: '',
+    poster_path: '/3WdH3FNMXgp3Qlx21T7kwKS8Mtc.jpg',
+    season_number: 4,
+  },
+  {
+    air_date: '1998-09-24',
+    episode_count: 24,
+    id: 4577,
+    name: 'Season 5',
+    overview: '',
+    poster_path: '/aEwLXWbo6gV1TNIv9veu4rRwsPZ.jpg',
+    season_number: 5,
+  },
+  {
+    air_date: '1999-09-23',
+    episode_count: 25,
+    id: 4578,
+    name: 'Season 6',
+    overview: '',
+    poster_path: '/7EU6bV6d8j1Xbc1F8QoNkOZrpsi.jpg',
+    season_number: 6,
+  },
+  {
+    air_date: '2000-10-12',
+    episode_count: 24,
+    id: 4579,
+    name: 'Season 7',
+    overview: '',
+    poster_path: '/yvUZVChjOnqCjB9rjdEqEmpDdnQ.jpg',
+    season_number: 7,
+  },
+  {
+    air_date: '2001-09-27',
+    episode_count: 24,
+    id: 4580,
+    name: 'Season 8',
+    overview:
+      'Rachel is pregnant and faces single parenthood, while Joey agonizes over his feelings for her. Chandler and Monica are now dealing with married life.',
+    poster_path: '/eh6PPkrzkXsEksRJDcdtx9lZsqX.jpg',
+    season_number: 8,
+  },
+  {
+    air_date: '2002-09-23',
+    episode_count: 24,
+    id: 4581,
+    name: 'Season 9',
+    overview:
+      'Rachel finds herself surprisingly adept at taking care of Emma but struggles to define her complicated relationships with Joey and Ross.',
+    poster_path: '/1IvIdN4I5jJ0bwC3BkmDCy4pQ9j.jpg',
+    season_number: 9,
+  },
+  {
+    air_date: '2003-09-25',
+    episode_count: 18,
+    id: 4582,
+    name: 'Season 10',
+    overview: '',
+    poster_path: '/67ETB6XIqYc5vZkyAjN8XINOX5i.jpg',
+    season_number: 10,
+  },
+];

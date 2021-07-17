@@ -7,6 +7,7 @@ import {
   mockedTvShowSeasonCredits,
   mockedApiTvShow,
   mockedApiMovie,
+  mockedSeasons,
 } from './mocks';
 
 export const handlers = [
@@ -70,7 +71,7 @@ export const handlers = [
       ctx.status(200),
       ctx.json({
         cast: mockedApiTvShow,
-        seasons: ['season 1'],
+        seasons: mockedSeasons,
       }),
     );
   }),
