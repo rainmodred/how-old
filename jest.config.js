@@ -6,7 +6,11 @@
 module.exports = {
   clearMocks: true,
   collectCoverage: true,
-  collectCoverageFrom: ['src/**/*.js', '!src/mocks/**/*.js'],
+  collectCoverageFrom: [
+    'src/**/*.js',
+    '!src/mocks/**/*.js',
+    '!src/pages/**/*.js',
+  ],
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',
   testEnvironment: 'jsdom',
