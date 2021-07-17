@@ -2,38 +2,42 @@ import { getPage } from 'next-page-tester';
 import { screen, waitFor } from '@testing-library/react';
 import { rest } from 'msw';
 import { server } from '@/mocks/server';
-import { mockedApiTvShow } from '@/mocks/mocks';
+import { mockedApiMovie } from '@/mocks/mocks';
 
 // eslint-disable-next-line
 jest.mock('next/image', () => () => <></>);
 
-const id = 1668;
-const season = 1;
-const title = 'Friends';
+const AVENGERS = {
+  id: 24428,
+  releaseDate: '2012-04-25',
+  title: 'The Avengers',
+};
 
-describe('Tv Show page', () => {
+const { id, releaseDate, title } = AVENGERS;
+
+describe('Movie page', () => {
   it('renders page with cast', async () => {
     const { render } = await getPage({
-      route: `/tv/${id}?season=${season}&title=${title}`,
+      route: `/movie/${id}?releaseDate=${releaseDate}&title=${title}`,
     });
 
     render();
-    expect(screen.getByText(/friends/i)).toBeInTheDocument();
+    expect(screen.getByText(/avengers/i)).toBeInTheDocument();
 
     await waitFor(() => expect(screen.queryByText('Loading...')).toBeNull());
 
-    expect(screen.getAllByTestId('name')).toHaveLength(mockedApiTvShow.length);
+    expect(screen.getAllByTestId('name')).toHaveLength(mockedApiMovie.length);
   });
 
   it('renders error message when receive an error from api', async () => {
     server.use(
-      rest.get('/api/tv/:id/', (_req, res, ctx) =>
+      rest.get('/api/movie/:id/', (_req, res, ctx) =>
         res.once(ctx.status(404), ctx.json({ error: 'Error' })),
       ),
     );
 
     const { render } = await getPage({
-      route: `/tv/1?season=${season}&title=${title}`,
+      route: `/movie/1?releaseDate=${releaseDate}&title=${title}`,
     });
 
     render();

@@ -6,6 +6,7 @@ import {
   mockedTvShow,
   mockedTvShowSeasonCredits,
   mockedApiTvShow,
+  mockedApiMovie,
 } from './mocks';
 
 export const handlers = [
@@ -72,6 +73,10 @@ export const handlers = [
         seasons: ['season 1'],
       }),
     );
+  }),
+
+  rest.get('/api/movie/:id/', (_req, res, ctx) => {
+    return res(ctx.status(200), ctx.json(mockedApiMovie));
   }),
 
   rest.get(
