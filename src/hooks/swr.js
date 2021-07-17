@@ -40,28 +40,18 @@ function useMovieCast(id, releaseDate) {
   };
 }
 
-function useTvShowCast(id, releaseDate, season) {
-  const shouldFetch = id && releaseDate && season;
+function useTvShowCast(id, season) {
+  const shouldFetch = id && season;
   const { data, error } = useSWR(
-    shouldFetch &&
-      `${BASE}/credits/tv?id=${id}&releaseDate=${releaseDate}&season=${season}`,
+    shouldFetch && `${BASE}/tv/${id}?season=${season}`,
   );
 
   return {
-    cast: data,
+    cast: data?.cast,
+    seasons: data?.seasons,
     isLoading: !error && !data,
     error,
   };
 }
 
-function useTvShow(id) {
-  const { data, error } = useSWR(id && `${BASE}/tv/${id}`);
-
-  return {
-    tvShow: data,
-    isLoading: !error && !data,
-    error,
-  };
-}
-
-export { useSearchMulti, useMovieCast, useTvShow, useTvShowCast };
+export { useSearchMulti, useMovieCast, useTvShowCast };

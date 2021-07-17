@@ -82,7 +82,7 @@ describe('Search', () => {
     const option = await screen.findByText('Lost (2004)');
     fireEvent.click(option);
 
-    expect(router.push).toBeCalledWith('/tv/4607?season=1');
+    expect(router.push).toBeCalledWith('/tv/4607?season=1&title=Lost');
     expect(router.push).toBeCalledTimes(1);
   });
 
@@ -92,7 +92,7 @@ describe('Search', () => {
         return res(ctx.json({ results: [] }));
       }),
     );
-    const { debug } = render(
+    render(
       <SWRConfig
         value={{
           revalidateOnFocus: false,
@@ -109,7 +109,5 @@ describe('Search', () => {
     fireEvent.change(input, { target: { value: 'lost' } });
 
     expect(await screen.findByText('Not found')).toBeInTheDocument();
-
-    debug();
   });
 });
