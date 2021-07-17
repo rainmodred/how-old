@@ -6,11 +6,13 @@
 module.exports = {
   clearMocks: true,
   collectCoverage: true,
+  collectCoverageFrom: ['src/**/*.js', '!src/mocks/**/*.js'],
   coverageDirectory: 'coverage',
   coverageProvider: 'v8',
   testEnvironment: 'jsdom',
   transform: {
     '^.+\\.(js|jsx)$': 'babel-jest',
+    '.+\\.(svg)$': 'jest-transform-stub',
   },
   setupFiles: [require.resolve('whatwg-fetch')],
   setupFilesAfterEnv: ['./setupTests.js'],
