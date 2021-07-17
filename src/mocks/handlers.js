@@ -1,5 +1,7 @@
 import { rest } from 'msw';
 
+import { mockedApiCast, mockedMovie, mockedMovieCredits } from './mocks';
+
 export const handlers = [
   rest.get('/api/search/multi', (_req, res, ctx) => {
     return res(
@@ -54,5 +56,19 @@ export const handlers = [
         ],
       }),
     );
+  }),
+
+  rest.get(
+    'https://api.themoviedb.org/3/movie/:id/credits',
+    (_req, res, ctx) => {
+      return res(ctx.status(200), ctx.json(mockedMovie));
+    },
+  ),
+
+  rest.get('https://api.themoviedb.org/3/person/:id/', (req, res, ctx) => {
+    const { id } = req.params;
+    const person = mockedMovieCredits[id];
+
+    return res(ctx.status(200), ctx.json(person));
   }),
 ];
