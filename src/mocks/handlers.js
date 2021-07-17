@@ -1,6 +1,12 @@
 import { rest } from 'msw';
 
-import { mockedApiCast, mockedMovie, mockedMovieCredits } from './mocks';
+import {
+  mockedPersons,
+  mockedMovie,
+  mockedTvShow,
+  mockedTvShowSeasonCredits,
+  mockedApiTvShow,
+} from './mocks';
 
 export const handlers = [
   rest.get('/api/search/multi', (_req, res, ctx) => {
@@ -58,6 +64,16 @@ export const handlers = [
     );
   }),
 
+  rest.get('/api/tv/:id/', (_req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json({
+        cast: mockedApiTvShow,
+        seasons: ['season 1'],
+      }),
+    );
+  }),
+
   rest.get(
     'https://api.themoviedb.org/3/movie/:id/credits',
     (_req, res, ctx) => {
@@ -65,9 +81,24 @@ export const handlers = [
     },
   ),
 
+  rest.get('https://api.themoviedb.org/3/tv/:id/', (_req, res, ctx) => {
+    return res(ctx.status(200), ctx.json(mockedTvShow));
+  }),
+
+  rest.get(
+    'https://api.themoviedb.org/3/tv/:id/season/:seasonID/credits',
+    (req, res, ctx) => {
+      const { seasonID } = req.params;
+      return res(
+        ctx.status(200),
+        ctx.json(mockedTvShowSeasonCredits[seasonID]),
+      );
+    },
+  ),
+
   rest.get('https://api.themoviedb.org/3/person/:id/', (req, res, ctx) => {
     const { id } = req.params;
-    const person = mockedMovieCredits[id];
+    const person = mockedPersons[id];
 
     return res(ctx.status(200), ctx.json(person));
   }),
