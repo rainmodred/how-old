@@ -14,7 +14,7 @@ export default function Layout({ children }) {
       justifyItems="center"
     >
       <Search />
-      <Box>{children}</Box>
+      <Box width="100%">{children}</Box>
       <Footer />
     </Grid>
   );
