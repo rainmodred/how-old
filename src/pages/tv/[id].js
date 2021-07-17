@@ -28,17 +28,13 @@ export default function TvShow() {
           {title}
         </Heading>
 
-        <Select onChange={handleSelect} placeholder="Select season">
+        <Select
+          onChange={handleSelect}
+          placeholder="Select season"
+          value={season}
+        >
           {!isLoading &&
             seasons?.map(({ id, season_number, name }) => {
-              if (season_number === Number(season)) {
-                return (
-                  <option key={id} value={season_number} selected>
-                    {name}
-                  </option>
-                );
-              }
-
               return (
                 <option key={id} value={season_number}>
                   {name}
