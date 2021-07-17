@@ -92,7 +92,7 @@ describe('Search', () => {
         return res(ctx.json({ results: [] }));
       }),
     );
-    const { debug } = render(
+    render(
       <SWRConfig
         value={{
           revalidateOnFocus: false,
@@ -109,7 +109,5 @@ describe('Search', () => {
     fireEvent.change(input, { target: { value: 'lost' } });
 
     expect(await screen.findByText('Not found')).toBeInTheDocument();
-
-    debug();
   });
 });
