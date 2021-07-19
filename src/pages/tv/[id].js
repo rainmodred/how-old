@@ -14,7 +14,7 @@ export default function TvShow() {
 
   function handleSelect(e) {
     if (e.target.value !== '') {
-      router.push(`/tv/${id}?season=${e.target.value}`);
+      router.push(`/tv/${id}?season=${e.target.value}&title=${title}`);
     }
   }
 
