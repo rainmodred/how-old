@@ -1,5 +1,5 @@
 import { getPage } from 'next-page-tester';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { rest } from 'msw';
 import { server } from '@/mocks/server';
 import { mockedApiMovie } from '@/mocks/mocks';
@@ -22,10 +22,9 @@ describe('Movie page', () => {
     });
 
     render();
+
     expect(screen.getByText(/avengers/i)).toBeInTheDocument();
-
-    await waitFor(() => expect(screen.queryByText('Loading...')).toBeNull());
-
+    await waitForElementToBeRemoved(() => screen.queryByText('Loading...'));
     expect(screen.getAllByTestId('name')).toHaveLength(mockedApiMovie.length);
   });
 
@@ -41,7 +40,7 @@ describe('Movie page', () => {
     });
 
     render();
-    await waitFor(() => expect(screen.queryByText('Loading...')).toBeNull());
+    await waitForElementToBeRemoved(() => screen.queryByText('Loading...'));
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
   });

@@ -14,7 +14,7 @@ export default function TvShow() {
 
   function handleSelect(e) {
     if (e.target.value !== '') {
-      router.push(`/tv/${id}?season=${e.target.value}`);
+      router.push(`/tv/${id}?season=${e.target.value}&title=${title}`);
     }
   }
 
@@ -34,10 +34,10 @@ export default function TvShow() {
           value={season}
         >
           {!isLoading &&
-            seasons?.map(({ id, season_number, name }) => {
+            seasons?.map(({ id, season_number }) => {
               return (
                 <option key={id} value={season_number}>
-                  {name}
+                  Season {season_number}
                 </option>
               );
             })}

@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 
 dayjs.extend(duration);
+dayjs.extend(localizedFormat);
 
 function getDiffInYears(date1, date2) {
-  return dayjs.duration(dayjs(date1).diff(dayjs(date2))).$d.years;
+  return Math.abs(dayjs.duration(dayjs(date1).diff(dayjs(date2))).$d.years);
 }
 
 const fetcher = async url => {
@@ -76,33 +78,20 @@ async function getTvShowCredits(id, season) {
   return data;
 }
 
-async function getPersonsFromCast(cast, releaseDate) {
+async function getPersons(cast) {
   const promises = cast.map(person => () => getPerson(person.id));
   const result = await Promise.allSettled(promises.map(f => f()));
   const persons = result
     .filter(({ value }) => value?.birthday)
-    .map(({ value }) => {
-      const { id, name, birthday, profile_path } = value;
-      const { character } = cast.find(person => person.id === id);
-
-      return {
-        id,
-        name,
-        character,
-        birthday,
-        profile_path,
-        age: getDiffInYears(dayjs(), birthday),
-        ageOnRelease: getDiffInYears(releaseDate, birthday),
-      };
-    });
+    .map(({ value }) => value);
 
   return persons;
 }
 
-async function getMovieCastAge(id, releaseDate) {
+async function getMovieCast(id) {
   const { cast } = await getMovieCredits(id);
 
-  return getPersonsFromCast(cast, releaseDate);
+  return cast;
 }
 
 async function getTvShow(id) {
@@ -111,18 +100,55 @@ async function getTvShow(id) {
   return data;
 }
 
-async function getTvShowCastAge(id, releaseDate, season) {
+async function getTvShowCast(id, season) {
   const { cast } = await getTvShowCredits(id, season);
 
-  return getPersonsFromCast(cast, releaseDate);
+  return cast;
+}
+
+function getCastAge(cast, persons, releaseDate) {
+  return persons.map(person => {
+    const { id } = person;
+    const { character } = cast.find(p => p.id === id);
+
+    return calculateAge(
+      {
+        ...person,
+        character,
+      },
+      releaseDate,
+    );
+  });
+}
+
+function calculateAge(person, releaseDate) {
+  const { id, name, character, birthday, deathday, profile_path } = person;
+
+  const age = deathday
+    ? getDiffInYears(deathday, birthday)
+    : getDiffInYears(dayjs(), birthday);
+
+  return {
+    id,
+    name,
+    character,
+    birthday: dayjs(birthday).format('LL'),
+    deathday: deathday ? dayjs(deathday).format('LL') : null,
+    profile_path,
+    age,
+    ageOnRelease: getDiffInYears(releaseDate, birthday),
+  };
 }
 
 export {
   fetcher,
   searchMulti,
-  getMovieCastAge,
+  getMovieCast,
   getPerson,
   getTvShow,
-  getTvShowCastAge,
+  getTvShowCast,
   getDiffInYears,
+  getPersons,
+  getCastAge,
+  calculateAge,
 };

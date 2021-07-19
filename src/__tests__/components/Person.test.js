@@ -16,14 +16,34 @@ describe('Person', () => {
       age: 32,
       ageOnRelease: 21,
     };
-    const { name, character, age, ageOnRelease } = person;
+    const { name, character, birthday, age, ageOnRelease } = person;
 
     render(<Person person={person} />);
 
     expect(screen.getByTestId('name')).toHaveTextContent(
       `${name} / ${character}`,
     );
-    expect(screen.getByText(`${age} years old`)).toBeInTheDocument();
-    expect(screen.getByText(ageOnRelease)).toBeInTheDocument();
+    expect(screen.getByTestId('birthday')).toHaveTextContent(birthday);
+    expect(screen.queryByTestId('deathday')).toBe(null);
+    expect(screen.getByTestId('age')).toHaveTextContent(`${age} years old`);
+    expect(screen.getByTestId('ageOnRelease')).toHaveTextContent(ageOnRelease);
+  });
+
+  it('shows death date', () => {
+    const person = {
+      id: 113,
+      name: 'Christopher Lee',
+      character: 'Saruman',
+      birthday: '1922-05-27',
+      deathday: '2015-06-07',
+      profile_path: '/4zPu5YaRPbhrcp9aVjXQDjpfwPC.jpg',
+      age: 93,
+      ageOnRelease: 80,
+    };
+
+    const { deathday } = person;
+    render(<Person person={person} />);
+
+    expect(screen.getByTestId('deathday')).toHaveTextContent(deathday);
   });
 });

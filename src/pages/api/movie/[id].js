@@ -1,4 +1,4 @@
-import { getMovieCastAge } from '@/utils/api';
+import { getCastAge, getMovieCast, getPersons } from '@/utils/api';
 
 export default async function handler(req, res) {
   const { id, releaseDate } = req.query;
@@ -6,7 +6,9 @@ export default async function handler(req, res) {
     return;
   }
 
-  const data = await getMovieCastAge(id, releaseDate);
+  const cast = await getMovieCast(id);
+  const persons = await getPersons(cast);
+  const result = getCastAge(cast, persons, releaseDate);
 
-  res.json(data);
+  return res.json(result);
 }

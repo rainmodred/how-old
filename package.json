@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
-    "test:watch": "jest --verbose --watch"
+    "test": "jest --detectOpenHandles",
+    "test:watch": "jest --verbose --watch --detectOpenHandles"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
