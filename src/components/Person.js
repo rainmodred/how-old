@@ -12,7 +12,15 @@ export const ChakraNextImage = props => {
 };
 
 export default function Person({ person }) {
-  const { name, character, age, ageOnRelease, profile_path } = person;
+  const {
+    name,
+    character,
+    birthday,
+    deathday,
+    age,
+    ageOnRelease,
+    profile_path,
+  } = person;
 
   return (
     <Box
@@ -40,7 +48,20 @@ export default function Person({ person }) {
           >
             {name} / {character}
           </Text>
-          <Text whiteSpace="nowrap">{age} years old</Text>
+          <Text whiteSpace="nowrap" data-testid="birthday">
+            <Text as="b">Born: </Text>
+            {birthday}
+          </Text>
+          {deathday && (
+            <Text whiteSpace="nowrap" data-testid="deathday">
+              <Text as="b">Died: </Text>
+              {deathday}
+            </Text>
+          )}
+
+          <Text whiteSpace="nowrap" data-testid="age">
+            <Text as="b">{age}</Text> years old
+          </Text>
         </Box>
         <Box ml="auto">
           <Box
@@ -49,6 +70,7 @@ export default function Person({ person }) {
             bg="teal.400"
             color="white"
             fontWeight="bold"
+            data-testid="ageOnRelease"
           >
             {ageOnRelease}
           </Box>
