@@ -1,12 +1,18 @@
 import { Flex, Text, Box } from '@chakra-ui/react';
-
 import NextImage from 'next/image';
+import profileFallback from '../../public/profileFallback.svg';
 
 export const ChakraNextImage = props => {
   const { src, alt, ...rest } = props;
+  console.log(src);
   return (
     <Box position="relative" {...rest}>
-      <NextImage objectFit="cover" layout="fill" src={src} alt={alt} />
+      <NextImage
+        objectFit={src ? 'cover' : 'contain'}
+        layout="fill"
+        src={src ? src : profileFallback}
+        alt={alt}
+      />
     </Box>
   );
 };
@@ -22,6 +28,10 @@ export default function Person({ person }) {
     profile_path,
   } = person;
 
+  const imgSrc = profile_path
+    ? `https://image.tmdb.org/t/p/w300${profile_path}`
+    : null;
+
   return (
     <Box
       p="1"
@@ -35,7 +45,7 @@ export default function Person({ person }) {
           h={{ base: '103px', md: '120px' }}
           w={{ base: '62px', md: '72px' }}
           minW="62px"
-          src={`https://image.tmdb.org/t/p/w300${profile_path}`}
+          src={imgSrc}
           alt={`${name} image`}
           borderRadius="10px"
           overflow="hidden"
