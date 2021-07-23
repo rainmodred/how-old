@@ -11,8 +11,10 @@ function formatData(data = []) {
   };
 
   data.forEach(item => {
-    if (item.media_type === 'movie') movies.items.push(item);
-    if (item.media_type === 'tv') tvShows.items.push(item);
+    if (item.media_type === 'movie' && item.release_date)
+      movies.items.push(item);
+    if (item.media_type === 'tv' && item.first_air_date)
+      tvShows.items.push(item);
   });
 
   const formattedData = [];
