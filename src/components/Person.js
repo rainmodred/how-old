@@ -4,7 +4,6 @@ import profileFallback from '../../public/profileFallback.svg';
 
 export const ChakraNextImage = props => {
   const { src, alt, ...rest } = props;
-  console.log(src);
   return (
     <Box position="relative" {...rest}>
       <NextImage
