@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import uniqBy from 'lodash.uniqby';
 
 dayjs.extend(duration);
 dayjs.extend(localizedFormat);
@@ -121,6 +122,24 @@ function getCastAge(cast, persons, releaseDate) {
   });
 }
 
+async function getMovieCastAge(id, releaseDate) {
+  const cast = await getMovieCast(id);
+  const uniqueCast = uniqBy(cast, 'id');
+  const persons = await getPersons(uniqueCast);
+  const result = getCastAge(uniqueCast, persons, releaseDate);
+
+  return result;
+}
+
+async function getTvShowCastAge(id, season, releaseDate) {
+  const cast = await getTvShowCast(id, season);
+  const uniqueCast = uniqBy(cast, 'id');
+  const persons = await getPersons(uniqueCast);
+  const result = getCastAge(uniqueCast, persons, releaseDate);
+
+  return result;
+}
+
 function calculateAge(person, releaseDate) {
   const { id, name, character, birthday, deathday, profile_path } = person;
 
@@ -151,4 +170,6 @@ export {
   getPersons,
   getCastAge,
   calculateAge,
+  getMovieCastAge,
+  getTvShowCastAge,
 };

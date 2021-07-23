@@ -1,4 +1,4 @@
-import { getCastAge, getPersons, getTvShow, getTvShowCast } from '@/utils/api';
+import { getTvShow, getTvShowCastAge } from '@/utils/api';
 
 function getSeasonAirDate(seasons, season = 1) {
   return seasons?.find(({ season_number }) => season_number === Number(season))
@@ -12,10 +12,11 @@ export default async function handler(req, res) {
   }
 
   const { seasons } = await getTvShow(id);
-
-  const cast = await getTvShowCast(id, season);
-  const persons = await getPersons(cast);
-  const result = getCastAge(cast, persons, getSeasonAirDate(seasons, season));
+  const result = await getTvShowCastAge(
+    id,
+    season,
+    getSeasonAirDate(seasons, season),
+  );
 
   return res.status(200).json({
     cast: result,
