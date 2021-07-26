@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 import { rest } from 'msw';
 
 import { fetcher } from '@/utils/api';
@@ -8,10 +8,19 @@ import Search from '@/components/Search';
 import { server } from '../../mocks/server';
 
 jest.mock('next/router', () => ({
-  push: jest.fn(),
+  useRouter: jest.fn(),
 }));
 
 describe('Search', () => {
+  const push = jest.fn();
+  useRouter.mockImplementation(() => ({
+    push,
+    pathname: '/',
+    route: '/',
+    asPath: '/',
+    query: '',
+  }));
+
   const placeholderText = 'Search for a movie or tv show';
 
   it('renders input', () => {
@@ -82,8 +91,8 @@ describe('Search', () => {
     const option = await screen.findByText('Lost (2004)');
     fireEvent.click(option);
 
-    expect(router.push).toBeCalledWith('/tv/4607?season=1&title=Lost');
-    expect(router.push).toBeCalledTimes(1);
+    expect(push).toBeCalledWith('/tv/4607?season=1&title=Lost');
+    expect(push).toBeCalledTimes(1);
   });
 
   it('shows Not found', async () => {

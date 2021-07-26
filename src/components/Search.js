@@ -13,7 +13,7 @@ import {
   Box,
 } from '@chakra-ui/react';
 import { SearchIcon, CloseIcon } from '@chakra-ui/icons';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 import { useCombobox } from 'downshift';
 
 import { useSearchMulti } from '@/hooks/swr';
@@ -51,6 +51,7 @@ function stateReducer(_state, actionAndChanges) {
 }
 
 export default function Search() {
+  const router = useRouter();
   const [inputValue, setInputValue] = useState('');
   const { data, isLoading, error } = useSearchMulti(
     inputValue ? inputValue?.trim()?.toLowerCase() : '',
