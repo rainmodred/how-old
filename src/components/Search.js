@@ -11,6 +11,7 @@ import {
   Heading,
   InputLeftElement,
   Box,
+  useColorMode,
 } from '@chakra-ui/react';
 import { SearchIcon, CloseIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/router';
@@ -56,6 +57,7 @@ export default function Search() {
   const { data, isLoading, error } = useSearchMulti(
     inputValue ? inputValue?.trim()?.toLowerCase() : '',
   );
+  const { colorMode } = useColorMode();
 
   const {
     isOpen,
@@ -208,7 +210,7 @@ export default function Search() {
         w="100%"
         overflowY="auto"
         p="5"
-        bg="white"
+        bg={colorMode === 'light' ? 'white' : 'gray.700'}
         boxShadow="0 4px 6px hsl(225deg 6% 13% / 28%)"
         borderRadius="10px"
         display={isOpen && (data || error) ? 'block' : 'none'}
