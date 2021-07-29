@@ -208,12 +208,13 @@ export default function Search() {
         mt="50px"
         zIndex="1"
         w="100%"
-        overflowY="auto"
+        overflowY="scroll"
         p="5"
         bg={colorMode === 'light' ? 'white' : 'gray.700'}
         boxShadow="0 4px 6px hsl(225deg 6% 13% / 28%)"
         borderRadius="10px"
         display={isOpen && (data || error) ? 'block' : 'none'}
+        maxHeight="500px"
         {...getMenuProps()}
       >
         {renderSuggestions()}
