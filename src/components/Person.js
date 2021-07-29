@@ -32,7 +32,7 @@ export default function Person({ person }) {
     : null;
 
   return (
-    <Box p="2" w="100%" borderRadius="10px">
+    <Box p="1" w="100%" borderRadius="10px">
       <Flex alignItems="center">
         <ChakraNextImage
           h={{ base: '103px', md: '120px' }}

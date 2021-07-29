@@ -4,7 +4,7 @@ import Person from '@/components/Person';
 
 export default function Persons({ persons, isLoading }) {
   return (
-    <VStack mt="10" w="100%">
+    <VStack mt="10" w="100%" spacing="0">
       {isLoading ? (
         <Spinner size="lg" />
       ) : (
