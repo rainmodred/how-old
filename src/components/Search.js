@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   InputRightElement,
   InputGroup,
@@ -58,6 +58,7 @@ export default function Search() {
     inputValue ? inputValue?.trim()?.toLowerCase() : '',
   );
   const { colorMode } = useColorMode();
+  const inputRef = useRef();
 
   const {
     isOpen,
@@ -85,14 +86,20 @@ export default function Search() {
     },
 
     onSelectedItemChange: ({ selectedItem }) => {
-      const { media_type, id, release_date, title, name } = selectedItem;
-      if (media_type === 'movie') {
-        router.push(`/movie/${id}?releaseDate=${release_date}&title=${title}`);
-      }
+      if (selectedItem) {
+        const { media_type, id, release_date, title, name } = selectedItem;
+        if (media_type === 'movie') {
+          router.push(
+            `/movie/${id}?releaseDate=${release_date}&title=${title}`,
+          );
+        }
 
-      if (media_type === 'tv') {
-        // get seasons list?
-        router.push(`/tv/${id}?season=1&title=${name}`);
+        if (media_type === 'tv') {
+          // get seasons list?
+          router.push(`/tv/${id}?season=1&title=${name}`);
+        }
+
+        inputRef?.current.blur();
       }
     },
   });
@@ -194,6 +201,7 @@ export default function Search() {
         <Input
           {...getInputProps({ onFocus: openMenu })}
           placeholder="Search for a movie or tv show"
+          ref={inputRef}
         />
         {inputValue !== '' && (
           <InputRightElement onClick={reset} cursor="pointer">
