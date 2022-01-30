@@ -18,7 +18,7 @@ export default function Movie() {
         <title>{title}</title>
       </Head>
       <Layout>
-        <Heading size="lg" m="4" textAlign="center">
+        <Heading size="lg" m="4" mb="8" textAlign="center">
           {title} ({releaseDate?.slice(0, 4)})
         </Heading>
         {error ? (
