@@ -1,6 +1,18 @@
 import { render, screen } from '@testing-library/react';
 
 import Person from '@/components/Person';
+import { Table, Tbody } from '@chakra-ui/react';
+
+const Wrapper = ({ children }) => {
+  return (
+    <Table>
+      <Tbody>{children}</Tbody>
+    </Table>
+  );
+};
+
+const customRender = (ui, options) =>
+  render(ui, { wrapper: Wrapper, ...options });
 
 // eslint-disable-next-line
 jest.mock('next/image', () => () => <></>);
@@ -18,15 +30,13 @@ describe('Person', () => {
     };
     const { name, character, birthday, age, ageOnRelease } = person;
 
-    render(<Person person={person} />);
+    customRender(<Person person={person} />);
 
-    expect(screen.getByTestId('name')).toHaveTextContent(
-      `${name} / ${character}`,
-    );
-    expect(screen.getByTestId('birthday')).toHaveTextContent(birthday);
-    expect(screen.queryByTestId('deathday')).toBe(null);
-    expect(screen.getByTestId('age')).toHaveTextContent(`${age} years old`);
-    expect(screen.getByTestId('ageOnRelease')).toHaveTextContent(ageOnRelease);
+    expect(screen.getByText(name)).toBeInTheDocument();
+    expect(screen.getByText(character)).toBeInTheDocument();
+    expect(screen.getByText(/birthday/i)).toHaveTextContent(birthday);
+    expect(screen.getByText(age)).toBeInTheDocument();
+    expect(screen.getByText(ageOnRelease)).toHaveTextContent(ageOnRelease);
   });
 
   it('shows death date', () => {
@@ -41,9 +51,11 @@ describe('Person', () => {
       ageOnRelease: 80,
     };
 
-    const { deathday } = person;
-    render(<Person person={person} />);
+    const { deathday, age } = person;
+    customRender(<Person person={person} />);
 
-    expect(screen.getByTestId('deathday')).toHaveTextContent(deathday);
+    expect(screen.getByText(`${deathday} (${age})`)).toHaveTextContent(
+      deathday,
+    );
   });
 });

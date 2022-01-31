@@ -16,6 +16,6 @@ describe('Persons', () => {
   it('renders persons', () => {
     render(<Persons isLoading={false} persons={mockedApiMovie} />);
 
-    expect(screen.getAllByTestId('name')).toHaveLength(mockedApiMovie.length);
+    expect(screen.getAllByRole('row')).toHaveLength(mockedApiMovie.length + 1);
   });
 });

@@ -45,11 +45,7 @@ export default function Person({ person }) {
             overflow="hidden"
           ></ChakraNextImage>
           <Box>
-            <Text
-              whiteSpace={['wrap', 'nowrap']}
-              fontWeight="bold"
-              data-testid="name"
-            >
+            <Text whiteSpace={['wrap', 'nowrap']} fontWeight="bold">
               {name}
             </Text>
             <Text>{character}</Text>

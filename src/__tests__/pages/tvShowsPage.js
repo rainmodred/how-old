@@ -20,7 +20,7 @@ describe('Tv Show page', () => {
     render();
     expect(screen.getByText(/friends/i)).toBeInTheDocument();
     await waitForElementToBeRemoved(() => screen.queryByText('Loading...'));
-    expect(screen.getAllByTestId('name')).toHaveLength(mockedApiTvShow.length);
+    expect(screen.getAllByRole('row')).toHaveLength(mockedApiTvShow.length + 1);
   });
 
   it('renders error message when receive an error from api', async () => {

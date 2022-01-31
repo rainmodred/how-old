@@ -199,9 +199,8 @@ export default function Search() {
           {isLoading ? <Spinner /> : <SearchIcon color="green.500" />}
         </InputLeftElement>
         <Input
-          {...getInputProps({ onFocus: openMenu })}
+          {...getInputProps({ onFocus: openMenu, ref: inputRef })}
           placeholder="Search for a movie or tv show"
-          ref={inputRef}
         />
         {inputValue !== '' && (
           <InputRightElement onClick={reset} cursor="pointer">
