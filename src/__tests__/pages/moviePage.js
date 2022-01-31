@@ -25,7 +25,7 @@ describe('Movie page', () => {
 
     expect(screen.getByText(/avengers/i)).toBeInTheDocument();
     await waitForElementToBeRemoved(() => screen.queryByText('Loading...'));
-    expect(screen.getAllByTestId('name')).toHaveLength(mockedApiMovie.length);
+    expect(screen.getAllByRole('row')).toHaveLength(mockedApiMovie.length + 1);
   });
 
   it('renders error message when receive an error from api', async () => {
