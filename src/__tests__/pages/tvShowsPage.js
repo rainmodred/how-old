@@ -12,7 +12,7 @@ const season = 1;
 const title = 'Friends';
 
 describe('Tv Show page', () => {
-  it('renders page with cast', async () => {
+  it.skip('renders page with cast', async () => {
     const { render } = await getPage({
       route: `/tv/${id}?season=${season}&title=${title}`,
     });
@@ -23,7 +23,7 @@ describe('Tv Show page', () => {
     expect(screen.getAllByRole('row')).toHaveLength(mockedApiTvShow.length + 1);
   });
 
-  it('renders error message when receive an error from api', async () => {
+  it.skip('renders error message when receive an error from api', async () => {
     server.use(
       rest.get('/api/tv/:id/', (_req, res, ctx) =>
         res.once(ctx.status(404), ctx.json({ error: 'Error' })),
