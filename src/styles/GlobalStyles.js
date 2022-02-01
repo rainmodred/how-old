@@ -12,17 +12,19 @@ export default function GlobalStyles() {
           margin: 0;
         }
 
-        *::-webkit-scrollbar {
-          width: 0.7em;
+        *::-webkit-scrollbar-track {
+          -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+          background-color: #f5f5f5;
         }
 
-        *::-webkit-scrollbar-track {
-          background-color: #e4e4e4;
+        *::-webkit-scrollbar {
+          width: 12px;
+          background-color: #f5f5f5;
         }
 
         *::-webkit-scrollbar-thumb {
-          background-color: #e2e2e2;
-          border-radius: 100px;
+          -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+          background-color: #394456;
         }
       `}
     />
