@@ -3,6 +3,9 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { SWRConfig } from 'swr';
 
 import { fetcher } from '@/utils/api';
+import { useEffect, useState } from 'react';
+import { Router } from 'next/router';
+import Layout from '@/components/Layout';
 
 if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
   if (typeof window === 'undefined') {
@@ -15,6 +18,26 @@ if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
 }
 
 function MyApp({ Component, pageProps }) {
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    const start = () => {
+      setIsLoading(true);
+    };
+
+    const end = () => {
+      setIsLoading(false);
+    };
+
+    Router.events.on('routeChangeStart', start);
+    Router.events.on('routeChangeComplete', end);
+    Router.events.on('routeChangeError', end);
+    return () => {
+      Router.events.off('routeChangeStart', start);
+      Router.events.off('routeChangeComplete', end);
+      Router.events.off('routeChangeError', end);
+    };
+  }, []);
+
   return (
     <SWRConfig
       value={{
@@ -25,7 +48,9 @@ function MyApp({ Component, pageProps }) {
     >
       <ChakraProvider>
         <GlobalStyles />
-        <Component {...pageProps} />
+        <Layout isLoading={isLoading}>
+          <Component {...pageProps} />
+        </Layout>
       </ChakraProvider>
     </SWRConfig>
   );
