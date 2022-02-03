@@ -48,8 +48,8 @@ describe('Search', () => {
 
     expect(await screen.findByText('TV Shows')).toBeInTheDocument();
     expect(screen.getByText('Movies')).toBeInTheDocument();
-    expect(screen.getByText('Lost (2004)')).toBeInTheDocument();
-    expect(screen.getByText('Lost in Space (1998)')).toBeInTheDocument();
+    expect(screen.getByText('The Avengers (2012)')).toBeInTheDocument();
+    expect(screen.getByText('Friends (1994)')).toBeInTheDocument();
   });
 
   it('renders spinner on loading', async () => {
@@ -88,10 +88,10 @@ describe('Search', () => {
 
     const input = screen.getByPlaceholderText(placeholderText);
     fireEvent.change(input, { target: { value: 'lost' } });
-    const option = await screen.findByText('Lost (2004)');
+    const option = await screen.findByText('Friends (1994)');
     fireEvent.click(option);
 
-    expect(push).toBeCalledWith('/tv/4607?season=1&title=Lost');
+    expect(push).toBeCalledWith('/tv/1668?season=1&title=Friends');
     expect(push).toBeCalledTimes(1);
   });
 

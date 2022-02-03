@@ -1,9 +1,10 @@
 import {
-  Box,
   Button,
+  Flex,
   Grid,
   HStack,
   Link,
+  Spinner,
   useColorMode,
 } from '@chakra-ui/react';
 import { FaMoon, FaRegSun } from 'react-icons/fa';
@@ -13,7 +14,7 @@ import Image from 'next/image';
 import Footer from '@/components/Footer';
 import Search from '@/components/Search';
 
-export default function Layout({ children }) {
+export default function Layout({ isLoading, children }) {
   const { colorMode, toggleColorMode } = useColorMode();
 
   return (
@@ -24,6 +25,7 @@ export default function Layout({ children }) {
       maxWidth="5xl"
       margin="auto"
       justifyItems="center"
+      gap="8"
     >
       <HStack justifyContent="center" width="100%">
         <Search />
@@ -54,7 +56,9 @@ export default function Layout({ children }) {
           />
         </Link>
       </HStack>
-      <Box width="100%">{children}</Box>
+      <Flex direction="column" alignItems="center" width="100%">
+        {isLoading ? <Spinner size="lg" /> : children}
+      </Flex>
       <Footer />
     </Grid>
   );

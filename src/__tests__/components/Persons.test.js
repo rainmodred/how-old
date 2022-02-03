@@ -7,14 +7,8 @@ import { mockedApiMovie } from '@/mocks/mocks';
 jest.mock('next/image', () => () => <></>);
 
 describe('Persons', () => {
-  it('renders spinner', () => {
-    render(<Persons isLoading={true} />);
-
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
-  });
-
   it('renders persons', () => {
-    render(<Persons isLoading={false} persons={mockedApiMovie} />);
+    render(<Persons persons={mockedApiMovie} />);
 
     expect(screen.getAllByRole('row')).toHaveLength(mockedApiMovie.length + 1);
   });

@@ -6,6 +6,16 @@ import uniqBy from 'lodash.uniqby';
 dayjs.extend(duration);
 dayjs.extend(localizedFormat);
 
+async function getMovieFromAPI(id, releaseDate) {
+  return fetch(
+    `${process.env.NEXT_BASE_URL}/api/movie/${id}?releaseDate=${releaseDate}`,
+  );
+}
+
+async function getTvShowFromAPI(id, season) {
+  return fetch(`${process.env.NEXT_BASE_URL}/api/tv/${id}?season=${season}`);
+}
+
 function getDiffInYears(date1, date2) {
   return Math.abs(dayjs.duration(dayjs(date1).diff(dayjs(date2))).$d.years);
 }
@@ -67,18 +77,6 @@ async function getPerson(id) {
   return data;
 }
 
-async function getMovieCredits(id) {
-  const data = await client(`/movie/${id}/credits`);
-
-  return data;
-}
-
-async function getTvShowCredits(id, season) {
-  const data = await client(`/tv/${id}/season/${season}/credits`);
-
-  return data;
-}
-
 async function getPersons(cast) {
   const promises = cast.map(person => () => getPerson(person.id));
   const result = await Promise.allSettled(promises.map(f => f()));
@@ -90,9 +88,9 @@ async function getPersons(cast) {
 }
 
 async function getMovieCast(id) {
-  const { cast } = await getMovieCredits(id);
-
-  return cast;
+  const { cast } = await client(`/movie/${id}/credits`);
+  const uniqueCast = uniqBy(cast, 'id');
+  return uniqueCast;
 }
 
 async function getTvShow(id) {
@@ -102,42 +100,9 @@ async function getTvShow(id) {
 }
 
 async function getTvShowCast(id, season) {
-  const { cast } = await getTvShowCredits(id, season);
-
-  return cast;
-}
-
-function getCastAge(cast, persons, releaseDate) {
-  return persons.map(person => {
-    const { id } = person;
-    const { character } = cast.find(p => p.id === id);
-
-    return calculateAge(
-      {
-        ...person,
-        character,
-      },
-      releaseDate,
-    );
-  });
-}
-
-async function getMovieCastAge(id, releaseDate) {
-  const cast = await getMovieCast(id);
+  const { cast } = await client(`/tv/${id}/season/${season}/credits`);
   const uniqueCast = uniqBy(cast, 'id');
-  const persons = await getPersons(uniqueCast);
-  const result = getCastAge(uniqueCast, persons, releaseDate);
-
-  return result;
-}
-
-async function getTvShowCastAge(id, season, releaseDate) {
-  const cast = await getTvShowCast(id, season);
-  const uniqueCast = uniqBy(cast, 'id');
-  const persons = await getPersons(uniqueCast);
-  const result = getCastAge(uniqueCast, persons, releaseDate);
-
-  return result;
+  return uniqueCast;
 }
 
 function calculateAge(person, releaseDate) {
@@ -159,6 +124,38 @@ function calculateAge(person, releaseDate) {
   };
 }
 
+function getCastAge(cast, persons, releaseDate) {
+  return persons.map(person => {
+    const { id } = person;
+    const { character } = cast.find(p => p.id === id);
+
+    return calculateAge(
+      {
+        ...person,
+        character,
+      },
+      releaseDate,
+    );
+  });
+}
+
+async function getPersonsWithAge(cast, releaseDate) {
+  const persons = await getPersons(cast);
+  const result = getCastAge(cast, persons, releaseDate);
+
+  return result;
+}
+
+async function getMovieCastAge(id, releaseDate) {
+  const cast = await getMovieCast(id);
+  return getPersonsWithAge(cast, releaseDate);
+}
+
+async function getTvShowCastAge(id, season, releaseDate) {
+  const cast = await getTvShowCast(id, season);
+  return getPersonsWithAge(cast, releaseDate);
+}
+
 export {
   fetcher,
   searchMulti,
@@ -172,4 +169,6 @@ export {
   calculateAge,
   getMovieCastAge,
   getTvShowCastAge,
+  getTvShowFromAPI,
+  getMovieFromAPI,
 };
