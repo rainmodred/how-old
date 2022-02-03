@@ -48,7 +48,9 @@ export default function Layout({ isLoading, children }) {
         >
           <Image
             src={`${
-              colorMode === 'light' ? '/githubMark.png' : '/githubMarkLight.png'
+              colorMode === 'light'
+                ? '/images/githubMark.png'
+                : '/images/githubMarkLight.png'
             }`}
             width="24"
             height="24"
