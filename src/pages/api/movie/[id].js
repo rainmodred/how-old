@@ -1,12 +1,28 @@
-import { getMovieCastAge } from '@/utils/api';
+import { ERRORS, getMovieCastAge } from '@/utils/api';
 
 export default async function handler(req, res) {
   const { id, releaseDate } = req.query;
-  if (!id || !releaseDate) {
-    return;
+
+  /*
+    without releaseDate query
+    /movie/:id
+
+    typeof releaseDate === string && releaseDate === 'undefined'
+  */
+
+  if (!id || releaseDate === 'undefined') {
+    return res.json({
+      error: ERRORS[404],
+    });
   }
 
-  const result = await getMovieCastAge(id, releaseDate);
+  const { cast, error } = await getMovieCastAge(id, releaseDate);
 
-  return res.json(result);
+  if (error) {
+    return res.json({ error: ERRORS[404] });
+  }
+
+  return res.json({
+    cast,
+  });
 }

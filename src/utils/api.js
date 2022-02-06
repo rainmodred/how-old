@@ -6,14 +6,29 @@ import uniqBy from 'lodash.uniqby';
 dayjs.extend(duration);
 dayjs.extend(localizedFormat);
 
+// TODO: refactor merge fetcher and client?
+
+export const ERRORS = {
+  404: {
+    statusCode: 404,
+    message: 'Not Found',
+  },
+};
+
 async function getMovieFromAPI(id, releaseDate) {
-  return fetch(
+  const response = await fetcher(
     `${process.env.NEXT_BASE_URL}/api/movie/${id}?releaseDate=${releaseDate}`,
   );
+
+  return response;
 }
 
 async function getTvShowFromAPI(id, season) {
-  return fetch(`${process.env.NEXT_BASE_URL}/api/tv/${id}?season=${season}`);
+  const response = await fetcher(
+    `${process.env.NEXT_BASE_URL}/api/tv/${id}?season=${season}`,
+  );
+
+  return response;
 }
 
 function getDiffInYears(date1, date2) {
@@ -88,20 +103,32 @@ async function getPersons(cast) {
 }
 
 async function getMovieCast(id) {
-  const { cast } = await client(`/movie/${id}/credits`);
-  const uniqueCast = uniqBy(cast, 'id');
+  const response = await client(`/movie/${id}/credits`);
+
+  if (!response) {
+    return [];
+  }
+
+  const uniqueCast = uniqBy(response.cast, 'id');
   return uniqueCast;
 }
 
-async function getTvShow(id) {
+async function getSeasons(id) {
   const data = await client(`/tv/${id}`);
+  if (!data || !data.seasons) {
+    return [];
+  }
 
-  return data;
+  return data.seasons;
 }
 
 async function getTvShowCast(id, season) {
-  const { cast } = await client(`/tv/${id}/season/${season}/credits`);
-  const uniqueCast = uniqBy(cast, 'id');
+  const response = await client(`/tv/${id}/season/${season}/credits`);
+  if (!response) {
+    return [];
+  }
+
+  const uniqueCast = uniqBy(response?.cast, 'id');
   return uniqueCast;
 }
 
@@ -148,20 +175,36 @@ async function getPersonsWithAge(cast, releaseDate) {
 
 async function getMovieCastAge(id, releaseDate) {
   const cast = await getMovieCast(id);
-  return getPersonsWithAge(cast, releaseDate);
+  if (cast.length === 0) {
+    return {
+      error: new Error('NotFound'),
+    };
+  }
+
+  const personsWithAge = await getPersonsWithAge(cast, releaseDate);
+  return {
+    cast: personsWithAge,
+  };
 }
 
 async function getTvShowCastAge(id, season, releaseDate) {
   const cast = await getTvShowCast(id, season);
-  return getPersonsWithAge(cast, releaseDate);
+  if (cast.length === 0) {
+    return { error: new Error('NotFound') };
+  }
+
+  const personsWithAge = await getPersonsWithAge(cast, releaseDate);
+  return {
+    cast: personsWithAge,
+  };
 }
 
 export {
+  BASE_URL,
   fetcher,
   searchMulti,
-  getMovieCast,
   getPerson,
-  getTvShow,
+  getSeasons,
   getTvShowCast,
   getDiffInYears,
   getPersons,

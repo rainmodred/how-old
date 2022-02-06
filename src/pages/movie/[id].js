@@ -6,10 +6,15 @@ import Persons from '@/components/Persons';
 
 import { Heading } from '@chakra-ui/react';
 import { getMovieFromAPI } from '@/utils/api';
+import NotFound from '../404';
 
 export default function Movie({ cast, error }) {
   const router = useRouter();
   const { releaseDate, title } = router.query;
+
+  if (error) {
+    return <NotFound />;
+  }
 
   return (
     <>
@@ -35,14 +40,20 @@ export default function Movie({ cast, error }) {
 
 export async function getServerSideProps({ query }) {
   const { id, releaseDate } = query;
-  const res = await getMovieFromAPI(id, releaseDate);
-  const error = res.ok ? false : res.statusCode;
-  const cast = await res.json();
+  const response = await getMovieFromAPI(id, releaseDate);
+
+  const { cast, error } = response;
+  if (error) {
+    return {
+      props: {
+        error,
+      },
+    };
+  }
 
   return {
     props: {
       cast,
-      error,
     },
   };
 }

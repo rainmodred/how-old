@@ -5,10 +5,15 @@ import { Heading, Select } from '@chakra-ui/react';
 
 import Persons from '@/components/Persons';
 import { getTvShowFromAPI } from '@/utils/api';
+import NotFound from '../404';
 
 export default function TvShow({ cast, seasons, error }) {
   const router = useRouter();
   const { id, season, title } = router.query;
+
+  if (error) {
+    return <NotFound />;
+  }
 
   function handleSelect(e) {
     if (e.target.value !== '') {
@@ -57,8 +62,7 @@ export default function TvShow({ cast, seasons, error }) {
 
 export async function getServerSideProps({ query }) {
   const { id, season } = query;
-  const res = await getTvShowFromAPI(id, season);
-  const error = res.ok ? false : res.status;
+  const { cast, seasons, error } = await getTvShowFromAPI(id, season);
 
   if (error) {
     return {
@@ -67,8 +71,6 @@ export async function getServerSideProps({ query }) {
       },
     };
   }
-
-  const { cast, seasons } = await res.json();
 
   return {
     props: {
