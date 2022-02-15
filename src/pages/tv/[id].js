@@ -3,14 +3,17 @@ import Head from 'next/head';
 import { Alert, AlertIcon } from '@chakra-ui/react';
 import { Heading, Select } from '@chakra-ui/react';
 
-import Layout from '@/components/Layout';
-import { useTvShowCast } from '@/hooks/swr';
 import Persons from '@/components/Persons';
+import { getTvShowFromAPI } from '@/utils/api';
+import NotFound from '../404';
 
-export default function TvShow() {
+export default function TvShow({ cast, seasons, error }) {
   const router = useRouter();
   const { id, season, title } = router.query;
-  const { cast, seasons, isLoading, error } = useTvShowCast(id, season);
+
+  if (error) {
+    return <NotFound />;
+  }
 
   function handleSelect(e) {
     if (e.target.value !== '') {
@@ -23,17 +26,18 @@ export default function TvShow() {
       <Head>
         <title>{title}</title>
       </Head>
-      <Layout>
+      <>
         <Heading size="lg" m="4" textAlign="center">
           {title}
         </Heading>
 
         <Select
+          marginBottom="4"
           onChange={handleSelect}
           placeholder="Select season"
           value={season}
         >
-          {!isLoading &&
+          {!error &&
             seasons?.map(({ id, season_number }) => {
               return (
                 <option key={id} value={season_number}>
@@ -49,9 +53,29 @@ export default function TvShow() {
             Something went wrong
           </Alert>
         ) : (
-          <Persons persons={cast} isLoading={isLoading} />
+          <Persons persons={cast} />
         )}
-      </Layout>
+      </>
     </>
   );
+}
+
+export async function getServerSideProps({ query }) {
+  const { id, season } = query;
+  const { cast, seasons, error } = await getTvShowFromAPI(id, season);
+
+  if (error) {
+    return {
+      props: {
+        error,
+      },
+    };
+  }
+
+  return {
+    props: {
+      cast,
+      seasons,
+    },
+  };
 }

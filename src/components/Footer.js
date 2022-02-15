@@ -1,7 +1,7 @@
 import { Flex, Link, Text } from '@chakra-ui/react';
 import Image from 'next/image';
 
-import tmdbLogo from '../../public/tmdb.svg';
+import tmdbLogo from '../../public/images/tmdb.svg';
 
 export default function Footer() {
   return (

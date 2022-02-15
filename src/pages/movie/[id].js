@@ -2,22 +2,26 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { Alert, AlertIcon } from '@chakra-ui/react';
 
-import Layout from '@/components/Layout';
 import Persons from '@/components/Persons';
-import { useMovieCast } from '@/hooks/swr';
-import { Heading } from '@chakra-ui/react';
 
-export default function Movie() {
+import { Heading } from '@chakra-ui/react';
+import { getMovieFromAPI } from '@/utils/api';
+import NotFound from '../404';
+
+export default function Movie({ cast, error }) {
   const router = useRouter();
-  const { id, releaseDate, title } = router.query;
-  const { cast, isLoading, error } = useMovieCast(id, releaseDate);
+  const { releaseDate, title } = router.query;
+
+  if (error) {
+    return <NotFound />;
+  }
 
   return (
     <>
       <Head>
         <title>{title}</title>
       </Head>
-      <Layout>
+      <>
         <Heading size="lg" m="4" mb="8" textAlign="center">
           {title} ({releaseDate?.slice(0, 4)})
         </Heading>
@@ -27,9 +31,29 @@ export default function Movie() {
             Something went wrong
           </Alert>
         ) : (
-          <Persons persons={cast} isLoading={isLoading} />
+          <Persons persons={cast} />
         )}
-      </Layout>
+      </>
     </>
   );
+}
+
+export async function getServerSideProps({ query }) {
+  const { id, releaseDate } = query;
+  const response = await getMovieFromAPI(id, releaseDate);
+
+  const { cast, error } = response;
+  if (error) {
+    return {
+      props: {
+        error,
+      },
+    };
+  }
+
+  return {
+    props: {
+      cast,
+    },
+  };
 }

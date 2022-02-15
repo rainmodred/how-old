@@ -1,6 +1,6 @@
 import { Flex, Text, Box, Tr, Td } from '@chakra-ui/react';
 import NextImage from 'next/image';
-import profileFallback from '../../public/profileFallback.svg';
+import profileFallback from '../../public/images/profileFallback.svg';
 
 export const ChakraNextImage = props => {
   const { src, alt, ...rest } = props;
