@@ -17,8 +17,26 @@ if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
   }
 }
 
+function AllProviders({ isLoading, children }) {
+  return (
+    <SWRConfig
+      value={{
+        revalidateOnFocus: false,
+        errorRetryCount: 1,
+        fetcher,
+      }}
+    >
+      <ChakraProvider>
+        <GlobalStyles />
+        <Layout isLoading={isLoading}>{children}</Layout>
+      </ChakraProvider>
+    </SWRConfig>
+  );
+}
+
 function MyApp({ Component, pageProps }) {
   const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     const start = () => {
       setIsLoading(true);
@@ -39,20 +57,9 @@ function MyApp({ Component, pageProps }) {
   }, []);
 
   return (
-    <SWRConfig
-      value={{
-        revalidateOnFocus: false,
-        errorRetryCount: 1,
-        fetcher,
-      }}
-    >
-      <ChakraProvider>
-        <GlobalStyles />
-        <Layout isLoading={isLoading}>
-          <Component {...pageProps} />
-        </Layout>
-      </ChakraProvider>
-    </SWRConfig>
+    <AllProviders isLoading={isLoading}>
+      <Component {...pageProps} />
+    </AllProviders>
   );
 }
 
