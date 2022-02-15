@@ -5,7 +5,7 @@ import Person from '@/components/Person';
 export default function Persons({ persons }) {
   return (
     <>
-      <Table size="sm">
+      <Table size="sm" className="table-sm">
         <Thead>
           <Tr>
             <Th>Actor</Th>
