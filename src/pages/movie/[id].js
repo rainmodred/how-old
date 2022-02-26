@@ -39,8 +39,8 @@ export default function Movie({ cast, error }) {
 }
 
 export async function getServerSideProps({ query }) {
-  const { id, releaseDate } = query;
-  const response = await getMovieFromAPI(id, releaseDate);
+  const { id, releaseDate, title } = query;
+  const response = await getMovieFromAPI(id, releaseDate, title);
 
   const { cast, error } = response;
   if (error) {

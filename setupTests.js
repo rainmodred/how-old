@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom/extend-expect';
+import { createClient } from '@supabase/supabase-js';
 
 import { server } from './src/mocks/server';
 // Establish API mocking before all tests.
@@ -8,3 +9,5 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 // Clean up after the tests are finished.
 afterAll(() => server.close());
+
+jest.mock('./src/utils/supabaseClient', () => jest.fn());
