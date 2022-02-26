@@ -61,8 +61,8 @@ export default function TvShow({ cast, seasons, error }) {
 }
 
 export async function getServerSideProps({ query }) {
-  const { id, season } = query;
-  const { cast, seasons, error } = await getTvShowFromAPI(id, season);
+  const { id, season, title } = query;
+  const { cast, seasons, error } = await getTvShowFromAPI(id, season, title);
 
   if (error) {
     return {
