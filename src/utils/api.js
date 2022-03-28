@@ -203,7 +203,7 @@ async function getTvShowCastAge(id, season, releaseDate) {
 async function updateDB(id, title) {
   try {
     const { data } = await supabase.from('movies').select('*').eq('id', id);
-
+    console.log('data', data);
     if (data && data.length > 0) {
       const movie = data[0];
 

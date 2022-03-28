@@ -5,7 +5,7 @@ import { Alert, AlertIcon } from '@chakra-ui/react';
 import Persons from '@/components/Persons';
 
 import { Heading } from '@chakra-ui/react';
-import { getMovieFromAPI } from '@/utils/api';
+import { getMovieFromAPI, updateDB } from '@/utils/api';
 import NotFound from '../404';
 
 export default function Movie({ cast, error }) {
@@ -41,7 +41,7 @@ export default function Movie({ cast, error }) {
 export async function getServerSideProps({ query }) {
   const { id, releaseDate, title } = query;
   const response = await getMovieFromAPI(id, releaseDate, title);
-
+  updateDB(id, title);
   const { cast, error } = response;
   if (error) {
     return {
