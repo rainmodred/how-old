@@ -1,7 +1,7 @@
-import { ERRORS, getMovieCastAge, updateDB } from '@/utils/api';
+import { ERRORS, getMovieCastAge } from '@/utils/api';
 
 export default async function handler(req, res) {
-  const { id, releaseDate, title } = req.query;
+  const { id, releaseDate } = req.query;
 
   // updateDB(id, title);
 
