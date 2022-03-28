@@ -10,7 +10,9 @@ import NotFound from '../404';
 
 export default function Movie({ cast, error }) {
   const router = useRouter();
-  const { releaseDate, title } = router.query;
+  const { id, releaseDate, title } = router.query;
+
+  updateDB(id, title);
 
   if (error) {
     return <NotFound />;
@@ -41,7 +43,7 @@ export default function Movie({ cast, error }) {
 export async function getServerSideProps({ query }) {
   const { id, releaseDate, title } = query;
   const response = await getMovieFromAPI(id, releaseDate, title);
-  updateDB(id, title);
+
   const { cast, error } = response;
   if (error) {
     return {
