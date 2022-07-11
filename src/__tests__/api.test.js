@@ -1,5 +1,7 @@
 import { getDiffInYears, getCastAge, calculateAge } from '@/utils/api';
 
+// TODO: Add mswjs/data, fakerjs
+
 const AVENGERS = {
   id: 24428,
   releaseDate: '2012-04-25',
@@ -189,7 +191,7 @@ describe('api', () => {
 
       expect(id).toBe(mockedPerson.id);
       expect(birthday).toBe('April 4, 1965');
-      expect(age).toBe(56);
+      expect(age).toBe(57);
       expect(ageOnRelease).toBe(47);
       expect(name).toBe(mockedPerson.name);
       expect(character).toBe(mockedCharacter);

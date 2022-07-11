@@ -2,7 +2,6 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import uniqBy from 'lodash.uniqby';
-import { supabase } from './supabaseClient';
 
 dayjs.extend(duration);
 dayjs.extend(localizedFormat);
@@ -200,25 +199,6 @@ async function getTvShowCastAge(id, season, releaseDate) {
   };
 }
 
-async function updateDB(id, title) {
-  try {
-    const { data } = await supabase.from('movies').select('*').eq('id', id);
-
-    if (data && data.length > 0) {
-      const movie = data[0];
-
-      await supabase
-        .from('movies')
-        .update([{ count: movie.count + 1 }])
-        .eq('id', id);
-    } else {
-      await supabase.from('movies').insert([{ id, title, count: 1 }]);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 export {
   BASE_URL,
   fetcher,
@@ -234,5 +214,4 @@ export {
   getTvShowCastAge,
   getTvShowFromAPI,
   getMovieFromAPI,
-  updateDB,
 };

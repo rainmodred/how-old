@@ -1,4 +1,4 @@
-import { ERRORS, getSeasons, getTvShowCastAge, updateDB } from '@/utils/api';
+import { ERRORS, getSeasons, getTvShowCastAge } from '@/utils/api';
 
 function getSeasonAirDate(seasons, season = 1) {
   return seasons?.find(({ season_number }) => season_number === Number(season))
@@ -6,14 +6,12 @@ function getSeasonAirDate(seasons, season = 1) {
 }
 
 export default async function handler(req, res) {
-  const { id, season, title } = req.query;
+  const { id, season } = req.query;
   if (!id || season === 'undefined') {
     return res.json({
       error: ERRORS[404],
     });
   }
-
-  updateDB(id, title);
 
   const seasons = await getSeasons(id);
   const { cast, error } = await getTvShowCastAge(
