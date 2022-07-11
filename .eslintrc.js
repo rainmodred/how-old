@@ -25,5 +25,6 @@ module.exports = {
     'arrow-body-style': 'off',
     'no-negated-condition': 'off',
     camelcase: 'off',
+    'object-shorthand': 'off',
   },
 };
