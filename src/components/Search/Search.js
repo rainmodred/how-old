@@ -18,16 +18,26 @@ function itemToString(item) {
 }
 
 function formatData(data = []) {
-  return data.map(item => {
-    return {
-      value: itemToString(item),
-      group: item.media_type === 'movie' ? 'Movies' : 'TV Shows',
-      id: item.id,
-      title: item.title,
-      name: item.name,
-      release_date: item.release_date,
-    };
-  });
+  return data.reduce(
+    (prev, item) => {
+      if (item.media_type !== 'movie' && item.media_type !== 'tv') {
+        return prev;
+      }
+      return [
+        ...prev,
+        {
+          value: itemToString(item),
+          group: item.media_type === 'movie' ? 'Movies' : 'TV Shows',
+          id: item.id,
+          title: item.title,
+          name: item.name,
+          release_date: item.release_date,
+        },
+      ];
+    },
+
+    [],
+  );
 }
 
 export default function Search() {
