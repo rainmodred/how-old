@@ -1,54 +1,12 @@
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
 import uniqBy from 'lodash.uniqby';
 
-dayjs.extend(duration);
-dayjs.extend(localizedFormat);
-
-// TODO: refactor merge fetcher and client?
+import { calculateCastAge } from './utils';
 
 export const ERRORS = {
   404: {
     statusCode: 404,
     message: 'Not Found',
   },
-};
-
-async function getMovieFromAPI(id, releaseDate, title) {
-  const response = await fetcher(
-    `${process.env.NEXT_BASE_URL}/api/movie/${id}?releaseDate=${releaseDate}&title=${title}`,
-  );
-
-  return response;
-}
-
-async function getTvShowFromAPI(id, season, title) {
-  const response = await fetcher(
-    `${process.env.NEXT_BASE_URL}/api/tv/${id}?season=${season}&title=${title}`,
-  );
-
-  return response;
-}
-
-function getDiffInYears(date1, date2) {
-  return Math.abs(dayjs.duration(dayjs(date1).diff(dayjs(date2))).$d.years);
-}
-
-const fetcher = async url => {
-  const res = await fetch(url);
-
-  if (!res.ok) {
-    const error = new Error('An error occurred while fetching the data.');
-
-    error.info = await res.json();
-    error.status = res.status;
-    throw error;
-  }
-
-  const data = await res.json();
-
-  return data;
 };
 
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -62,9 +20,9 @@ function generateUrl(endpoint, params = []) {
   return url;
 }
 
-async function client(endpoint, params = []) {
+async function client(url) {
   try {
-    const res = await fetch(generateUrl(endpoint, params));
+    const res = await fetch(url);
 
     if (!res.ok) {
       const error = new Error('An error occurred while fetching the data.');
@@ -74,20 +32,33 @@ async function client(endpoint, params = []) {
       throw error;
     }
 
-    return res.json();
+    const data = await res.json();
+    return data;
   } catch (error) {
-    console.error(error);
+    return Promise.reject(error);
   }
 }
 
+function getMovieFromAPI(id, releaseDate) {
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/movie/${id}?releaseDate=${releaseDate}`;
+  return client(url);
+}
+
+function getTvShowFromAPI(id, season) {
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/tv/${id}?season=${season}`;
+  return client(url);
+}
+
 async function searchMulti(query) {
-  const data = await client('/search/multi', [{ name: 'query', value: query }]);
+  const url = generateUrl('/search/multi', [{ name: 'query', value: query }]);
+  const data = await client(url);
 
   return data;
 }
 
 async function getPerson(id) {
-  const data = await client(`/person/${id}`);
+  const url = generateUrl(`/person/${id}`);
+  const data = await client(url);
 
   return data;
 }
@@ -103,7 +74,8 @@ async function getPersons(cast) {
 }
 
 async function getMovieCast(id) {
-  const response = await client(`/movie/${id}/credits`);
+  const url = generateUrl(`/movie/${id}/credits`);
+  const response = await client(url);
 
   if (!response) {
     return [];
@@ -114,7 +86,8 @@ async function getMovieCast(id) {
 }
 
 async function getSeasons(id) {
-  const data = await client(`/tv/${id}`);
+  const url = generateUrl(`/tv/${id}`);
+  const data = await client(url);
   if (!data || !data.seasons) {
     return [];
   }
@@ -123,7 +96,8 @@ async function getSeasons(id) {
 }
 
 async function getTvShowCast(id, season) {
-  const response = await client(`/tv/${id}/season/${season}/credits`);
+  const url = generateUrl(`/tv/${id}/season/${season}/credits`);
+  const response = await client(url);
   if (!response) {
     return [];
   }
@@ -132,43 +106,9 @@ async function getTvShowCast(id, season) {
   return uniqueCast;
 }
 
-function calculateAge(person, releaseDate) {
-  const { id, name, character, birthday, deathday, profile_path } = person;
-
-  const age = deathday
-    ? getDiffInYears(deathday, birthday)
-    : getDiffInYears(dayjs(), birthday);
-
-  return {
-    id,
-    name,
-    character,
-    birthday: dayjs(birthday).format('LL'),
-    deathday: deathday ? dayjs(deathday).format('LL') : null,
-    profile_path,
-    age,
-    ageOnRelease: getDiffInYears(releaseDate, birthday),
-  };
-}
-
-function getCastAge(cast, persons, releaseDate) {
-  return persons.map(person => {
-    const { id } = person;
-    const { character } = cast.find(p => p.id === id);
-
-    return calculateAge(
-      {
-        ...person,
-        character,
-      },
-      releaseDate,
-    );
-  });
-}
-
 async function getPersonsWithAge(cast, releaseDate) {
   const persons = await getPersons(cast);
-  const result = getCastAge(cast, persons, releaseDate);
+  const result = calculateCastAge(cast, persons, releaseDate);
 
   return result;
 }
@@ -201,15 +141,12 @@ async function getTvShowCastAge(id, season, releaseDate) {
 
 export {
   BASE_URL,
-  fetcher,
+  client,
   searchMulti,
   getPerson,
   getSeasons,
   getTvShowCast,
-  getDiffInYears,
   getPersons,
-  getCastAge,
-  calculateAge,
   getMovieCastAge,
   getTvShowCastAge,
   getTvShowFromAPI,

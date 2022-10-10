@@ -1,16 +1,20 @@
+import { client, getMovieFromAPI, getTvShowFromAPI } from '@/utils/api';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { useDebounce } from 'use-debounce';
+import useSWRImmutable from 'swr/immutable';
+
+import { useDebouncedValue } from '@mantine/hooks';
 
 const BASE = '/api';
 
 function useSearchMulti(query) {
   const [queried, setQueried] = useState(false);
-  const [debouncedQuery] = useDebounce(query, 500);
+  const [debouncedQuery] = useDebouncedValue(query, 500);
   const { data, error } = useSWR(
     debouncedQuery !== ''
       ? `${BASE}/search/multi?query=${encodeURIComponent(debouncedQuery)}`
       : null,
+    client,
   );
 
   useEffect(() => {
@@ -22,15 +26,17 @@ function useSearchMulti(query) {
   }, [query]);
 
   return {
-    data: data?.results,
+    data: data?.results ? data.results : [],
     isLoading: !error && !data && queried,
     error,
   };
 }
 
 function useMovieCast(id, releaseDate) {
-  const { data, error } = useSWR(
-    id && releaseDate && `${BASE}/movie/${id}?releaseDate=${releaseDate}`,
+  const shouldFetch = Boolean(id) && Boolean(releaseDate);
+  const { data, error } = useSWRImmutable(
+    shouldFetch && `${BASE}/movie/${id}?releaseDate=${releaseDate}`,
+    () => getMovieFromAPI(id, releaseDate),
   );
 
   return {
@@ -42,8 +48,9 @@ function useMovieCast(id, releaseDate) {
 
 function useTvShowCast(id, season) {
   const shouldFetch = id && season;
-  const { data, error } = useSWR(
+  const { data, error } = useSWRImmutable(
     shouldFetch && `${BASE}/tv/${id}?season=${season}`,
+    () => getTvShowFromAPI(id, season),
   );
 
   return {
