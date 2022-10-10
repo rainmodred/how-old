@@ -8,6 +8,9 @@ import {
   mockedTvShowSeasonCredits,
   mockedSearch,
   mockedApiSearch,
+  mockedApiMovie,
+  mockedApiTvShow,
+  mockedSeasons,
 } from './mocks';
 
 export const handlers = [
@@ -20,30 +23,41 @@ export const handlers = [
     );
   }),
 
-  // rest.get('*/api/tv/:id', (req, res, ctx) => {
-  //   const season = req.url.searchParams.get('season');
+  rest.get(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/movie/:id`,
+    (req, res, ctx) => {
+      const { id } = req.params;
 
-  //   return res(
-  //     ctx.status(200),
-  //     ctx.json({
-  //       cast: mockedApiTvShow[season],
-  //       seasons: mockedSeasons,
-  //     }),
-  //   );
-  // }),
+      const castFromApi = mockedApiMovie[id];
+      if (!castFromApi) {
+        return res(ctx.status(404), ctx.json({}));
+      }
 
-  // rest.get('*/api/movie/:id', (req, res, ctx) => {
-  //   const id = req.url.searchParams.get('id');
+      return res(ctx.status(200), ctx.json(castFromApi));
+    },
+  ),
 
-  //   console.log('req', req);
+  rest.get(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/tv/:id`,
+    (req, res, ctx) => {
+      const { id } = req.params;
+      const season = req.url.searchParams.get('season');
+      if (!mockedApiTvShow[id]) {
+        return res(ctx.status(404), ctx.json({}));
+      }
 
-  //   const castFromApi = mockedApiMovie[id];
-  //   if (!castFromApi) {
-  //     return res(ctx.status(404), ctx.json({}));
-  //   }
+      const cast = mockedApiTvShow[id][season];
+      const seasons = mockedSeasons;
 
-  //   return res(ctx.status(200), ctx.json(mockedApiMovie[id]));
-  // }),
+      return res(
+        ctx.status(200),
+        ctx.json({
+          cast,
+          seasons,
+        }),
+      );
+    },
+  ),
 
   rest.get(`${BASE_URL}/search/multi`, (_req, res, ctx) => {
     return res(ctx.status(200), ctx.json(mockedSearch));
