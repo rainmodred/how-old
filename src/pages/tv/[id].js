@@ -1,25 +1,26 @@
-import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { Alert, AlertIcon } from '@chakra-ui/react';
-import { Heading, Select } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
+import { Center, Title, Alert, Loader, Select } from '@mantine/core';
 
-import Persons from '@/components/Persons';
-import { getTvShowFromAPI } from '@/utils/api';
-import NotFound from '../404';
+import Persons from '@/components/Persons/Persons';
+import { useTvShowCast } from '@/hooks/swr';
 
-export default function TvShow({ cast, seasons, error }) {
+export default function TvShow() {
   const router = useRouter();
   const { id, season, title } = router.query;
+  const { cast, seasons, error, isLoading } = useTvShowCast(id, season, title);
 
-  if (error) {
-    return <NotFound />;
+  function handleSelect(value) {
+    router.push(`/tv/${id}?season=${value}&title=${title}`);
   }
 
-  function handleSelect(e) {
-    if (e.target.value !== '') {
-      router.push(`/tv/${id}?season=${e.target.value}&title=${title}`);
-    }
-  }
+  const selectData =
+    !isLoading && !error
+      ? seasons?.map(({ season_number }) => ({
+          value: season_number.toString(),
+          label: `Season ${season_number}`,
+        }))
+      : [];
 
   return (
     <>
@@ -27,55 +28,30 @@ export default function TvShow({ cast, seasons, error }) {
         <title>{title}</title>
       </Head>
       <>
-        <Heading size="lg" m="4" textAlign="center">
-          {title}
-        </Heading>
+        {title ? (
+          <Title size="h1" my="xs" align="center">
+            {title}
+          </Title>
+        ) : (
+          <Center>
+            <Loader />
+          </Center>
+        )}
 
         <Select
-          marginBottom="4"
+          my="md"
           onChange={handleSelect}
           placeholder="Select season"
           value={season}
-        >
-          {!error &&
-            seasons?.map(({ id, season_number }) => {
-              return (
-                <option key={id} value={season_number}>
-                  Season {season_number}
-                </option>
-              );
-            })}
-        </Select>
+          data={selectData}
+        />
 
         {error ? (
-          <Alert status="error">
-            <AlertIcon />
-            Something went wrong
-          </Alert>
+          <Alert mt="lg">Something went wrong</Alert>
         ) : (
-          <Persons persons={cast} />
+          <Persons persons={cast} isLoading={isLoading} />
         )}
       </>
     </>
   );
-}
-
-export async function getServerSideProps({ query }) {
-  const { id, season, title } = query;
-  const { cast, seasons, error } = await getTvShowFromAPI(id, season, title);
-
-  if (error) {
-    return {
-      props: {
-        error,
-      },
-    };
-  }
-
-  return {
-    props: {
-      cast,
-      seasons,
-    },
-  };
 }
