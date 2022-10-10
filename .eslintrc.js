@@ -6,25 +6,19 @@ module.exports = {
     jest: true,
   },
   extends: [
+    'eslint:recommended',
     'plugin:react/recommended',
-    'xo',
     'next',
     'next/core-web-vitals',
+    'plugin:jest/recommended',
+    'plugin:testing-library/react',
     'prettier',
   ],
+  overrides: [],
   parserOptions: {
-    ecmaFeatures: {
-      jsx: true,
-    },
-    ecmaVersion: 12,
+    ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  plugins: ['react'],
-  rules: {
-    'capitalized-comments': 'off',
-    'arrow-body-style': 'off',
-    'no-negated-condition': 'off',
-    camelcase: 'off',
-    'object-shorthand': 'off',
-  },
+  plugins: ['react', 'testing-library', 'jest'],
+  rules: {},
 };
