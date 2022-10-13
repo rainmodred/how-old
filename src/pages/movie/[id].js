@@ -1,20 +1,15 @@
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { Alert, AlertIcon } from '@chakra-ui/react';
+import { Center, Title, Alert, Loader } from '@mantine/core';
 
-import Persons from '@/components/Persons';
+import Persons from '@/components/Persons/Persons';
+import { useMovieCast } from '@/hooks/swr';
 
-import { Heading } from '@chakra-ui/react';
-import { getMovieFromAPI } from '@/utils/api';
-import NotFound from '../404';
-
-export default function Movie({ cast, error }) {
+export default function Movie() {
   const router = useRouter();
-  const { releaseDate, title } = router.query;
 
-  if (error) {
-    return <NotFound />;
-  }
+  const { id, releaseDate, title } = router.query;
+  const { cast, error, isLoading } = useMovieCast(id, releaseDate, title);
 
   return (
     <>
@@ -22,38 +17,22 @@ export default function Movie({ cast, error }) {
         <title>{title}</title>
       </Head>
       <>
-        <Heading size="lg" m="4" mb="8" textAlign="center">
-          {title} ({releaseDate?.slice(0, 4)})
-        </Heading>
-        {error ? (
-          <Alert status="error">
-            <AlertIcon />
-            Something went wrong
-          </Alert>
+        {title ? (
+          <Title size="h1" my="xs" align="center">
+            {title} ({releaseDate?.slice(0, 4)})
+          </Title>
         ) : (
-          <Persons persons={cast} />
+          <Center>
+            <Loader />
+          </Center>
+        )}
+
+        {error ? (
+          <Alert mt="lg">Something went wrong</Alert>
+        ) : (
+          <Persons persons={cast} isLoading={isLoading} />
         )}
       </>
     </>
   );
-}
-
-export async function getServerSideProps({ query }) {
-  const { id, releaseDate, title } = query;
-  const response = await getMovieFromAPI(id, releaseDate, title);
-
-  const { cast, error } = response;
-  if (error) {
-    return {
-      props: {
-        error,
-      },
-    };
-  }
-
-  return {
-    props: {
-      cast,
-    },
-  };
 }

@@ -1,63 +1,51 @@
-import GlobalStyles from '../styles/GlobalStyles';
-import { ChakraProvider } from '@chakra-ui/react';
 import { SWRConfig } from 'swr';
+import { ColorSchemeProvider, MantineProvider } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 
-import { fetcher } from '@/utils/api';
-import { useEffect, useState } from 'react';
-import { Router } from 'next/router';
-import Layout from '@/components/Layout';
+import Layout from '@/components/Layout/Layout';
 
 if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
-  if (typeof window === 'undefined') {
-    const { server } = require('../mocks/server');
-    server.listen({ onUnhandledRequest: 'bypass' });
-  } else {
-    const { worker } = require('../mocks/browser');
-    worker.start({ onUnhandledRequest: 'bypass' });
-  }
+  require('../mocks');
 }
 
-function AllProviders({ isLoading, children }) {
+function AllProviders({ children }) {
+  const [colorScheme, setColorScheme] = useLocalStorage({
+    key: 'mantine-color-scheme',
+    defaultValue: 'light',
+    getInitialValueInEffect: true,
+  });
+
+  const toggleColorScheme = value =>
+    setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
+
   return (
     <SWRConfig
       value={{
         revalidateOnFocus: false,
+        revalidateIfStale: false,
+        revalidateOnReconnect: false,
         errorRetryCount: 1,
-        fetcher,
       }}
     >
-      <ChakraProvider>
-        <GlobalStyles />
-        <Layout isLoading={isLoading}>{children}</Layout>
-      </ChakraProvider>
+      <ColorSchemeProvider
+        colorScheme={colorScheme}
+        toggleColorScheme={toggleColorScheme}
+      >
+        <MantineProvider
+          withGlobalStyles
+          withNormalizeCSS
+          theme={{ colorScheme }}
+        >
+          <Layout>{children}</Layout>
+        </MantineProvider>
+      </ColorSchemeProvider>
     </SWRConfig>
   );
 }
 
 function MyApp({ Component, pageProps }) {
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    const start = () => {
-      setIsLoading(true);
-    };
-
-    const end = () => {
-      setIsLoading(false);
-    };
-
-    Router.events.on('routeChangeStart', start);
-    Router.events.on('routeChangeComplete', end);
-    Router.events.on('routeChangeError', end);
-    return () => {
-      Router.events.off('routeChangeStart', start);
-      Router.events.off('routeChangeComplete', end);
-      Router.events.off('routeChangeError', end);
-    };
-  }, []);
-
   return (
-    <AllProviders isLoading={isLoading}>
+    <AllProviders>
       <Component {...pageProps} />
     </AllProviders>
   );

@@ -1,13 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@/test/test-utils';
 
-import Person from '@/components/Person';
-import { Table, Tbody } from '@chakra-ui/react';
+import Person from '@/components/Persons/Person/Person';
 
 const Wrapper = ({ children }) => {
   return (
-    <Table>
-      <Tbody>{children}</Tbody>
-    </Table>
+    <table>
+      <tbody>{children}</tbody>
+    </table>
   );
 };
 
