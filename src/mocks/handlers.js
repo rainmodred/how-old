@@ -28,12 +28,12 @@ export const handlers = [
     (req, res, ctx) => {
       const { id } = req.params;
 
-      const castFromApi = mockedApiMovie[id];
-      if (!castFromApi) {
+      const cast = mockedApiMovie[id];
+      if (!cast) {
         return res(ctx.status(404), ctx.json({}));
       }
 
-      return res(ctx.status(200), ctx.json(castFromApi));
+      return res(ctx.status(200), ctx.json({ cast }));
     },
   ),
 

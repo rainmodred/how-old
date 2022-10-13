@@ -40,7 +40,7 @@ function useMovieCast(id, releaseDate) {
   );
 
   return {
-    cast: data,
+    cast: data?.cast,
     isLoading: !error && !data,
     error,
   };
