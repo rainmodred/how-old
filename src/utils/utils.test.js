@@ -8,6 +8,12 @@ const AVENGERS = {
 const { releaseDate } = AVENGERS;
 
 describe('utils', () => {
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(new Date('2022-07-07'));
+  });
+  afterAll(() => {
+    jest.useRealTimers();
+  });
   describe('getDiffInYears', () => {
     it('returns years between dates', () => {
       const date1 = '2021-07-17';

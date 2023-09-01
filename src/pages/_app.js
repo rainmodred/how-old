@@ -1,6 +1,9 @@
 import { SWRConfig } from 'swr';
+import { useState } from 'react';
 import { ColorSchemeProvider, MantineProvider } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
+
+import NextApp from 'next/app';
+import { getCookie, setCookie } from 'cookies-next';
 
 import Layout from '@/components/Layout/Layout';
 
@@ -8,15 +11,23 @@ if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
   require('../mocks');
 }
 
-function AllProviders({ children }) {
-  const [colorScheme, setColorScheme] = useLocalStorage({
-    key: 'mantine-color-scheme',
-    defaultValue: 'light',
-    getInitialValueInEffect: true,
-  });
+function AllProviders(props) {
+  // const [colorScheme, setColorScheme] = useLocalStorage({
 
-  const toggleColorScheme = value =>
-    setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
+  //   key: 'mantine-color-scheme',
+  //   defaultValue: 'light',
+  //   getInitialValueInEffect: true,
+  // });
+  const [colorScheme, setColorScheme] = useState(props.colorScheme);
+
+  const toggleColorScheme = value => {
+    const nextColorScheme =
+      value || (colorScheme === 'dark' ? 'light' : 'dark');
+    setColorScheme(nextColorScheme);
+    setCookie('mantine-color-scheme', nextColorScheme, {
+      maxAge: 60 * 60 * 24 * 30,
+    });
+  };
 
   return (
     <SWRConfig
@@ -36,19 +47,27 @@ function AllProviders({ children }) {
           withNormalizeCSS
           theme={{ colorScheme }}
         >
-          <Layout>{children}</Layout>
+          <Layout>{props.children}</Layout>
         </MantineProvider>
       </ColorSchemeProvider>
     </SWRConfig>
   );
 }
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps, colorScheme }) {
   return (
-    <AllProviders>
+    <AllProviders colorScheme={colorScheme}>
       <Component {...pageProps} />
     </AllProviders>
   );
 }
+
+MyApp.getInitialProps = async appContext => {
+  const appProps = await NextApp.getInitialProps(appContext);
+  return {
+    ...appProps,
+    colorScheme: getCookie('mantine-color-scheme', appContext.ctx) || 'dark',
+  };
+};
 
 export default MyApp;
