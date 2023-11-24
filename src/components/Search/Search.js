@@ -75,7 +75,6 @@ export default function Search() {
       }
       placeholder="Search for a movie or tv show"
       data={formattedData}
-      sx={() => ({ width: '80%', maxWidth: '350px' })}
     />
   );
 }

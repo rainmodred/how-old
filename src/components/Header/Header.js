@@ -1,42 +1,32 @@
 import { Button, Group, useMantineColorScheme } from '@mantine/core';
 import Link from 'next/link';
-import Image from 'next/legacy/image';
 import { IconSun, IconMoonStars } from '@tabler/icons-react';
 
 import Search from '@/components/Search/Search';
 
+import classes from './Header.module.css';
+
 export default function Header() {
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-  const dark = colorScheme === 'dark';
+  const { toggleColorScheme } = useMantineColorScheme();
 
   return (
-    <Group wrap="nowrap" spacing="xs" sx={() => ({ justifyContent: 'center' })}>
+    <Group wrap="nowrap" spacing="xs">
       <Search />
-      <Button variant="default" onClick={() => toggleColorScheme()}>
-        {dark ? <IconSun size={18} /> : <IconMoonStars size={18} />}
+      <Button px="xs" variant="default" onClick={() => toggleColorScheme()}>
+        <>
+          <IconSun size={18} className={classes.darkIcon} />
+          <IconMoonStars size={18} className={classes.lightIcon} />
+        </>
       </Button>
-      <Link
+      <Button
+        component={Link}
         href="https://github.com/rainmodred/how-old"
-        passHref
-        legacyBehavior
-      >
-        <Button
-          component="a"
-          target="_blank"
-          rel="noreferrer"
-          variant="default"
-          px="xs"
-        >
-          <Image
-            src={`${
-              dark ? '/images/githubMarkLight.png' : '/images/githubMark.png'
-            }`}
-            width="24"
-            height="24"
-            alt="github logo"
-          />
-        </Button>
-      </Link>
+        target="_blank"
+        rel="noreferrer"
+        variant="default"
+        px="xs"
+        className={classes.githubIcon}
+      ></Button>
     </Group>
   );
 }

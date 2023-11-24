@@ -6,16 +6,7 @@ import profileFallback from '/public/images/profileFallback.svg';
 export const Image = props => {
   const { src, alt } = props;
   return (
-    <Box
-      sx={() => ({
-        position: 'relative',
-        height: '100px',
-        width: '60px',
-        borderRadius: '10px',
-        overflow: 'hidden',
-        flexShrink: 0,
-      })}
-    >
+    <Box>
       <NextImage
         objectFit={src ? 'cover' : 'contain'}
         layout="fill"

@@ -1,0 +1,24 @@
+.darkIcon {
+  @mixin light {
+    display: none;
+  }
+}
+
+.lightIcon {
+  @mixin dark {
+    display: none;
+  }
+}
+
+.githubIcon {
+  @mixin dark {
+    background: url('/images/github-mark-white.svg') no-repeat;
+    background-size: 70%;
+    background-position: center;
+  }
+
+  background: url('/images/github-mark.svg') no-repeat;
+  background-size: 80%;
+  background-position: center;
+  width: 2.5rem;
+}
