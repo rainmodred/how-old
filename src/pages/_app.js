@@ -1,34 +1,16 @@
+import '@mantine/core/styles.css';
 import { SWRConfig } from 'swr';
-import { useState } from 'react';
-import { ColorSchemeProvider, MantineProvider } from '@mantine/core';
-
-import NextApp from 'next/app';
-import { getCookie, setCookie } from 'cookies-next';
+import { createTheme, MantineProvider } from '@mantine/core';
 
 import Layout from '@/components/Layout/Layout';
 
-if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
-  require('../mocks');
-}
+// if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
+//   require('../mocks');
+// }
+
+const theme = createTheme({});
 
 function AllProviders(props) {
-  // const [colorScheme, setColorScheme] = useLocalStorage({
-
-  //   key: 'mantine-color-scheme',
-  //   defaultValue: 'light',
-  //   getInitialValueInEffect: true,
-  // });
-  const [colorScheme, setColorScheme] = useState(props.colorScheme);
-
-  const toggleColorScheme = value => {
-    const nextColorScheme =
-      value || (colorScheme === 'dark' ? 'light' : 'dark');
-    setColorScheme(nextColorScheme);
-    setCookie('mantine-color-scheme', nextColorScheme, {
-      maxAge: 60 * 60 * 24 * 30,
-    });
-  };
-
   return (
     <SWRConfig
       value={{
@@ -38,36 +20,19 @@ function AllProviders(props) {
         errorRetryCount: 1,
       }}
     >
-      <ColorSchemeProvider
-        colorScheme={colorScheme}
-        toggleColorScheme={toggleColorScheme}
-      >
-        <MantineProvider
-          withGlobalStyles
-          withNormalizeCSS
-          theme={{ colorScheme }}
-        >
-          <Layout>{props.children}</Layout>
-        </MantineProvider>
-      </ColorSchemeProvider>
+      <MantineProvider theme={{ theme }}>
+        <Layout>{props.children}</Layout>
+      </MantineProvider>
     </SWRConfig>
   );
 }
 
-function MyApp({ Component, pageProps, colorScheme }) {
+function MyApp({ Component, pageProps }) {
   return (
-    <AllProviders colorScheme={colorScheme}>
+    <AllProviders>
       <Component {...pageProps} />
     </AllProviders>
   );
 }
-
-MyApp.getInitialProps = async appContext => {
-  const appProps = await NextApp.getInitialProps(appContext);
-  return {
-    ...appProps,
-    colorScheme: getCookie('mantine-color-scheme', appContext.ctx) || 'dark',
-  };
-};
 
 export default MyApp;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Autocomplete, Loader } from '@mantine/core';
-import { IconSearch, IconX } from '@tabler/icons';
+import { IconSearch, IconX } from '@tabler/icons-react';
 
 import { useSearchMulti } from '@/hooks/swr';
 
@@ -66,7 +66,7 @@ export default function Search() {
     <Autocomplete
       value={value}
       onChange={setValue}
-      onItemSubmit={handleSubmit}
+      onOptionSubmit={handleSubmit}
       icon={isLoading ? <Loader size={16} /> : <IconSearch size={16} />}
       rightSection={
         value.length > 0 && (

@@ -1,7 +1,7 @@
 import { Button, Group, useMantineColorScheme } from '@mantine/core';
 import Link from 'next/link';
-import Image from "next/legacy/image";
-import { IconSun, IconMoonStars } from '@tabler/icons';
+import Image from 'next/legacy/image';
+import { IconSun, IconMoonStars } from '@tabler/icons-react';
 
 import Search from '@/components/Search/Search';
 
@@ -10,12 +10,16 @@ export default function Header() {
   const dark = colorScheme === 'dark';
 
   return (
-    <Group spacing="xs" noWrap sx={() => ({ justifyContent: 'center' })}>
+    <Group wrap="nowrap" spacing="xs" sx={() => ({ justifyContent: 'center' })}>
       <Search />
       <Button variant="default" onClick={() => toggleColorScheme()}>
         {dark ? <IconSun size={18} /> : <IconMoonStars size={18} />}
       </Button>
-      <Link href="https://github.com/rainmodred/how-old" passHref legacyBehavior>
+      <Link
+        href="https://github.com/rainmodred/how-old"
+        passHref
+        legacyBehavior
+      >
         <Button
           component="a"
           target="_blank"

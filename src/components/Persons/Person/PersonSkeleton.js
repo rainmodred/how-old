@@ -4,7 +4,7 @@ export default function PersonSkeleton() {
   return (
     <tr>
       <td>
-        <Group align="center" noWrap>
+        <Group align="center" wrap="noWrap">
           <Skeleton height={100} width={60} radius="xs" />
           <Box>
             <Skeleton data-testid="skeleton" height={8} width="100px" mb="xs" />

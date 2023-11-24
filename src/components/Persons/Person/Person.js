@@ -1,4 +1,4 @@
-import NextImage from "next/legacy/image";
+import NextImage from 'next/legacy/image';
 import { Box, Group, Text } from '@mantine/core';
 
 import profileFallback from '/public/images/profileFallback.svg';
@@ -44,7 +44,7 @@ export default function Person({ person }) {
   return (
     <tr>
       <td>
-        <Group noWrap>
+        <Group wrap="noWrap">
           <Image src={imgSrc} alt={`${name} image`}></Image>
           <Box>
             <Text weight="bold">{name}</Text>

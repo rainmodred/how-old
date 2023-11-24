@@ -1,4 +1,4 @@
-module.exports = {
+const nextConfig = {
   reactStrictMode: true,
   env: {
     apiKey: process.env.API_KEY,
@@ -6,5 +6,6 @@ module.exports = {
   images: {
     domains: ['image.tmdb.org'],
   },
-  experimental: { esmExternals: false },
 };
+
+module.exports = nextConfig;
