@@ -10,9 +10,9 @@ export default function Footer() {
       <Group noWrap>
         <Text mr="20px">Data and Images provided by</Text>
         <Link href="https://www.themoviedb.org/">
-          <a>
-            <Image src={tmdbLogo} alt="tmdb logo" width="64px" height="64px" />
-          </a>
+
+          <Image src={tmdbLogo} alt="tmdb logo" width="64px" height="64px" />
+
         </Link>
       </Group>
     </Container>

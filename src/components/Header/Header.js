@@ -15,7 +15,7 @@ export default function Header() {
       <Button variant="default" onClick={() => toggleColorScheme()}>
         {dark ? <IconSun size={18} /> : <IconMoonStars size={18} />}
       </Button>
-      <Link href="https://github.com/rainmodred/how-old" passHref>
+      <Link href="https://github.com/rainmodred/how-old" passHref legacyBehavior>
         <Button
           component="a"
           target="_blank"
