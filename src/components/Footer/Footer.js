@@ -1,5 +1,5 @@
 import { Container, Group, Text } from '@mantine/core';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import Link from 'next/link';
 
 import tmdbLogo from '/public/images/tmdb.svg';

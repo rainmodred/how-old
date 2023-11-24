@@ -1,6 +1,6 @@
 import { Button, Group, useMantineColorScheme } from '@mantine/core';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { IconSun, IconMoonStars } from '@tabler/icons';
 
 import Search from '@/components/Search/Search';
