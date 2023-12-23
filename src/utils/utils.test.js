@@ -1,4 +1,5 @@
 import { getDiffInYears, calculateAge, calculateCastAge } from './utils';
+import { describe, beforeAll, afterAll, it, vi, expect } from 'vitest';
 
 const AVENGERS = {
   id: 24428,
@@ -9,10 +10,10 @@ const { releaseDate } = AVENGERS;
 
 describe('utils', () => {
   beforeAll(() => {
-    jest.useFakeTimers().setSystemTime(new Date('2022-07-07'));
+    vi.useFakeTimers().setSystemTime(new Date('2022-07-07'));
   });
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
   describe('getDiffInYears', () => {
     it('returns years between dates', () => {

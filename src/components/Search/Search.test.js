@@ -5,6 +5,7 @@ import {
   waitForElementToBeRemoved,
   userEvent,
 } from '@/test/test-utils';
+import { describe, beforeAll, afterAll, it, vi, expect } from 'vitest';
 
 import Search from '@/components/Search/Search';
 
