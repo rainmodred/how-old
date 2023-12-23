@@ -6,7 +6,7 @@ const createJestConfig = nextJest({
 
 // Add any custom config to be passed to Jest
 const customJestConfig = {
-  setupFiles: [require.resolve('whatwg-fetch')],
+  setupFiles: [require.resolve('whatwg-fetch'), './jest.polyfills.js'],
   setupFilesAfterEnv: ['./setupTests.js'],
   moduleDirectories: ['node_modules', '<rootDir>/'],
   testEnvironment: 'jest-environment-jsdom',
@@ -17,6 +17,9 @@ const customJestConfig = {
     '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
     '^@/mocks/(.*)$': '<rootDir>/src/mocks/$1',
     '^@/test/(.*)$': '<rootDir>/src/test/$1',
+  },
+  testEnvironmentOptions: {
+    customExportConditions: [''],
   },
 };
 
