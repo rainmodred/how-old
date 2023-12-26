@@ -3,7 +3,7 @@ import { useFetcher, useNavigate } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 
 import { ColorSchemeToggle } from '~/components/ColorSchemeToggle';
-import { Search } from '~/components/Search';
+import { Group, Search } from '~/components/Search';
 import { multiSearch } from '../utils/api.server';
 
 export function useDebounce<T>(value: T, delay?: number): T {
@@ -27,11 +27,6 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export interface Group {
-  label: string;
-  options: string[];
-}
-
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const query = url.searchParams.get('search');
@@ -44,30 +39,40 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const movies: Group = { label: 'Movies', options: [] };
   const tvSeries: Group = { label: 'TV Series', options: [] };
 
-  const sortedByDate = data.results
-    .filter(item => item.release_date || item.first_air_date)
-    .sort((a, b) => {
-      if (a.release_date && b.release_date) {
-        return Date.parse(a.release_date) - Date.parse(b.release_date);
-      }
-
-      if (a.first_air_date && b.first_air_date) {
-        return Date.parse(a.first_air_date) - Date.parse(b.first_air_date);
-      }
-      return 1;
-    });
-
-  for (const item of sortedByDate) {
-    if (item.release_date) {
-      const title = `${item.title} (${item.release_date.slice(0, 4)})`;
-      movies.options.push(title);
-    } else if (item.first_air_date) {
-      const title = `${item.name} (${item.first_air_date.slice(0, 4)})`;
-      tvSeries.options.push(title);
+  for (const item of data.results) {
+    if (item.release_date && item.title) {
+      const label = `${item.title} (${item.release_date.slice(0, 4)})`;
+      movies.options.push({
+        label,
+        id: item.id,
+        title: item.title,
+        release_date: item.release_date,
+      });
+    } else if (item.first_air_date && item.name) {
+      const label = `${item.name} (${item.first_air_date.slice(0, 4)})`;
+      tvSeries.options.push({
+        label,
+        id: item.id,
+        title: item.name,
+        release_date: item.first_air_date,
+      });
     }
   }
 
-  return [movies, tvSeries];
+  return [
+    {
+      ...movies,
+      options: movies.options.sort(
+        (a, b) => Date.parse(a.release_date) - Date.parse(b.release_date),
+      ),
+    },
+    {
+      ...tvSeries,
+      options: tvSeries.options.sort(
+        (a, b) => Date.parse(a.release_date) - Date.parse(b.release_date),
+      ),
+    },
+  ];
 }
 
 export default function Index() {
@@ -94,7 +99,12 @@ export default function Index() {
           isLoading={fetcher.state !== 'idle'}
           value={query}
           onChange={value => setQuery(value)}
-          onOptionSubmit={path => navigate(`/${path}`)}
+          onOptionSubmit={item => {
+            const params = new URLSearchParams();
+            params.set('title', item.title);
+            params.set('release_date', item.release_date);
+            navigate(`/movie/${item.id}?${params.toString()}`);
+          }}
         />
       </fetcher.Form>
     </div>

@@ -2,14 +2,24 @@ import { useState } from 'react';
 import { Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
 
-import { Group } from '~/routes/_index';
+export interface Group {
+  label: string;
+  options: GroupItem[];
+}
+
+export interface GroupItem {
+  label: string;
+  id: number;
+  title: string;
+  release_date: string;
+}
 
 interface Props {
   data: Group[] | null;
   isLoading: boolean;
   value: string;
   onChange: (value: string) => void;
-  onOptionSubmit: (value: string) => void;
+  onOptionSubmit: (item: GroupItem) => void;
 }
 
 export function Search({
@@ -35,8 +45,8 @@ export function Search({
     data &&
     data?.map(group => {
       const options = group.options.map(item => (
-        <Combobox.Option value={item} key={item}>
-          {item}
+        <Combobox.Option value={item.id.toString()} key={item.id}>
+          {item.label}
         </Combobox.Option>
       ));
 
@@ -51,12 +61,20 @@ export function Search({
     ? data.reduce((acc, group) => acc + group.options.length, 0)
     : 0;
 
+  const map = data
+    ?.map(group => group.options)
+    .flat()
+    .reduce<Record<number, GroupItem>>((acc, curr) => {
+      acc[curr.id] = curr;
+
+      return acc;
+    }, {});
+
   return (
     <Combobox
       onOptionSubmit={optionValue => {
-        // setValue(optionValue);
         combobox.closeDropdown();
-        onOptionSubmit(optionValue);
+        onOptionSubmit(map[optionValue]);
       }}
       withinPortal={false}
       store={combobox}
