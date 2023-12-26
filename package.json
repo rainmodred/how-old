@@ -16,6 +16,7 @@
     "@remix-run/node": "^2.4.1",
     "@remix-run/react": "^2.4.1",
     "@remix-run/serve": "^2.4.1",
+    "@tabler/icons-react": "^2.44.0",
     "isbot": "^3.6.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -25,10 +26,6 @@
     "@remix-run/eslint-config": "^2.4.1",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
-    "postcss": "^8.4.32",
-    "postcss-preset-mantine": "1.12.1",
-    "postcss-simple-vars": "^7.0.1",
-    "prettier": "^3.1.1",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "eslint": "^8.38.0",
     "eslint-config-prettier": "^9.0.0",
@@ -36,6 +33,10 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "postcss": "^8.4.32",
+    "postcss-preset-mantine": "1.12.1",
+    "postcss-simple-vars": "^7.0.1",
+    "prettier": "^3.1.1",
     "typescript": "^5.1.6"
   },
   "engines": {
