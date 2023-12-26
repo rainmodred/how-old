@@ -55,6 +55,17 @@ export async function multiSearch(query: string, language: string = 'en-US') {
   return data;
 }
 
+export async function getCast(id: string) {
+  const { cast } = await fetcher<{ cast: Actor[] }>(`/movie/${id}/credits`);
+
+  return cast;
+}
+
+export async function getPerson(id: number, character: string) {
+  const person = await fetcher<Person>(`/person/${id}`);
+  return { ...person, character };
+}
+
 export interface Movie {
   id: number;
   release_date: string;
@@ -77,4 +88,12 @@ export interface Person {
   birthday: string;
   deathday?: string;
   name: string;
+  profile_path: string;
+}
+
+export interface Actor {
+  id: number;
+  name: string;
+  profile_path: string;
+  character: string;
 }
