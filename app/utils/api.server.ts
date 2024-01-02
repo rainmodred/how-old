@@ -61,9 +61,31 @@ export async function getCast(id: string) {
   return cast;
 }
 
+export async function getTvCast(id: string, season: string) {
+  const { cast } = await fetcher<{ cast: Actor[] }>(
+    `/tv/${id}/season/${season}/credits`,
+  );
+
+  return cast;
+}
+
 export async function getPerson(id: number, character: string) {
   const person = await fetcher<Person>(`/person/${id}`);
   return { ...person, character };
+}
+
+export async function getSeasons(id: number | string) {
+  const data = await fetcher<{
+    seasons: {
+      id: number;
+      air_date: string | null;
+      season_number: number;
+      poster_path: string;
+      name: string;
+    }[];
+  }>(`/tv/${id}`);
+
+  return data.seasons;
 }
 
 export interface Movie {

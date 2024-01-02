@@ -12,6 +12,7 @@ export interface GroupItem {
   id: number;
   title: string;
   release_date: string;
+  media_type: 'tv' | 'movie';
 }
 
 interface Props {

@@ -47,6 +47,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         id: item.id,
         title: item.title,
         release_date: item.release_date,
+        media_type: 'movie',
       });
     } else if (item.first_air_date && item.name) {
       const label = `${item.name} (${item.first_air_date.slice(0, 4)})`;
@@ -55,6 +56,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         id: item.id,
         title: item.name,
         release_date: item.first_air_date,
+        media_type: 'tv',
       });
     }
   }
@@ -103,7 +105,11 @@ export default function Index() {
             const params = new URLSearchParams();
             params.set('title', item.title);
             params.set('release_date', item.release_date);
-            navigate(`/movie/${item.id}?${params.toString()}`);
+            navigate(
+              item.media_type === 'movie'
+                ? `/movie/${item.id}?${params.toString()}`
+                : `/tv/${item.id}/season/1`,
+            );
           }}
         />
       </fetcher.Form>
