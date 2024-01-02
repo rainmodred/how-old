@@ -1,3 +1,6 @@
+import { differenceInYears } from 'date-fns';
+import { formatDate } from './dates.server';
+
 const API_URL = 'https://api.themoviedb.org/3';
 const token = process.env.API_TOKEN;
 if (!token) {
@@ -54,6 +57,33 @@ export async function multiSearch(query: string, language: string = 'en-US') {
 
   return data;
 }
+
+export async function getCastWithAges(cast: Actor[], releaseDate: string) {
+  const promises = cast
+    .slice(0, 5)
+    .map(actor => getPerson(actor.id, actor.character));
+
+  const result = await Promise.all(promises);
+
+  const castWithAges = result.map(person => {
+    const end = person.deathday ? new Date(person.deathday) : new Date();
+
+    return {
+      id: person.id,
+      name: person.name,
+      character: person.character,
+      birthday: formatDate(person.birthday),
+      deathday: formatDate(person.deathday),
+      profile_path: person.profile_path,
+      ageNow: differenceInYears(end, person.birthday),
+      ageThen: differenceInYears(new Date(releaseDate), person.birthday),
+    };
+  });
+
+  return castWithAges;
+}
+
+export type CastWithAges = Awaited<ReturnType<typeof getCastWithAges>>;
 
 export async function getCast(id: string) {
   const { cast } = await fetcher<{ cast: Actor[] }>(`/movie/${id}/credits`);

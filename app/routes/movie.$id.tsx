@@ -1,10 +1,9 @@
-import { Text, Title, Center, Loader, Table, Group, Box } from '@mantine/core';
+import { Title, Table } from '@mantine/core';
 import { redirect, type LoaderFunctionArgs } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
-import { differenceInYears } from 'date-fns';
-import { ProfileImage } from '~/components/ProfileImage';
-import { getCast, getPerson } from '~/utils/api.server';
-import { formatDate } from '~/utils/dates.server';
+import { useLoaderData, useNavigation } from '@remix-run/react';
+import { PersonSkeleton } from '~/components/PersonSkeleton';
+import { Persons } from '~/components/Persons';
+import { getCast, getCastWithAges } from '~/utils/api.server';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -14,28 +13,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 
   const cast = await getCast(params.id);
-  const promises = cast
-    .slice(0, 5)
-    .map(actor => getPerson(actor.id, actor.character));
-
-  const result = await Promise.all(promises);
-  console.log({ result });
-
-  const castWithAges = result.map(person => {
-    const end = person.deathday ? new Date(person.deathday) : new Date();
-
-    return {
-      id: person.id,
-      name: person.name,
-      character: person.character,
-      birthday: formatDate(person.birthday),
-      deathday: formatDate(person.deathday),
-      profile_path: person.profile_path,
-      ageNow: differenceInYears(end, person.birthday),
-      ageThen: differenceInYears(new Date(releaseDate), person.birthday),
-    };
-  });
-  console.log({ castWithAges });
+  const castWithAges = await getCastWithAges(cast, releaseDate);
 
   return {
     cast: castWithAges,
@@ -46,69 +24,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function MoviePage() {
   const { cast, releaseDate, title } = useLoaderData<typeof loader>();
-  console.log({ cast });
+
+  const { state } = useNavigation();
+  if (state === 'loading') {
+    return (
+      <Table>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <PersonSkeleton key={index} />
+        ))}
+      </Table>
+    );
+  }
   return (
     <>
-      {title ? (
-        <Title size="h1">
-          {title} ({releaseDate?.slice(0, 4)})
-        </Title>
-      ) : (
-        <Center>
-          <Loader />
-        </Center>
-      )}
-
-      <Table className="table-sm">
-        <thead>
-          <tr>
-            <th>Actor</th>
-            <th>Age then</th>
-            <th>Age now</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* {isLoading
-            ? Array.from({ length: 5 }).map((_, index) => (
-                <PersonSkeleton key={index} />
-              ))
-            : persons?.map(person => (
-                <Person key={person.id} person={person} />
-              ))} */}
-
-          {cast.map(
-            ({
-              id,
-              name,
-              character,
-              birthday,
-              deathday,
-              ageNow,
-              ageThen,
-              profile_path,
-            }) => {
-              return (
-                <Table.Tr key={id}>
-                  <Table.Td>
-                    <Group>
-                      <ProfileImage src={profile_path} alt={`${name} image`} />
-                      <Box>
-                        <Text fw="700">{name}</Text>
-                        <Text>{character}</Text>
-                        <Text>Birthday: {birthday}</Text>
-                      </Box>
-                    </Group>
-                  </Table.Td>
-                  <Table.Td align="center">{ageThen}</Table.Td>
-                  <Table.Td align="center">
-                    {deathday ? ` ${deathday} (${ageNow})` : ageNow}
-                  </Table.Td>
-                </Table.Tr>
-              );
-            },
-          )}
-        </tbody>
-      </Table>
+      <Title size="h1">
+        {title} ({releaseDate?.slice(0, 4)})
+      </Title>
+      <Persons cast={cast} />
     </>
   );
 }
