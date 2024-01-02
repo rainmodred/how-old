@@ -2,7 +2,7 @@ import { Title, Flex } from '@mantine/core';
 import { redirect, type LoaderFunctionArgs, json } from '@remix-run/node';
 import { NavLink, useLoaderData } from '@remix-run/react';
 import { Outlet } from 'react-router-dom';
-import { getSeasons } from '~/utils/api.server';
+import { getTvDetails } from '~/utils/api.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -12,9 +12,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     throw redirect('/');
   }
 
-  const seasons = await getSeasons(tvId);
+  const { seasons, name } = await getTvDetails(tvId);
 
   return json({
+    title: name,
     seasons: seasons
       .filter(season => season.air_date)
       .map(season => {
@@ -30,13 +31,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function TvPage() {
-  const { seasons } = useLoaderData<typeof loader>();
+  const { seasons, title } = useLoaderData<typeof loader>();
 
   return (
     <div>
       <Title order={3}>Seasons:</Title>
       <Flex gap="lg" wrap="wrap">
         {seasons.map(season => {
+          const params = new URLSearchParams();
+          params.set('title', title);
+          params.set('release_date', season.airDate);
           return (
             <NavLink
               style={({ isActive, isPending }) => {
@@ -47,7 +51,7 @@ export default function TvPage() {
                 };
               }}
               key={season.id}
-              to={`./season/${season.seasonNumber}?release_date=${season.airDate}`}
+              to={`./season/${season.seasonNumber}?${params.toString()}`}
             >
               {season.seasonNumber}
             </NavLink>

@@ -1,7 +1,8 @@
-import { Image, Text, Title, Table, Group, Box } from '@mantine/core';
+import { Text, Title, Table, Group, Box } from '@mantine/core';
 import { redirect, type LoaderFunctionArgs } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { differenceInYears } from 'date-fns';
+import { ProfileImage } from '~/components/ProfileImage';
 import { getPerson, getTvCast } from '~/utils/api.server';
 import { formatDate } from '~/utils/dates.server';
 
@@ -14,7 +15,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (!seasonNumber || !releaseDate || !tvId) {
     throw redirect('/');
   }
-  console.log('/tv/:id/season/:id', params);
 
   const cast = await getTvCast(tvId, seasonNumber.toString());
   const promises = cast
@@ -80,18 +80,7 @@ export default function TvPage() {
                 <Table.Tr key={id}>
                   <Table.Td>
                     <Group>
-                      <Box style={{ width: '85px' }}>
-                        <Image
-                          loading="lazy"
-                          src={
-                            profile_path
-                              ? `http://image.tmdb.org/t/p/w185${profile_path}`
-                              : '/profileFallback.svg'
-                          }
-                          radius={4}
-                          alt={`${name} image`}
-                        />
-                      </Box>
+                      <ProfileImage src={profile_path} alt={`${name} image`} />
                       <Box>
                         <Text fw="700">{name}</Text>
                         <Text>{character}</Text>

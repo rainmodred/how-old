@@ -74,8 +74,10 @@ export async function getPerson(id: number, character: string) {
   return { ...person, character };
 }
 
-export async function getSeasons(id: number | string) {
+export async function getTvDetails(id: number | string) {
   const data = await fetcher<{
+    id: number;
+    name: string;
     seasons: {
       id: number;
       air_date: string | null;
@@ -85,7 +87,7 @@ export async function getSeasons(id: number | string) {
     }[];
   }>(`/tv/${id}`);
 
-  return data.seasons;
+  return data;
 }
 
 export interface Movie {

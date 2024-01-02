@@ -1,16 +1,8 @@
-import {
-  Image,
-  Text,
-  Title,
-  Center,
-  Loader,
-  Table,
-  Group,
-  Box,
-} from '@mantine/core';
+import { Text, Title, Center, Loader, Table, Group, Box } from '@mantine/core';
 import { redirect, type LoaderFunctionArgs } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { differenceInYears } from 'date-fns';
+import { ProfileImage } from '~/components/ProfileImage';
 import { getCast, getPerson } from '~/utils/api.server';
 import { formatDate } from '~/utils/dates.server';
 
@@ -99,16 +91,7 @@ export default function MoviePage() {
                 <Table.Tr key={id}>
                   <Table.Td>
                     <Group>
-                      <Image
-                        loading="lazy"
-                        src={
-                          profile_path
-                            ? `http://image.tmdb.org/t/p/w185${profile_path}`
-                            : '/profileFallback.svg'
-                        }
-                        w={185}
-                        alt={`${name} image`}
-                      />
+                      <ProfileImage src={profile_path} alt={`${name} image`} />
                       <Box>
                         <Text fw="700">{name}</Text>
                         <Text>{character}</Text>
