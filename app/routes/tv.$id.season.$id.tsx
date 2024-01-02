@@ -49,10 +49,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function TvPage() {
   const { cast, releaseDate, title } = useLoaderData<typeof loader>();
-  console.log({ cast, releaseDate, title });
   return (
     <>
-      <Title size="h1">
+      <Title order={3}>
         {title} ({releaseDate?.slice(0, 4)})
       </Title>
 

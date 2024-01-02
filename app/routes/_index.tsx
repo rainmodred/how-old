@@ -108,7 +108,7 @@ export default function Index() {
             navigate(
               item.media_type === 'movie'
                 ? `/movie/${item.id}?${params.toString()}`
-                : `/tv/${item.id}/season/1`,
+                : `/tv/${item.id}/season/1?${params.toString()}`,
             );
           }}
         />
