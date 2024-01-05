@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
 
-export interface Group {
+export interface IGroup {
   label: string;
   options: GroupItem[];
 }
@@ -16,7 +16,7 @@ export interface GroupItem {
 }
 
 interface Props {
-  data: Group[] | null;
+  data: IGroup[] | null;
   isLoading: boolean;
   value: string;
   onChange: (value: string) => void;
@@ -84,7 +84,6 @@ export function Search({
         <TextInput
           type="search"
           name="search"
-          label="Search"
           placeholder="Search for a movie or tv series"
           value={value}
           onChange={event => {
