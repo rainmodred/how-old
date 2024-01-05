@@ -58,8 +58,8 @@ export function Persons({ cast }: Props) {
                     </Box>
                   </Group>
                 </Table.Td>
-                <Table.Td align="center">{ageThen}</Table.Td>
-                <Table.Td align="center">
+                <Table.Td>{ageThen}</Table.Td>
+                <Table.Td>
                   {deathday ? ` ${deathday} (${ageNow})` : ageNow}
                 </Table.Td>
               </Table.Tr>
