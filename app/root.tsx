@@ -13,12 +13,14 @@ import {
   useNavigate,
 } from '@remix-run/react';
 import {
+  Text,
   Stack,
   Image,
   MantineProvider,
   ColorSchemeScript,
   Group,
   useMantineColorScheme,
+  Container,
 } from '@mantine/core';
 import { IGroup, Search } from './components/Search';
 import { ColorSchemeToggle } from './components/ColorSchemeToggle';
@@ -132,33 +134,58 @@ export default function App() {
       <body>
         <MantineProvider>
           <Stack p={'sm'} h={'100dvh'}>
-            <header>
-              <Group wrap="nowrap" align="center" justify="center" gap="sm">
-                <fetcher.Form style={{ width: '80%', maxWidth: '350px' }}>
-                  <Search
-                    data={fetcher.data ? fetcher.data : null}
-                    isLoading={fetcher.state !== 'idle'}
-                    value={query}
-                    onChange={value => setQuery(value)}
-                    onOptionSubmit={item => {
-                      const params = new URLSearchParams();
-                      params.set('title', item.title);
-                      params.set('release_date', item.release_date);
-                      navigate(
-                        item.media_type === 'movie'
-                          ? `/movie/${item.id}?${params.toString()}`
-                          : `/tv/${item.id}/season/1?${params.toString()}`,
-                      );
-                    }}
+            <Group
+              component={'header'}
+              wrap="nowrap"
+              align="center"
+              justify="center"
+              gap="sm"
+            >
+              <fetcher.Form style={{ width: '80%', maxWidth: '350px' }}>
+                <Search
+                  data={fetcher.data ? fetcher.data : null}
+                  isLoading={fetcher.state !== 'idle'}
+                  value={query}
+                  onChange={value => setQuery(value)}
+                  onOptionSubmit={item => {
+                    const params = new URLSearchParams();
+                    params.set('title', item.title);
+                    params.set('release_date', item.release_date);
+                    navigate(
+                      item.media_type === 'movie'
+                        ? `/movie/${item.id}?${params.toString()}`
+                        : `/tv/${item.id}/season/1?${params.toString()}`,
+                    );
+                  }}
+                />
+              </fetcher.Form>
+              <ColorSchemeToggle />
+              <Link to="https://github.com/rainmodred/how-old">
+                <GithubImage />
+              </Link>
+            </Group>
+            <Container
+              component={'main'}
+              px="0"
+              w={'100%'}
+              styles={{ root: { flex: '1' } }}
+            >
+              <Outlet />
+            </Container>
+            <Container component={'footer'}>
+              <Group wrap="nowrap">
+                <Text>Data and Images provided by</Text>
+                <Link to="https://www.themoviedb.org/">
+                  <Image
+                    src={'/tmdb.svg'}
+                    alt="tmdb logo"
+                    w="64px"
+                    h="64px"
+                    fit="contain"
                   />
-                </fetcher.Form>
-                <ColorSchemeToggle />
-                <Link to="https://github.com/rainmodred/how-old">
-                  <GithubImage />
                 </Link>
               </Group>
-            </header>
-            <Outlet />
+            </Container>
           </Stack>
           <ScrollRestoration />
           <Scripts />
