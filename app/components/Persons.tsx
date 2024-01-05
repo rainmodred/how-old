@@ -1,6 +1,24 @@
-import { Box, Group, Table, Text } from '@mantine/core';
-import { ProfileImage } from './ProfileImage';
+import { Box, Image, Group, Table, Text } from '@mantine/core';
 import { CastWithAges } from '~/utils/api.server';
+import { baseImageUrl } from '~/utils/constants';
+
+interface Props {
+  src: string;
+  alt: string;
+}
+
+function ProfileImage({ src, alt }: Props) {
+  return (
+    <Box style={{ width: '85px' }}>
+      <Image
+        loading="lazy"
+        src={src ? `${baseImageUrl}/${src}` : '/profileFallback.svg'}
+        radius={4}
+        alt={alt}
+      />
+    </Box>
+  );
+}
 
 interface Props {
   cast: CastWithAges;
