@@ -1,6 +1,10 @@
 import '@mantine/core/styles.css';
 import { cssBundleHref } from '@remix-run/css-bundle';
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
+import type {
+  ActionFunctionArgs,
+  LinksFunction,
+  LoaderFunctionArgs,
+} from '@remix-run/node';
 import {
   Link,
   Links,
@@ -9,7 +13,10 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  json,
   useFetcher,
+  useFetchers,
+  useLoaderData,
   useNavigate,
 } from '@remix-run/react';
 import {
@@ -17,15 +24,16 @@ import {
   Stack,
   Image,
   MantineProvider,
-  ColorSchemeScript,
   Group,
-  useMantineColorScheme,
   Container,
+  Select,
+  Button,
 } from '@mantine/core';
 import { IGroup, Search } from './components/Search';
-import { ColorSchemeToggle } from './components/ColorSchemeToggle';
 import { useState, useEffect } from 'react';
 import { multiSearch } from './utils/api.server';
+import { Theme, getTheme, setTheme } from './utils/theme.server';
+import { IconMoonStars, IconSun } from '@tabler/icons-react';
 
 function useDebounce<T>(value: T, delay?: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -41,12 +49,46 @@ function useDebounce<T>(value: T, delay?: number): T {
   return debouncedValue;
 }
 
-function GithubImage() {
-  const { colorScheme } = useMantineColorScheme();
+function useTheme() {
+  const data = useLoaderData<typeof loader>();
+  const fetchers = useFetchers();
+  const themeFetcher = fetchers.find(
+    f => f.formData?.get('intent') === 'update-theme',
+  );
+  const optimisticTheme = themeFetcher?.formData?.get('theme');
+  if (optimisticTheme === 'light' || optimisticTheme === 'dark') {
+    return optimisticTheme;
+  }
+  return data.theme;
+}
+
+function ThemeSwitch({ userPreference }: { userPreference?: Theme }) {
+  const fetcher = useFetcher<typeof action>();
+
+  const mode = userPreference ?? 'light';
+  const nextMode = mode === 'light' ? 'dark' : 'light';
+
+  return (
+    <fetcher.Form method="POST">
+      <input type="hidden" name="theme" value={nextMode} />
+      <Button
+        name="intent"
+        value="update-theme"
+        type="submit"
+        variant="default"
+        styles={{ root: { padding: '5px 10px' } }}
+      >
+        {mode === 'dark' ? <IconSun /> : <IconMoonStars />}
+      </Button>
+    </fetcher.Form>
+  );
+}
+
+function GithubImage({ theme }: { theme: Theme }) {
   return (
     <Image
       src={`${
-        colorScheme === 'dark' ? '/github-mark-white.svg' : '/github-mark.svg'
+        theme === 'dark' ? '/github-mark-white.svg' : '/github-mark.svg'
       }`}
       width="2"
       height="24"
@@ -63,7 +105,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const query = url.searchParams.get('search');
   if (!query || query?.length === 0) {
-    return null;
+    return json({ options: [], theme: getTheme(request) });
   }
 
   const data = await multiSearch(query);
@@ -92,27 +134,48 @@ export async function loader({ request }: LoaderFunctionArgs) {
       });
     }
   }
-  return [
-    {
-      ...movies,
-      options: movies.options.sort(
-        (a, b) => Date.parse(a.release_date) - Date.parse(b.release_date),
-      ),
-    },
-    {
-      ...tvSeries,
-      options: tvSeries.options.sort(
-        (a, b) => Date.parse(a.release_date) - Date.parse(b.release_date),
-      ),
-    },
-  ];
+  return json({
+    options: [
+      {
+        ...movies,
+        options: movies.options.sort(
+          (a, b) => Date.parse(a.release_date) - Date.parse(b.release_date),
+        ),
+      },
+      {
+        ...tvSeries,
+        options: tvSeries.options.sort(
+          (a, b) => Date.parse(a.release_date) - Date.parse(b.release_date),
+        ),
+      },
+    ],
+    theme: getTheme(request),
+  });
 }
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const theme = String(formData.get('theme')) as Theme;
+  const responseInit = {
+    headers: { 'set-cookie': setTheme(theme) },
+  };
+  return json({ success: true }, responseInit);
+}
+
+//https://github.com/orgs/mantinedev/discussions/4829#discussioncomment-7071081
+const colorSchemeManager = {
+  set: () => null,
+  subscribe: () => null,
+  unsubscribe: () => {},
+  clear: () => null,
+};
 
 export default function App() {
   const fetcher = useFetcher<typeof loader>();
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
 
+  const theme = useTheme();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -123,16 +186,17 @@ export default function App() {
   }, [debouncedQuery]);
 
   return (
-    <html lang="en">
+    <html lang="en" data-mantine-color-scheme={theme}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
-        <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>
+        <MantineProvider
+          colorSchemeManager={{ ...colorSchemeManager, get: () => theme }}
+        >
           <Stack p={'sm'} h={'100dvh'}>
             <Group
               component={'header'}
@@ -143,7 +207,7 @@ export default function App() {
             >
               <fetcher.Form style={{ width: '80%', maxWidth: '350px' }}>
                 <Search
-                  data={fetcher.data ? fetcher.data : null}
+                  data={fetcher.data?.options ? fetcher.data.options : null}
                   isLoading={fetcher.state !== 'idle'}
                   value={query}
                   onChange={value => setQuery(value)}
@@ -159,9 +223,10 @@ export default function App() {
                   }}
                 />
               </fetcher.Form>
-              <ColorSchemeToggle />
+
+              <ThemeSwitch userPreference={theme} />
               <Link to="https://github.com/rainmodred/how-old">
-                <GithubImage />
+                <GithubImage theme={theme} />
               </Link>
             </Group>
             <Container
