@@ -59,26 +59,26 @@ export async function multiSearch(query: string, language: string = 'en') {
 }
 
 export async function getCastWithAges(cast: Actor[], releaseDate: string) {
-  const promises = cast
-    .slice(0, 5)
-    .map(actor => getPerson(actor.id, actor.character));
+  const promises = cast.map(actor => getPerson(actor.id, actor.character));
 
   const result = await Promise.all(promises);
 
-  const castWithAges = result.map(person => {
-    const end = person.deathday ? new Date(person.deathday) : new Date();
+  const castWithAges = result
+    .filter(person => person.birthday)
+    .map(person => {
+      const end = person.deathday ? new Date(person.deathday) : new Date();
 
-    return {
-      id: person.id,
-      name: person.name,
-      character: person.character,
-      birthday: formatDate(person.birthday),
-      deathday: formatDate(person.deathday),
-      profile_path: person.profile_path,
-      ageNow: differenceInYears(end, person.birthday),
-      ageThen: differenceInYears(new Date(releaseDate), person.birthday),
-    };
-  });
+      return {
+        id: person.id,
+        name: person.name,
+        character: person.character,
+        birthday: formatDate(person.birthday),
+        deathday: formatDate(person.deathday),
+        profile_path: person.profile_path,
+        ageNow: differenceInYears(end, person.birthday),
+        ageThen: differenceInYears(new Date(releaseDate), person.birthday),
+      };
+    });
 
   return castWithAges;
 }
