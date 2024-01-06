@@ -26,7 +26,7 @@ export default function MoviePage() {
   const { cast, releaseDate, title } = useLoaderData<typeof loader>();
 
   const { state } = useNavigation();
-  if (state === 'loading') {
+  if (state !== 'idle') {
     return (
       <Table>
         {Array.from({ length: 5 }).map((_, index) => (
