@@ -113,7 +113,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 
-  const data = await multiSearch(query);
+  const language = getLang(request);
+  const data = await multiSearch(query, language);
 
   const movies: IGroup = { label: 'Movies', options: [] };
   const tvSeries: IGroup = { label: 'TV Series', options: [] };

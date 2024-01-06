@@ -41,7 +41,7 @@ async function fetcher<T>(
   }
 }
 
-export async function multiSearch(query: string, language: string = 'en-US') {
+export async function multiSearch(query: string, language: string = 'en') {
   const params = new URLSearchParams({ query, language });
   const data = await fetcher<{
     page: number;
