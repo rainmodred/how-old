@@ -34,6 +34,7 @@ import { useState, useEffect } from 'react';
 import { multiSearch } from './utils/api.server';
 import { Theme, getTheme, setTheme } from './utils/theme.server';
 import { IconMoonStars, IconSun } from '@tabler/icons-react';
+import { Lang, getLang, setLang } from './utils/lang.server';
 
 function useDebounce<T>(value: T, delay?: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -105,7 +106,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const query = url.searchParams.get('search');
   if (!query || query?.length === 0) {
-    return json({ options: [], theme: getTheme(request) });
+    return json({
+      options: [],
+      theme: getTheme(request),
+      lang: getLang(request),
+    });
   }
 
   const data = await multiSearch(query);
@@ -150,16 +155,32 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     ],
     theme: getTheme(request),
+    lang: getLang(request),
   });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const theme = String(formData.get('theme')) as Theme;
-  const responseInit = {
-    headers: { 'set-cookie': setTheme(theme) },
-  };
-  return json({ success: true }, responseInit);
+  const intent = formData.get('intent');
+
+  switch (intent) {
+    case 'update-theme': {
+      const theme = String(formData.get('theme')) as Theme;
+      const responseInit = {
+        headers: { 'set-cookie': setTheme(theme) },
+      };
+      return json({ success: true }, responseInit);
+    }
+    case 'change-lang': {
+      const language = String(formData.get('language')) as Lang;
+      const responseInit = {
+        headers: { 'set-cookie': setLang(language) },
+      };
+      return json({ success: true }, responseInit);
+    }
+    default:
+      return null;
+  }
 }
 
 //https://github.com/orgs/mantinedev/discussions/4829#discussioncomment-7071081
@@ -225,6 +246,26 @@ export default function App() {
               </fetcher.Form>
 
               <ThemeSwitch userPreference={theme} />
+
+              <fetcher.Form>
+                <Select
+                  data={['en', 'ru']}
+                  defaultValue="en"
+                  withCheckIcon={false}
+                  allowDeselect={false}
+                  onChange={value =>
+                    fetcher.submit(
+                      { intent: 'change-lang', language: value },
+                      { method: 'POST' },
+                    )
+                  }
+                  styles={{
+                    wrapper: { width: '45px' },
+                    section: { display: 'none' },
+                    input: { padding: 0, textAlign: 'center' },
+                  }}
+                />
+              </fetcher.Form>
               <Link to="https://github.com/rainmodred/how-old">
                 <GithubImage theme={theme} />
               </Link>
