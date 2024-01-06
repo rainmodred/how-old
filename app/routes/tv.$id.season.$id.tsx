@@ -1,5 +1,5 @@
 import { Title, Table } from '@mantine/core';
-import { redirect, type LoaderFunctionArgs } from '@remix-run/node';
+import { redirect, type LoaderFunctionArgs } from '@vercel/remix';
 import { useLoaderData, useNavigation } from '@remix-run/react';
 import { PersonSkeleton } from '~/components/PersonSkeleton';
 import { Persons } from '~/components/Persons';

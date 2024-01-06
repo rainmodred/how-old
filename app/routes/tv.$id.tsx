@@ -1,5 +1,5 @@
 import { Title, Flex } from '@mantine/core';
-import { redirect, type LoaderFunctionArgs, json } from '@remix-run/node';
+import { redirect, type LoaderFunctionArgs, json } from '@vercel/remix';
 import { NavLink, useLoaderData } from '@remix-run/react';
 import { Outlet } from 'react-router-dom';
 import { getTvDetails } from '~/utils/api.server';

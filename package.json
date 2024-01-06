@@ -17,6 +17,7 @@
     "@remix-run/react": "^2.4.1",
     "@remix-run/serve": "^2.4.1",
     "@tabler/icons-react": "^2.44.0",
+    "@vercel/remix": "^2.4.1",
     "date-fns": "^3.0.6",
     "isbot": "^3.6.8",
     "react": "^18.2.0",

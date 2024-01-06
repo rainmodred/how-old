@@ -1,23 +1,22 @@
 import '@mantine/core/styles.css';
-import { cssBundleHref } from '@remix-run/css-bundle';
-import type {
+import {
   ActionFunctionArgs,
   LinksFunction,
   LoaderFunctionArgs,
-} from '@remix-run/node';
-import {
-  Link,
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
   json,
-  useFetcher,
-  useFetchers,
+} from '@vercel/remix';
+import {
   useLoaderData,
+  useFetchers,
+  useFetcher,
   useNavigate,
+  Meta,
+  Links,
+  Link,
+  Outlet,
+  ScrollRestoration,
+  Scripts,
+  LiveReload,
 } from '@remix-run/react';
 import {
   Text,
@@ -35,6 +34,7 @@ import { multiSearch } from './utils/api.server';
 import { Theme, getTheme, setTheme } from './utils/theme.server';
 import { IconMoonStars, IconSun } from '@tabler/icons-react';
 import { Lang, getLang, setLang } from './utils/lang.server';
+import { cssBundleHref } from '@remix-run/css-bundle';
 
 function useDebounce<T>(value: T, delay?: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
