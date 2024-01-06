@@ -50,7 +50,7 @@ function useDebounce<T>(value: T, delay?: number): T {
   return debouncedValue;
 }
 
-function useTheme() {
+function useData() {
   const data = useLoaderData<typeof loader>();
   const fetchers = useFetchers();
   const themeFetcher = fetchers.find(
@@ -58,9 +58,9 @@ function useTheme() {
   );
   const optimisticTheme = themeFetcher?.formData?.get('theme');
   if (optimisticTheme === 'light' || optimisticTheme === 'dark') {
-    return optimisticTheme;
+    return { ...data, theme: optimisticTheme as Theme };
   }
-  return data.theme;
+  return data;
 }
 
 function ThemeSwitch({ userPreference }: { userPreference?: Theme }) {
@@ -197,7 +197,7 @@ export default function App() {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
 
-  const theme = useTheme();
+  const { theme, lang } = useData();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -234,9 +234,10 @@ export default function App() {
                   value={query}
                   onChange={value => setQuery(value)}
                   onOptionSubmit={item => {
-                    const params = new URLSearchParams();
-                    params.set('title', item.title);
-                    params.set('release_date', item.release_date);
+                    const params = new URLSearchParams({
+                      title: item.title,
+                      release_date: item.release_date,
+                    });
                     navigate(
                       item.media_type === 'movie'
                         ? `/movie/${item.id}?${params.toString()}`
@@ -251,7 +252,7 @@ export default function App() {
               <fetcher.Form>
                 <Select
                   data={['en', 'ru']}
-                  defaultValue="en"
+                  defaultValue={lang}
                   withCheckIcon={false}
                   allowDeselect={false}
                   onChange={value =>
