@@ -105,11 +105,13 @@ export const links: LinksFunction = () => [
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const query = url.searchParams.get('search');
+  const lang = getLang(request);
+  const theme = getTheme(request);
   if (!query || query?.length === 0) {
     return json({
       options: [],
-      theme: getTheme(request),
-      lang: getLang(request),
+      theme,
+      lang,
     });
   }
 
@@ -155,8 +157,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
         ),
       },
     ],
-    theme: getTheme(request),
-    lang: getLang(request),
+    theme,
+    lang,
   });
 }
 
@@ -192,6 +194,35 @@ const colorSchemeManager = {
   clear: () => null,
 };
 
+function Document({
+  children,
+  theme,
+}: {
+  children: React.ReactNode;
+  theme: Theme;
+}) {
+  return (
+    <html lang="en" data-mantine-color-scheme={theme}>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <MantineProvider
+          colorSchemeManager={{ ...colorSchemeManager, get: () => theme }}
+        >
+          {children}
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </MantineProvider>
+      </body>
+    </html>
+  );
+}
+
 export default function App() {
   const fetcher = useFetcher<typeof loader>();
   const [query, setQuery] = useState('');
@@ -208,98 +239,97 @@ export default function App() {
   }, [debouncedQuery]);
 
   return (
-    <html lang="en" data-mantine-color-scheme={theme}>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <MantineProvider
-          colorSchemeManager={{ ...colorSchemeManager, get: () => theme }}
+    <Document theme={theme}>
+      <Stack p={'sm'} h={'100dvh'}>
+        <Group
+          component={'header'}
+          wrap="nowrap"
+          align="center"
+          justify="center"
+          gap="sm"
         >
-          <Stack p={'sm'} h={'100dvh'}>
-            <Group
-              component={'header'}
-              wrap="nowrap"
-              align="center"
-              justify="center"
-              gap="sm"
-            >
-              <fetcher.Form style={{ width: '80%', maxWidth: '350px' }}>
-                <Search
-                  data={fetcher.data?.options ? fetcher.data.options : null}
-                  isLoading={fetcher.state !== 'idle'}
-                  value={query}
-                  onChange={value => setQuery(value)}
-                  onOptionSubmit={item => {
-                    const params = new URLSearchParams({
-                      title: item.title,
-                      release_date: item.release_date,
-                    });
-                    navigate(
-                      item.media_type === 'movie'
-                        ? `/movie/${item.id}?${params.toString()}`
-                        : `/tv/${item.id}/season/1?${params.toString()}`,
-                    );
-                  }}
-                />
-              </fetcher.Form>
+          <fetcher.Form style={{ width: '80%', maxWidth: '350px' }}>
+            <Search
+              data={fetcher.data?.options ? fetcher.data.options : null}
+              isLoading={fetcher.state !== 'idle'}
+              value={query}
+              onChange={value => setQuery(value)}
+              onOptionSubmit={item => {
+                const params = new URLSearchParams({
+                  title: item.title,
+                  release_date: item.release_date,
+                });
+                navigate(
+                  item.media_type === 'movie'
+                    ? `/movie/${item.id}?${params.toString()}`
+                    : `/tv/${item.id}/season/1?${params.toString()}`,
+                );
+              }}
+            />
+          </fetcher.Form>
 
-              <ThemeSwitch userPreference={theme} />
+          <ThemeSwitch userPreference={theme} />
 
-              <fetcher.Form>
-                <Select
-                  data={['en', 'ru']}
-                  defaultValue={lang}
-                  withCheckIcon={false}
-                  allowDeselect={false}
-                  onChange={value =>
-                    fetcher.submit(
-                      { intent: 'change-lang', language: value },
-                      { method: 'POST' },
-                    )
-                  }
-                  styles={{
-                    wrapper: { width: '45px' },
-                    section: { display: 'none' },
-                    input: { padding: 0, textAlign: 'center' },
-                  }}
-                />
-              </fetcher.Form>
-              <Link to="https://github.com/rainmodred/how-old">
-                <GithubImage theme={theme} />
-              </Link>
-            </Group>
-            <Container
-              component={'main'}
-              px="0"
-              w={'100%'}
-              styles={{ root: { flex: '1' } }}
-            >
-              <Outlet />
-            </Container>
-            <Container component={'footer'}>
-              <Group wrap="nowrap">
-                <Text>Data and Images provided by</Text>
-                <Link to="https://www.themoviedb.org/">
-                  <Image
-                    src={'/tmdb.svg'}
-                    alt="tmdb logo"
-                    w="64px"
-                    h="64px"
-                    fit="contain"
-                  />
-                </Link>
-              </Group>
-            </Container>
-          </Stack>
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
-        </MantineProvider>
-      </body>
-    </html>
+          <fetcher.Form>
+            <Select
+              data={['en', 'ru']}
+              defaultValue={lang}
+              withCheckIcon={false}
+              allowDeselect={false}
+              onChange={value =>
+                fetcher.submit(
+                  { intent: 'change-lang', language: value },
+                  { method: 'POST' },
+                )
+              }
+              styles={{
+                wrapper: { width: '45px' },
+                section: { display: 'none' },
+                input: { padding: 0, textAlign: 'center' },
+              }}
+            />
+          </fetcher.Form>
+          <Link to="https://github.com/rainmodred/how-old">
+            <GithubImage theme={theme} />
+          </Link>
+        </Group>
+        <Container
+          component={'main'}
+          px="0"
+          w={'100%'}
+          styles={{ root: { flex: '1' } }}
+        >
+          <Outlet />
+        </Container>
+        <Container component={'footer'}>
+          <Group wrap="nowrap">
+            <Text>Data and Images provided by</Text>
+            <Link to="https://www.themoviedb.org/">
+              <Image
+                src={'/tmdb.svg'}
+                alt="tmdb logo"
+                w="64px"
+                h="64px"
+                fit="contain"
+              />
+            </Link>
+          </Group>
+        </Container>
+      </Stack>
+      <ScrollRestoration />
+      <Scripts />
+      <LiveReload />
+    </Document>
+  );
+}
+
+export function ErrorBoundary() {
+  return (
+    <Document theme="light">
+      <Stack p={'sm'}>
+        <h1>Something went wrong</h1>
+        <Link to="/">go back</Link>
+      </Stack>
+    </Document>
   );
 }
