@@ -1,6 +1,6 @@
-import { Group, Box, Skeleton, Table } from '@mantine/core';
+import { Box, Group, Skeleton, Table } from '@mantine/core';
 
-export function PersonSkeleton() {
+function PersonSkeleton() {
   return (
     <Table.Tr>
       <Table.Td>
@@ -20,5 +20,17 @@ export function PersonSkeleton() {
         <Skeleton height={8} width={12} />
       </Table.Td>
     </Table.Tr>
+  );
+}
+
+export function SkeletonTable({ rows }: { rows: number }) {
+  return (
+    <Table>
+      <Table.Tbody>
+        {Array.from({ length: rows }).map((_, index) => (
+          <PersonSkeleton key={index} />
+        ))}
+      </Table.Tbody>
+    </Table>
   );
 }

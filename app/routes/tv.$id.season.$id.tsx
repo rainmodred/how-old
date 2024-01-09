@@ -1,9 +1,9 @@
-import { Title, Table } from '@mantine/core';
+import { Title } from '@mantine/core';
 import { redirect, type LoaderFunctionArgs } from '@vercel/remix';
 import { json, useLoaderData, useNavigation } from '@remix-run/react';
-import { PersonSkeleton } from '~/components/PersonSkeleton';
 import { Persons } from '~/components/Persons';
 import { getCastWithAges, getTvCast } from '~/utils/api.server';
+import { SkeletonTable } from '~/components/SkeletonTable';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -30,13 +30,7 @@ export default function TvPage() {
 
   const { state } = useNavigation();
   if (state === 'loading') {
-    return (
-      <Table>
-        {Array.from({ length: 5 }).map((_, index) => (
-          <PersonSkeleton key={index} />
-        ))}
-      </Table>
-    );
+    return <SkeletonTable rows={5} />;
   }
   return (
     <>

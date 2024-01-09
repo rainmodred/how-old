@@ -1,9 +1,9 @@
-import { Title, Table } from '@mantine/core';
+import { Title } from '@mantine/core';
 import { redirect, type LoaderFunctionArgs, json } from '@vercel/remix';
 import { useLoaderData, useNavigation } from '@remix-run/react';
-import { PersonSkeleton } from '~/components/PersonSkeleton';
 import { Persons } from '~/components/Persons';
 import { getCast, getCastWithAges } from '~/utils/api.server';
+import { SkeletonTable } from '~/components/SkeletonTable';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -27,13 +27,7 @@ export default function MoviePage() {
 
   const { state } = useNavigation();
   if (state !== 'idle') {
-    return (
-      <Table>
-        {Array.from({ length: 5 }).map((_, index) => (
-          <PersonSkeleton key={index} />
-        ))}
-      </Table>
-    );
+    return <SkeletonTable rows={5} />;
   }
   return (
     <>

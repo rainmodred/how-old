@@ -37,7 +37,7 @@ import { Theme, getTheme, setTheme } from './utils/theme.server';
 import { IconMoonStars, IconSun } from '@tabler/icons-react';
 import { Lang, getLang, setLang } from './utils/lang.server';
 import { cssBundleHref } from '@remix-run/css-bundle';
-import { PersonSkeleton } from './components/PersonSkeleton';
+import { SkeletonTable } from './components/SkeletonTable';
 
 function useDebounce<T>(value: T, delay?: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -306,13 +306,7 @@ export default function App() {
           w={'100%'}
           styles={{ root: { flex: '1' } }}
         >
-          {state !== 'idle' && (
-            <Table>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <PersonSkeleton key={index} />
-              ))}
-            </Table>
-          )}
+          {state !== 'idle' && <SkeletonTable rows={5} />}
           <Outlet />
         </Container>
         <Container component={'footer'}>
