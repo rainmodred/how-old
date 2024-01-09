@@ -1,5 +1,5 @@
 import { Title, Table } from '@mantine/core';
-import { redirect, type LoaderFunctionArgs } from '@remix-run/node';
+import { redirect, type LoaderFunctionArgs, json } from '@vercel/remix';
 import { useLoaderData, useNavigation } from '@remix-run/react';
 import { PersonSkeleton } from '~/components/PersonSkeleton';
 import { Persons } from '~/components/Persons';
@@ -15,11 +15,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const cast = await getCast(params.id);
   const castWithAges = await getCastWithAges(cast, releaseDate);
 
-  return {
+  return json({
     cast: castWithAges,
     releaseDate,
     title: url.searchParams.get('title'),
-  };
+  });
 }
 
 export default function MoviePage() {

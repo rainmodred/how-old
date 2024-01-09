@@ -1,6 +1,6 @@
 import { Title, Table } from '@mantine/core';
 import { redirect, type LoaderFunctionArgs } from '@vercel/remix';
-import { useLoaderData, useNavigation } from '@remix-run/react';
+import { json, useLoaderData, useNavigation } from '@remix-run/react';
 import { PersonSkeleton } from '~/components/PersonSkeleton';
 import { Persons } from '~/components/Persons';
 import { getCastWithAges, getTvCast } from '~/utils/api.server';
@@ -18,15 +18,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const cast = await getTvCast(tvId, seasonNumber.toString());
   const castWithAges = await getCastWithAges(cast, releaseDate);
 
-  return {
+  return json({
     cast: castWithAges,
     releaseDate,
     title: url.searchParams.get('title'),
-  };
+  });
 }
 
 export default function TvPage() {
   const { cast, releaseDate, title } = useLoaderData<typeof loader>();
+
   const { state } = useNavigation();
   if (state === 'loading') {
     return (
