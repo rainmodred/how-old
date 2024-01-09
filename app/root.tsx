@@ -17,6 +17,7 @@ import {
   ScrollRestoration,
   Scripts,
   LiveReload,
+  useNavigation,
 } from '@remix-run/react';
 import {
   Text,
@@ -27,6 +28,7 @@ import {
   Container,
   Select,
   Button,
+  Table,
 } from '@mantine/core';
 import { IGroup, Search } from './components/Search';
 import { useState, useEffect } from 'react';
@@ -35,6 +37,7 @@ import { Theme, getTheme, setTheme } from './utils/theme.server';
 import { IconMoonStars, IconSun } from '@tabler/icons-react';
 import { Lang, getLang, setLang } from './utils/lang.server';
 import { cssBundleHref } from '@remix-run/css-bundle';
+import { PersonSkeleton } from './components/PersonSkeleton';
 
 function useDebounce<T>(value: T, delay?: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -230,13 +233,17 @@ export default function App() {
 
   const { theme, lang } = useData();
   const navigate = useNavigate();
+  const { state } = useNavigation();
 
   useEffect(() => {
     if (debouncedQuery.length <= 2) {
       return;
     }
-    fetcher.submit({ search: debouncedQuery });
+    fetcher.submit({ intent: 'search', search: debouncedQuery });
   }, [debouncedQuery]);
+
+  if (state !== 'idle') {
+  }
 
   return (
     <Document theme={theme}>
@@ -251,7 +258,10 @@ export default function App() {
           <fetcher.Form style={{ width: '80%', maxWidth: '350px' }}>
             <Search
               data={fetcher.data?.options ? fetcher.data.options : null}
-              isLoading={fetcher.state !== 'idle'}
+              isLoading={
+                fetcher.state !== 'idle' &&
+                fetcher.formData?.get('intent') === 'search'
+              }
               value={query}
               onChange={value => setQuery(value)}
               onOptionSubmit={item => {
@@ -299,6 +309,13 @@ export default function App() {
           w={'100%'}
           styles={{ root: { flex: '1' } }}
         >
+          {state !== 'idle' && (
+            <Table>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <PersonSkeleton key={index} />
+              ))}
+            </Table>
+          )}
           <Outlet />
         </Container>
         <Container component={'footer'}>
