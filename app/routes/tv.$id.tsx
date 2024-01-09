@@ -17,7 +17,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({
     title: name,
     seasons: seasons
-      .filter(season => season.air_date)
+      .filter(season => season.air_date && season.season_number > 0)
       .map(season => {
         return {
           airDate: season.air_date,
