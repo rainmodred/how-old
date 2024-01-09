@@ -242,9 +242,6 @@ export default function App() {
     fetcher.submit({ intent: 'search', search: debouncedQuery });
   }, [debouncedQuery]);
 
-  if (state !== 'idle') {
-  }
-
   return (
     <Document theme={theme}>
       <Stack p={'sm'} h={'100dvh'}>
