@@ -1,7 +1,7 @@
 import { differenceInYears } from 'date-fns';
 import { formatDate } from './dates.server';
+import { API_URL } from './constants';
 
-const API_URL = 'https://api.themoviedb.org/3';
 const token = process.env.API_TOKEN;
 if (!token) {
   throw new Error('token is missing');
