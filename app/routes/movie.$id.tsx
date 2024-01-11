@@ -1,9 +1,18 @@
 import { Title } from '@mantine/core';
-import { redirect, type LoaderFunctionArgs, json } from '@vercel/remix';
+import {
+  redirect,
+  type LoaderFunctionArgs,
+  json,
+  MetaFunction,
+} from '@vercel/remix';
 import { useLoaderData, useNavigation } from '@remix-run/react';
 import { Persons } from '~/components/Persons';
 import { getCast, getCastWithAges } from '~/utils/api.server';
 import { SkeletonTable } from '~/components/SkeletonTable';
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [{ title: data?.title ?? 'Movie' }];
+};
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
