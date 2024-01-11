@@ -1,4 +1,4 @@
-import { Title, Flex } from '@mantine/core';
+import { Flex, Text } from '@mantine/core';
 import { redirect, type LoaderFunctionArgs, json } from '@vercel/remix';
 import { NavLink, useLoaderData } from '@remix-run/react';
 import { Outlet } from 'react-router-dom';
@@ -35,12 +35,13 @@ export default function TvPage() {
 
   return (
     <div>
-      <Title order={3}>Seasons:</Title>
-      <Flex gap="lg" wrap="wrap">
+      <Flex gap="xs" wrap="wrap">
+        <Text>Seasons:</Text>
         {seasons.map(season => {
-          const params = new URLSearchParams();
-          params.set('title', title);
-          params.set('release_date', season.airDate);
+          const params = new URLSearchParams({
+            title,
+            release_date: season.airDate!,
+          });
           return (
             <NavLink
               style={({ isActive, isPending }) => {
