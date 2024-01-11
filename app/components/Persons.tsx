@@ -1,13 +1,13 @@
 import { Box, Image, Group, Table, Text } from '@mantine/core';
-import { CastWithAges } from '~/utils/api.server';
+import { CastWithAges, Person } from '~/utils/api.server';
 import { baseImageUrl } from '~/utils/constants';
 
-interface Props {
+interface ProfileImageProps {
   src: string;
   alt: string;
 }
 
-function ProfileImage({ src, alt }: Props) {
+function ProfileImage({ src, alt }: ProfileImageProps) {
   return (
     <Box style={{ width: '85px' }}>
       <Image
@@ -20,13 +20,13 @@ function ProfileImage({ src, alt }: Props) {
   );
 }
 
-interface Props {
+interface PersonsProps {
   cast: CastWithAges;
 }
 
-export function Persons({ cast }: Props) {
+export function Persons({ cast }: PersonsProps) {
   return (
-    <Table className="table-sm">
+    <Table className="table-sm" id="persons">
       <Table.Thead>
         <Table.Tr>
           <Table.Th>Actor</Table.Th>
