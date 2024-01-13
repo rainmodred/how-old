@@ -1,13 +1,7 @@
 import '@mantine/core/styles.css';
-import {
-  ActionFunctionArgs,
-  LinksFunction,
-  LoaderFunctionArgs,
-  json,
-} from '@vercel/remix';
+import { LinksFunction, LoaderFunctionArgs, json } from '@vercel/remix';
 import {
   useLoaderData,
-  useFetchers,
   useFetcher,
   useNavigate,
   Meta,
@@ -28,16 +22,15 @@ import {
   Container,
   Select,
   Button,
-  Table,
 } from '@mantine/core';
 import { IGroup, Search } from './components/Search';
 import { useState, useEffect } from 'react';
 import { multiSearch } from './utils/api.server';
-import { Theme, getTheme, setTheme } from './utils/theme.server';
-import { IconMoonStars, IconSun } from '@tabler/icons-react';
-import { Lang, getLang, setLang } from './utils/lang.server';
 import { cssBundleHref } from '@remix-run/css-bundle';
 import { SkeletonTable } from './components/SkeletonTable';
+import { Theme, getPrefsSession } from './utils/userPrefs.server';
+import { IconSun, IconMoonStars } from '@tabler/icons-react';
+import { action } from './routes/action.set-prefs';
 
 function useDebounce<T>(value: T, delay?: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -53,54 +46,6 @@ function useDebounce<T>(value: T, delay?: number): T {
   return debouncedValue;
 }
 
-function useData() {
-  const data = useLoaderData<typeof loader>();
-  const fetchers = useFetchers();
-  const themeFetcher = fetchers.find(
-    f => f.formData?.get('intent') === 'update-theme',
-  );
-  const optimisticTheme = themeFetcher?.formData?.get('theme');
-  if (optimisticTheme === 'light' || optimisticTheme === 'dark') {
-    return { ...data, theme: optimisticTheme as Theme };
-  }
-  return data;
-}
-
-function ThemeSwitch({ userPreference }: { userPreference?: Theme }) {
-  const fetcher = useFetcher<typeof action>();
-
-  const mode = userPreference ?? 'light';
-  const nextMode = mode === 'light' ? 'dark' : 'light';
-
-  return (
-    <fetcher.Form method="POST">
-      <input type="hidden" name="theme" value={nextMode} />
-      <Button
-        name="intent"
-        value="update-theme"
-        type="submit"
-        variant="default"
-        styles={{ root: { padding: '5px 10px' } }}
-      >
-        {mode === 'dark' ? <IconSun /> : <IconMoonStars />}
-      </Button>
-    </fetcher.Form>
-  );
-}
-
-function GithubImage({ theme }: { theme: Theme }) {
-  return (
-    <Image
-      src={`${
-        theme === 'dark' ? '/github-mark-white.svg' : '/github-mark.svg'
-      }`}
-      width="2"
-      height="24"
-      alt="github logo"
-    />
-  );
-}
-
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ];
@@ -108,8 +53,10 @@ export const links: LinksFunction = () => [
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const query = url.searchParams.get('search');
-  const lang = getLang(request);
-  const theme = getTheme(request);
+
+  const prefsSession = await getPrefsSession(request);
+  const { theme, lang } = prefsSession.getPrefs();
+
   if (!query || query?.length === 0) {
     return json({
       options: [],
@@ -118,8 +65,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 
-  const language = getLang(request);
-  const data = await multiSearch(query, language);
+  const data = await multiSearch(query, lang);
 
   const movies: IGroup = { label: 'Movies', options: [] };
   const tvSeries: IGroup = { label: 'TV Series', options: [] };
@@ -165,30 +111,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 }
 
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const intent = formData.get('intent');
-
-  switch (intent) {
-    case 'update-theme': {
-      const theme = String(formData.get('theme')) as Theme;
-      const responseInit = {
-        headers: { 'set-cookie': setTheme(theme) },
-      };
-      return json({ success: true }, responseInit);
-    }
-    case 'change-lang': {
-      const language = String(formData.get('language')) as Lang;
-      const responseInit = {
-        headers: { 'set-cookie': setLang(language) },
-      };
-      return json({ success: true }, responseInit);
-    }
-    default:
-      return null;
-  }
-}
-
 //https://github.com/orgs/mantinedev/discussions/4829#discussioncomment-7071081
 const colorSchemeManager = {
   set: () => null,
@@ -231,7 +153,9 @@ export default function App() {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
 
-  const { theme, lang } = useData();
+  const { theme: serverTheme, lang } = useLoaderData<typeof loader>();
+  const [theme, setTheme] = useState(serverTheme);
+
   const navigate = useNavigate();
   const { state } = useNavigation();
 
@@ -275,29 +199,42 @@ export default function App() {
             />
           </fetcher.Form>
 
-          <ThemeSwitch userPreference={theme} />
+          <ThemeSwitch theme={theme} onChange={setTheme} />
 
-          <fetcher.Form>
-            <Select
-              data={['en', 'ru']}
-              defaultValue={lang}
-              withCheckIcon={false}
-              allowDeselect={false}
-              onChange={value =>
-                fetcher.submit(
-                  { intent: 'change-lang', language: value },
-                  { method: 'POST' },
-                )
-              }
-              styles={{
-                wrapper: { width: '45px' },
-                section: { display: 'none' },
-                input: { padding: 0, textAlign: 'center' },
-              }}
+          <Select
+            data={['en', 'ru']}
+            defaultValue={lang}
+            withCheckIcon={false}
+            allowDeselect={false}
+            onChange={value =>
+              fetcher.submit(
+                { intent: 'change-lang', lang: value },
+                { action: 'action/set-prefs', method: 'POST' },
+              )
+            }
+            styles={{
+              wrapper: { width: '45px' },
+              section: { display: 'none' },
+              input: { padding: 0, textAlign: 'center' },
+              option: {
+                padding: '2px',
+                display: 'flex',
+                justifyContent: 'center',
+              },
+            }}
+          />
+          <Link
+            to="https://github.com/rainmodred/how-old"
+            style={{ flexShrink: 0 }}
+          >
+            <Image
+              src={`${
+                theme === 'dark' ? '/github-mark-white.svg' : '/github-mark.svg'
+              }`}
+              width="2"
+              height="24"
+              alt="github logo"
             />
-          </fetcher.Form>
-          <Link to="https://github.com/rainmodred/how-old">
-            <GithubImage theme={theme} />
           </Link>
         </Group>
         <Container
@@ -339,5 +276,33 @@ export function ErrorBoundary() {
         <Link to="/">go back</Link>
       </Stack>
     </Document>
+  );
+}
+
+function ThemeSwitch({
+  theme,
+  onChange,
+}: {
+  theme: Theme;
+  onChange: (theme: Theme) => void;
+}) {
+  const fetcher = useFetcher<typeof action>();
+  const nextTheme = theme === 'light' ? 'dark' : 'light';
+
+  return (
+    <Button
+      type="button"
+      variant="default"
+      styles={{ root: { padding: '5px 10px' } }}
+      onClick={() => {
+        onChange(nextTheme);
+        fetcher.submit(
+          { intent: 'change-theme', theme: nextTheme },
+          { action: '/action/set-prefs', method: 'post' },
+        );
+      }}
+    >
+      {theme === 'dark' ? <IconSun /> : <IconMoonStars />}
+    </Button>
   );
 }
