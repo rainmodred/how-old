@@ -23,7 +23,7 @@ interface Props {
   onOptionSubmit: (item: GroupItem) => void;
 }
 
-export function Search({
+export function Autocomplete({
   data,
   isLoading = false,
   value,

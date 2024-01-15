@@ -23,28 +23,15 @@ import {
   Select,
   Button,
 } from '@mantine/core';
-import { IGroup, Search } from './components/Search';
-import { useState, useEffect } from 'react';
+import { Autocomplete, IGroup } from './components/Autocomplete';
+import { useState, useEffect, useRef } from 'react';
 import { multiSearch } from './utils/api.server';
 import { cssBundleHref } from '@remix-run/css-bundle';
 import { SkeletonTable } from './components/SkeletonTable';
-import { Theme, getPrefsSession } from './utils/userPrefs.server';
+import { Lang, Theme, getPrefsSession } from './utils/userPrefs.server';
 import { IconSun, IconMoonStars } from '@tabler/icons-react';
 import { action } from './routes/action.set-prefs';
-
-function useDebounce<T>(value: T, delay?: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay || 500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
+import { useDebounce } from './utils/misc';
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
@@ -149,22 +136,10 @@ function Document({
 }
 
 export default function App() {
-  const fetcher = useFetcher<typeof loader>();
-  const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 300);
-
   const { theme: serverTheme, lang } = useLoaderData<typeof loader>();
   const [theme, setTheme] = useState(serverTheme);
 
-  const navigate = useNavigate();
   const { state } = useNavigation();
-
-  useEffect(() => {
-    if (debouncedQuery.length <= 2) {
-      return;
-    }
-    fetcher.submit({ intent: 'search', search: debouncedQuery });
-  }, [debouncedQuery]);
 
   return (
     <Document theme={theme}>
@@ -176,53 +151,9 @@ export default function App() {
           justify="center"
           gap="sm"
         >
-          <fetcher.Form style={{ width: '80%', maxWidth: '350px' }}>
-            <Search
-              data={fetcher.data?.options ? fetcher.data.options : null}
-              isLoading={
-                fetcher.state !== 'idle' &&
-                fetcher.formData?.get('intent') === 'search'
-              }
-              value={query}
-              onChange={value => setQuery(value)}
-              onOptionSubmit={item => {
-                const params = new URLSearchParams({
-                  title: item.title,
-                  release_date: item.release_date,
-                });
-                navigate(
-                  item.media_type === 'movie'
-                    ? `/movie/${item.id}?${params.toString()}`
-                    : `/tv/${item.id}/season/1?${params.toString()}`,
-                );
-              }}
-            />
-          </fetcher.Form>
-
+          <Search />
           <ThemeSwitch theme={theme} onChange={setTheme} />
-
-          <Select
-            data={['en', 'ru']}
-            defaultValue={lang}
-            withCheckIcon={false}
-            allowDeselect={false}
-            onChange={value =>
-              fetcher.submit(
-                { intent: 'change-lang', lang: value },
-                { action: 'action/set-prefs', method: 'POST' },
-              )
-            }
-            styles={{
-              wrapper: { width: '45px' },
-              section: { display: 'none' },
-              input: { padding: 0, textAlign: 'center' },
-              option: {
-                padding: '2px',
-                display: 'flex',
-                justifyContent: 'center',
-              },
-            }}
-          />
+          <LangSwitch lang={lang} />
           <Link
             to="https://github.com/rainmodred/how-old"
             style={{ flexShrink: 0 }}
@@ -304,5 +235,76 @@ function ThemeSwitch({
     >
       {theme === 'dark' ? <IconSun /> : <IconMoonStars />}
     </Button>
+  );
+}
+
+function Search() {
+  const fetcher = useFetcher<typeof loader>();
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+
+  const navigate = useNavigate();
+
+  const fetcherRef = useRef(fetcher);
+  useEffect(() => {
+    fetcherRef.current = fetcher;
+  }, [fetcher]);
+
+  useEffect(() => {
+    if (debouncedQuery.length <= 2) {
+      return;
+    }
+    fetcherRef.current.submit({ intent: 'search', search: debouncedQuery });
+  }, [debouncedQuery]);
+
+  return (
+    <Autocomplete
+      data={fetcher.data?.options ? fetcher.data.options : null}
+      isLoading={
+        fetcher.state !== 'idle' && fetcher.formData?.get('intent') === 'search'
+      }
+      value={query}
+      onChange={value => setQuery(value)}
+      onOptionSubmit={item => {
+        const params = new URLSearchParams({
+          title: item.title,
+          release_date: item.release_date,
+        });
+        navigate(
+          item.media_type === 'movie'
+            ? `/movie/${item.id}?${params.toString()}`
+            : `/tv/${item.id}/season/1?${params.toString()}`,
+        );
+      }}
+    />
+  );
+}
+
+function LangSwitch({ lang }: { lang: Lang }) {
+  const fetcher = useFetcher<typeof loader>();
+
+  return (
+    <Select
+      data={['en', 'ru']}
+      defaultValue={lang}
+      withCheckIcon={false}
+      allowDeselect={false}
+      onChange={value =>
+        fetcher.submit(
+          { intent: 'change-lang', lang: value },
+          { action: 'action/set-prefs', method: 'POST' },
+        )
+      }
+      styles={{
+        wrapper: { width: '45px' },
+        section: { display: 'none' },
+        input: { padding: 0, textAlign: 'center' },
+        option: {
+          padding: '2px',
+          display: 'flex',
+          justifyContent: 'center',
+        },
+      }}
+    />
   );
 }
