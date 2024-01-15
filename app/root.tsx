@@ -22,6 +22,7 @@ import {
   Container,
   Select,
   Button,
+  Box,
 } from '@mantine/core';
 import { Autocomplete, IGroup } from './components/Autocomplete';
 import { useState, useEffect, useRef } from 'react';
@@ -258,25 +259,28 @@ function Search() {
   }, [debouncedQuery]);
 
   return (
-    <Autocomplete
-      data={fetcher.data?.options ? fetcher.data.options : null}
-      isLoading={
-        fetcher.state !== 'idle' && fetcher.formData?.get('intent') === 'search'
-      }
-      value={query}
-      onChange={value => setQuery(value)}
-      onOptionSubmit={item => {
-        const params = new URLSearchParams({
-          title: item.title,
-          release_date: item.release_date,
-        });
-        navigate(
-          item.media_type === 'movie'
-            ? `/movie/${item.id}?${params.toString()}`
-            : `/tv/${item.id}/season/1?${params.toString()}`,
-        );
-      }}
-    />
+    <Box style={{ flexGrow: 1, maxWidth: '350px' }}>
+      <Autocomplete
+        data={fetcher.data?.options ? fetcher.data.options : null}
+        isLoading={
+          fetcher.state !== 'idle' &&
+          fetcher.formData?.get('intent') === 'search'
+        }
+        value={query}
+        onChange={value => setQuery(value)}
+        onOptionSubmit={item => {
+          const params = new URLSearchParams({
+            title: item.title,
+            release_date: item.release_date,
+          });
+          navigate(
+            item.media_type === 'movie'
+              ? `/movie/${item.id}?${params.toString()}`
+              : `/tv/${item.id}/season/1?${params.toString()}`,
+          );
+        }}
+      />
+    </Box>
   );
 }
 
