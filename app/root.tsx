@@ -12,6 +12,7 @@ import {
   Scripts,
   LiveReload,
   useNavigation,
+  useLocation,
 } from '@remix-run/react';
 import {
   Text,
@@ -141,6 +142,9 @@ export default function App() {
   const [theme, setTheme] = useState(serverTheme);
 
   const { state } = useNavigation();
+  const { pathname } = useLocation();
+
+  const isLoading = state !== 'idle' && pathname === '/';
 
   return (
     <Document theme={theme}>
@@ -175,7 +179,7 @@ export default function App() {
           w={'100%'}
           styles={{ root: { flex: '1' } }}
         >
-          {state !== 'idle' && <SkeletonTable rows={5} />}
+          {isLoading && <SkeletonTable rows={5} />}
           <Outlet />
         </Container>
         <Container component={'footer'}>
