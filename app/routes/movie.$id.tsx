@@ -24,11 +24,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const cast = await getCast(params.id);
   const castWithAges = await getCastWithAges(cast, releaseDate);
 
-  return json({
-    cast: castWithAges,
-    releaseDate,
-    title: url.searchParams.get('title'),
-  });
+  return json(
+    {
+      cast: castWithAges,
+      releaseDate,
+      title: url.searchParams.get('title'),
+    },
+    {
+      headers: {
+        'cache-control': 'max-age=86400',
+      },
+    },
+  );
 }
 
 export default function MoviePage() {

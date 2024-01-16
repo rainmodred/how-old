@@ -22,26 +22,37 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const cast = await getTvCast(tvId, seasonNumber.toString());
   const castWithAges = await getCastWithAges(cast, releaseDate);
 
-  return json({
-    cast: castWithAges,
-    releaseDate,
-    title: url.searchParams.get('title'),
-  });
+  return json(
+    {
+      cast: castWithAges,
+      releaseDate,
+      title: url.searchParams.get('title'),
+    },
+    {
+      headers: {
+        'cache-control': 'max-age=86400',
+      },
+    },
+  );
 }
 
 export default function TvPage() {
   const { cast, releaseDate, title } = useLoaderData<typeof loader>();
 
   const { state } = useNavigation();
-  if (state === 'loading') {
-    return <SkeletonTable rows={5} />;
-  }
+  // if (state === 'loading') {
+  //   return <SkeletonTable rows={5} />;
+  // }
   return (
     <>
       <Title order={3}>
         {title} ({releaseDate?.slice(0, 4)})
       </Title>
-      <Persons cast={cast} />
+      {state === 'loading' ? (
+        <SkeletonTable rows={5} />
+      ) : (
+        <Persons cast={cast} />
+      )}
     </>
   );
 }

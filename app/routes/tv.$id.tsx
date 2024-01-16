@@ -14,20 +14,27 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const { seasons, name } = await getTvDetails(tvId);
 
-  return json({
-    title: name,
-    seasons: seasons
-      .filter(season => season.air_date && season.season_number > 0)
-      .map(season => {
-        return {
-          airDate: season.air_date,
-          id: season.id,
-          name: season.name,
-          posterPath: season.poster_path,
-          seasonNumber: season.season_number,
-        };
-      }),
-  });
+  return json(
+    {
+      title: name,
+      seasons: seasons
+        .filter(season => season.air_date && season.season_number > 0)
+        .map(season => {
+          return {
+            airDate: season.air_date,
+            id: season.id,
+            name: season.name,
+            posterPath: season.poster_path,
+            seasonNumber: season.season_number,
+          };
+        }),
+    },
+    {
+      headers: {
+        'cache-control': 'max-age=86400',
+      },
+    },
+  );
 }
 
 export default function TvPage() {
@@ -59,7 +66,9 @@ export default function TvPage() {
           );
         })}
       </Flex>
-      <Outlet />
+      <div>
+        <Outlet />
+      </div>
     </div>
   );
 }
