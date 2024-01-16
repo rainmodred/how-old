@@ -7,7 +7,7 @@ function PersonSkeleton() {
         <Group align="center" wrap="nowrap">
           <Skeleton height={100} width={60} radius="xs" />
           <Box>
-            <Skeleton data-testid="skeleton" height={8} width="100px" mb="xs" />
+            <Skeleton height={8} width="100px" mb="xs" />
             <Skeleton height={8} width="100px" mb="xs" />
             <Skeleton height={8} width="100px" />
           </Box>
@@ -25,7 +25,7 @@ function PersonSkeleton() {
 
 export function SkeletonTable({ rows }: { rows: number }) {
   return (
-    <Table>
+    <Table data-testid="skeleton-table">
       <Table.Tbody>
         {Array.from({ length: rows }).map((_, index) => (
           <PersonSkeleton key={index} />
