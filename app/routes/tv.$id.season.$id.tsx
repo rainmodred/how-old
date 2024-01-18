@@ -40,9 +40,6 @@ export default function TvPage() {
   const { cast, releaseDate, title } = useLoaderData<typeof loader>();
 
   const { state } = useNavigation();
-  // if (state === 'loading') {
-  //   return <SkeletonTable rows={5} />;
-  // }
   return (
     <>
       <Title order={3}>
