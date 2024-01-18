@@ -1,5 +1,5 @@
 import { Box, Image, Group, Table, Text } from '@mantine/core';
-import { CastWithAges, Person } from '~/utils/api.server';
+import { CastWithAges } from '~/utils/api.server';
 import { baseImageUrl } from '~/utils/constants';
 
 interface ProfileImageProps {
@@ -49,7 +49,7 @@ export function Persons({ cast }: PersonsProps) {
             return (
               <Table.Tr key={id}>
                 <Table.Td>
-                  <Group>
+                  <Group wrap="nowrap">
                     <ProfileImage src={profile_path} alt={`${name} image`} />
                     <Box>
                       <Text fw="700">{name}</Text>
