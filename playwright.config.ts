@@ -1,4 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
+const PORT = process.env.PORT || 3000;
+
+const baseURL = `http://localhost:${PORT}`;
 
 /**
  * Read environment variables from file.
@@ -69,9 +72,9 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://127.0.0.1:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: {
+    command: 'npm run dev',
+    url: baseURL,
+    reuseExistingServer: !process.env.CI,
+  },
 });
