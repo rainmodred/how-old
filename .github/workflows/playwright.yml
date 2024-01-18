@@ -4,6 +4,9 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+env:
+  API_TOKEN: secret
+  SESSION_SECRET: secret
 jobs:
   test:
     timeout-minutes: 60
