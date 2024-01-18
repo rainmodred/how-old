@@ -88,7 +88,11 @@ export type CastWithAges = Awaited<ReturnType<typeof getCastWithAges>>;
 export async function getCast(id: string) {
   const { cast } = await fetcher<{ cast: Actor[] }>(`/movie/${id}/credits`);
 
-  return cast;
+  return cast.filter(
+    actor =>
+      actor.known_for_department === 'Acting' &&
+      !actor.character.includes('uncredited'),
+  );
 }
 
 export async function getTvCast(id: string, season: string) {
@@ -150,4 +154,5 @@ export interface Actor {
   name: string;
   profile_path: string;
   character: string;
+  known_for_department: string;
 }
