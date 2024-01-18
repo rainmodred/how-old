@@ -400,8 +400,36 @@ export const handlers = [
       status_message: 'The resource you requested could not be found.',
     });
   }),
+  http.get(`${API_URL}/tv/:id`, () => {
+    return HttpResponse.json({
+      id: 84773,
+      name: 'The Lord of the Rings: The Rings of Power',
+      seasons: [
+        {
+          air_date: '2022-09-03',
+          episode_count: 26,
+          id: 311036,
+          name: 'Specials',
+          overview: '',
+          poster_path: '/tRaU2w0S8aRSfNmkSxesaO4DAhe.jpg',
+          season_number: 0,
+          vote_average: 0,
+        },
+        {
+          air_date: '2022-09-01',
+          episode_count: 8,
+          id: 114041,
+          name: 'Season 1',
+          overview: '',
+          poster_path: '/umRaUV2ku9MMtEunMQt3uCO1OgE.jpg',
+          season_number: 1,
+          vote_average: 6.4,
+        },
+      ],
+    });
+  }),
 
-  http.get(`${API_URL}/tv/:id/credits`, ({ params }) => {
+  http.get(`${API_URL}/tv/:id/season/:seasonNumber/credits`, ({ params }) => {
     const { id } = params as { id: keyof typeof movies };
     if (movies[id]) {
       return HttpResponse.json(movies[id]);
