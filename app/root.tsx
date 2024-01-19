@@ -227,6 +227,7 @@ function ThemeSwitch({
 
   return (
     <Button
+      aria-label="theme switch"
       type="button"
       variant="default"
       styles={{ root: { padding: '5px 10px' } }}
@@ -293,6 +294,7 @@ function LangSwitch({ lang }: { lang: Lang }) {
 
   return (
     <Select
+      aria-label="lang switch"
       data={['en', 'ru']}
       defaultValue={lang}
       withCheckIcon={false}
