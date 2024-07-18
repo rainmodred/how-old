@@ -4,9 +4,9 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "remix build",
-    "dev": "remix dev --manual",
-    "start": "remix-serve ./build/index.js",
+    "dev": "remix vite:dev",
+    "build": "remix vite:build",
+    "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "test": "playwright test --ui",
     "test:e2e": "playwright test"
@@ -14,21 +14,20 @@
   "dependencies": {
     "@mantine/core": "^7.11.2",
     "@mantine/hooks": "^7.11.2",
-    "@remix-run/css-bundle": "^2.4.1",
-    "@remix-run/node": "^2.4.1",
-    "@remix-run/react": "^2.4.1",
-    "@remix-run/serve": "^2.4.1",
+    "@remix-run/node": "^2.10.2",
+    "@remix-run/react": "^2.10.2",
+    "@remix-run/serve": "^2.10.2",
     "@tabler/icons-react": "^2.44.0",
-    "@vercel/remix": "^2.4.1",
+    "@vercel/remix": "^2.10.2",
     "date-fns": "^3.0.6",
-    "isbot": "^3.6.8",
+    "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.1",
-    "@remix-run/dev": "^2.4.1",
-    "@remix-run/eslint-config": "^2.4.1",
+    "@remix-run/dev": "^2.10.2",
+    "@remix-run/eslint-config": "^2.10.2",
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
@@ -39,12 +38,14 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "msw": "^2.0.13",
+    "msw": "^2.3.1",
     "postcss": "^8.4.39",
     "postcss-preset-mantine": "^1.16.0",
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.1.1",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vite": "^5.3.4",
+    "vite-tsconfig-paths": "^4.3.2"
   },
   "engines": {
     "node": ">=18.0.0"

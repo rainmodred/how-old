@@ -1,5 +1,5 @@
 import '@mantine/core/styles.css';
-import { LinksFunction, LoaderFunctionArgs, json } from '@vercel/remix';
+import { LoaderFunctionArgs, json } from '@vercel/remix';
 import {
   useLoaderData,
   useFetcher,
@@ -10,7 +10,6 @@ import {
   Outlet,
   ScrollRestoration,
   Scripts,
-  LiveReload,
   useNavigation,
   useLocation,
 } from '@remix-run/react';
@@ -28,16 +27,11 @@ import {
 import { Autocomplete, IGroup } from './components/Autocomplete';
 import { useState, useEffect, useRef } from 'react';
 import { multiSearch } from './utils/api.server';
-import { cssBundleHref } from '@remix-run/css-bundle';
 import { SkeletonTable } from './components/SkeletonTable';
 import { Lang, Theme, getPrefsSession } from './utils/userPrefs.server';
 import { IconSun, IconMoonStars } from '@tabler/icons-react';
 import { action } from './routes/action.set-prefs';
 import { useDebounce } from './utils/misc';
-
-export const links: LinksFunction = () => [
-  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
-];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -130,7 +124,6 @@ function Document({
           {children}
           <ScrollRestoration />
           <Scripts />
-          <LiveReload />
         </MantineProvider>
       </body>
     </html>
@@ -197,9 +190,6 @@ export default function App() {
           </Group>
         </Container>
       </Stack>
-      <ScrollRestoration />
-      <Scripts />
-      <LiveReload />
     </Document>
   );
 }

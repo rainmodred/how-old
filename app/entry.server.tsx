@@ -9,7 +9,7 @@ import { PassThrough } from 'node:stream';
 import type { AppLoadContext, EntryContext } from '@vercel/remix';
 import { createReadableStreamFromReadable } from '@remix-run/node';
 import { RemixServer } from '@remix-run/react';
-import isbot from 'isbot';
+import { isbot } from 'isbot';
 import { renderToPipeableStream } from 'react-dom/server';
 import { server } from './mocks/node';
 
