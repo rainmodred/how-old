@@ -264,14 +264,10 @@ function Search() {
         value={query}
         onChange={value => setQuery(value)}
         onOptionSubmit={item => {
-          const params = new URLSearchParams({
-            title: item.title,
-            release_date: item.release_date,
-          });
           navigate(
             item.media_type === 'movie'
-              ? `/movie/${item.id}?${params.toString()}`
-              : `/tv/${item.id}/season/1?${params.toString()}`,
+              ? `/movie/${item.id}`
+              : `/tv/${item.id}/season/1`,
           );
         }}
       />

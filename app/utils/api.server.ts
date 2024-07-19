@@ -112,6 +112,7 @@ export async function getTvDetails(id: number | string) {
   const data = await fetcher<{
     id: number;
     name: string;
+    first_air_date: string;
     seasons: {
       id: number;
       air_date: string | null;
