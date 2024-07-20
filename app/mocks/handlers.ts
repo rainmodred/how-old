@@ -57,7 +57,7 @@ export const handlers = [
   }),
 
   http.get(`${API_URL}/movie/:id/credits`, async ({ params }) => {
-    await delay(2000);
+    await delay();
     const { id } = params;
     if (id) {
       const res = db.cast.findFirst({

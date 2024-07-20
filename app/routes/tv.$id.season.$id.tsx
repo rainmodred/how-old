@@ -62,7 +62,6 @@ export default function TvPage() {
 
   const location = useLocation();
   const navigation = useNavigation();
-  console.log(navigation);
 
   return (
     <div>
