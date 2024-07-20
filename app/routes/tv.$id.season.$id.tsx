@@ -1,14 +1,21 @@
 import { Flex, Text, Title } from '@mantine/core';
-import { redirect, type LoaderFunctionArgs, json } from '@vercel/remix';
+import { redirect, type LoaderFunctionArgs, json, defer } from '@vercel/remix';
 import {
+  Await,
   NavLink,
   useLoaderData,
   useLocation,
   useNavigation,
 } from '@remix-run/react';
-import { getCastWithAges, getTvCast, getTvDetails } from '~/utils/api.server';
+import {
+  CastWithAges,
+  getCastWithAges,
+  getTvCast,
+  getTvDetails,
+} from '~/utils/api.server';
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Persons } from '~/components/Persons';
+import { Suspense } from 'react';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -23,9 +30,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       getTvDetails(tvId),
       getTvCast(tvId, seasonNumber.toString()),
     ]);
-  const castWithAges = await getCastWithAges(cast, releaseDate);
+  const castWithAges = getCastWithAges(cast, releaseDate);
 
-  return json(
+  return defer(
     {
       title: name,
       seasons: seasons
@@ -53,8 +60,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function TvPage() {
   const { seasons, title, cast, releaseDate } = useLoaderData<typeof loader>();
 
-  const { state } = useNavigation();
   const location = useLocation();
+  const navigation = useNavigation();
+  console.log(navigation);
 
   return (
     <div>
@@ -83,11 +91,13 @@ export default function TvPage() {
         <Title size="h1" order={3}>
           {title} ({releaseDate?.slice(0, 4)})
         </Title>
-        {state === 'loading' ? (
-          <SkeletonTable rows={5} />
-        ) : (
-          <Persons cast={cast} />
-        )}
+        <Suspense fallback={<SkeletonTable rows={5} />}>
+          <Await resolve={cast}>
+            {cast => {
+              return <Persons cast={cast as CastWithAges} />;
+            }}
+          </Await>
+        </Suspense>
       </div>
     </div>
   );
