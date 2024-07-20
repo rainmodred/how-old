@@ -73,7 +73,7 @@ export async function getCastWithAges(cast: Actor[], releaseDate: string) {
         name: person.name,
         character: person.character,
         birthday: formatDate(person.birthday),
-        deathday: formatDate(person.deathday),
+        deathday: person.deathday && formatDate(person.deathday),
         profile_path: person.profile_path,
         ageNow: differenceInYears(end, person.birthday),
         ageThen: differenceInYears(new Date(releaseDate), person.birthday),
