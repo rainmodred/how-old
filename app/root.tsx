@@ -134,11 +134,6 @@ export default function App() {
   const { theme: serverTheme, lang } = useLoaderData<typeof loader>();
   const [theme, setTheme] = useState(serverTheme);
 
-  const { state } = useNavigation();
-  const { pathname } = useLocation();
-
-  const isLoading = state !== 'idle' && pathname === '/';
-
   return (
     <Document theme={theme}>
       <Stack p={'sm'} h={'100dvh'}>
@@ -172,7 +167,6 @@ export default function App() {
           w={'100%'}
           styles={{ root: { flex: '1' } }}
         >
-          {isLoading && <SkeletonTable rows={5} />}
           <Outlet />
         </Container>
         <Container component={'footer'}>
@@ -270,8 +264,11 @@ function Search() {
           });
           navigate(
             item.media_type === 'movie'
-              ? `/movie/${item.id}?${params.toString()}`
-              : `/tv/${item.id}/season/1?${params.toString()}`,
+              ? `/movie/${item.id}`
+              : `/tv/${item.id}/season/1`,
+            // item.media_type === 'movie'
+            //   ? `/movie/${item.id}?${params.toString()}`
+            //   : `/tv/${item.id}/season/1?${params.toString()}`,
           );
         }}
       />

@@ -1,4 +1,4 @@
-import { differenceInYears } from 'date-fns';
+import { differenceInYears, sub } from 'date-fns';
 import { formatDate } from './dates.server';
 import { API_URL } from './constants';
 
@@ -73,7 +73,7 @@ export async function getCastWithAges(cast: Actor[], releaseDate: string) {
         name: person.name,
         character: person.character,
         birthday: formatDate(person.birthday),
-        deathday: formatDate(person.deathday),
+        deathday: person.deathday && formatDate(person.deathday),
         profile_path: person.profile_path,
         ageNow: differenceInYears(end, person.birthday),
         ageThen: differenceInYears(new Date(releaseDate), person.birthday),
@@ -112,6 +112,7 @@ export async function getTvDetails(id: number | string) {
   const data = await fetcher<{
     id: number;
     name: string;
+    first_air_date: string;
     seasons: {
       id: number;
       air_date: string | null;
@@ -124,10 +125,34 @@ export async function getTvDetails(id: number | string) {
   return data;
 }
 
+export async function discover() {
+  const prevYear = sub(new Date(), { years: 1 });
+  const data = await fetcher<{
+    page: number;
+    results: Movie[];
+    total_pages: number;
+    total_results: number;
+  }>(
+    `/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&primary_release_date.lte=${prevYear}&sort_by=popularity.desc&without_genres=16`,
+  );
+
+  return data.results.map(m => ({
+    ...m,
+    release_date: formatDate(m.release_date),
+    age: differenceInYears(new Date(), m.release_date),
+  }));
+}
+
+export async function getMovie(id: string) {
+  const movie = await fetcher<Movie>(`/movie/${id}`);
+  return movie;
+}
+
 export interface Movie {
   id: number;
   release_date: string;
   title: string;
+  poster_path: string;
 }
 
 export interface Tv {

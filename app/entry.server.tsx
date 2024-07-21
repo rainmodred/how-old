@@ -12,10 +12,15 @@ import { RemixServer } from '@remix-run/react';
 import { isbot } from 'isbot';
 import { renderToPipeableStream } from 'react-dom/server';
 import { server } from './mocks/node';
+import { db, initDb } from './mocks/db';
+import { drop } from '@mswjs/data';
 
 const ABORT_DELAY = 5_000;
 
 if (process.env.NODE_ENV === 'development') {
+  drop(db);
+  initDb();
+
   server.listen();
 }
 
