@@ -6,7 +6,12 @@ type Props = { movie: Movie & { age: number } };
 
 export function MovieCard({ movie }: Props) {
   return (
-    <Card radius="md" shadow="sm" styles={{ root: { flexShrink: 0 } }}>
+    <Card
+      data-testid="movie-card"
+      radius="md"
+      shadow="sm"
+      styles={{ root: { flexShrink: 0 } }}
+    >
       <CardSection>
         <Link to={`/movie/${movie.id}`}>
           <Image
@@ -19,7 +24,9 @@ export function MovieCard({ movie }: Props) {
       <CardSection w="185" p="sm">
         <Text fw={700}>{movie.title}</Text>
         <Text>{movie.release_date}</Text>
-        <Text>{movie.age} years ago</Text>
+        <Text>
+          {movie.age} {movie.age === 1 ? 'year' : 'years'} ago
+        </Text>
       </CardSection>
     </Card>
   );
