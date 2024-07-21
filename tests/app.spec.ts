@@ -15,18 +15,13 @@ test('should work with movies', async ({ page }) => {
   await expect(option).toBeVisible();
   await option.click();
 
-  await expect(page.getByRole('heading')).not.toBeVisible();
-  //sometimes can't find element
-  // await expect(page.getByTestId('skeleton-table')).toBeVisible();
+  await expect(
+    page.getByRole('heading', {
+      name: 'The Lord of the Rings',
+    }),
+  ).toHaveText('The Lord of the Rings: The Fellowship of the Ring (2001)');
 
-  const heading = page.getByRole('heading', {
-    name: 'The Lord of the Rings',
-  });
-  await expect(heading).toHaveText(
-    'The Lord of the Rings: The Fellowship of the Ring (2001)',
-  );
-
-  const rows = await page.getByRole('row');
+  const rows = page.getByRole('row');
   const rowsCount = await rows.count();
 
   expect(rowsCount).toBe(4);
@@ -54,16 +49,12 @@ test('should work with tv series', async ({ page }) => {
   await expect(option).toBeVisible();
   await option.click();
 
-  await expect(page.getByRole('heading')).not.toBeVisible();
-  //sometimes can't find element
-  // await expect(page.getByTestId('skeleton-table')).toBeVisible();
-
   await expect(
     page.getByRole('heading', {
       name: 'The Lord of the Rings: The Rings of Power (2022)',
     }),
   ).toBeVisible();
-  const rows = await page.getByRole('row');
+  const rows = page.getByRole('row');
   const rowsCount = await rows.count();
 
   expect(rowsCount).toBe(3);
