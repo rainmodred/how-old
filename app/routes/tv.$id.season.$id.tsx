@@ -1,12 +1,6 @@
 import { Flex, Text, Title } from '@mantine/core';
-import { redirect, type LoaderFunctionArgs, json, defer } from '@vercel/remix';
-import {
-  Await,
-  NavLink,
-  useLoaderData,
-  useLocation,
-  useNavigation,
-} from '@remix-run/react';
+import { redirect, type LoaderFunctionArgs, defer } from '@vercel/remix';
+import { Await, NavLink, useLoaderData, useLocation } from '@remix-run/react';
 import {
   CastWithAges,
   getCastWithAges,
@@ -61,7 +55,6 @@ export default function TvPage() {
   const { seasons, title, cast, releaseDate } = useLoaderData<typeof loader>();
 
   const location = useLocation();
-  const navigation = useNavigation();
 
   return (
     <div>
