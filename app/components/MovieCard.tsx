@@ -15,6 +15,7 @@ export function MovieCard({ movie }: Props) {
       <CardSection>
         <Link to={`/movie/${movie.id}`}>
           <Image
+            alt="movie poster"
             src={`https://image.tmdb.org/t/p/w185/${movie.poster_path}`}
             w="185"
             h="278"
