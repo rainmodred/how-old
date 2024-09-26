@@ -126,6 +126,7 @@ export async function getTvDetails(id: number | string) {
 }
 
 export async function discover() {
+  const vote_count = 1000;
   const prevYear = sub(new Date(), { years: 1 });
   const data = await fetcher<{
     page: number;
@@ -133,7 +134,7 @@ export async function discover() {
     total_pages: number;
     total_results: number;
   }>(
-    `/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&primary_release_date.lte=${prevYear}&sort_by=popularity.desc&without_genres=16`,
+    `/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&primary_release_date.lte=${prevYear}&sort_by=vote_count.desc&without_genres=16&vote_count.gte=${vote_count}`,
   );
 
   return data.results.map(m => ({
