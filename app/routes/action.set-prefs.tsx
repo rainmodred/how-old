@@ -1,7 +1,8 @@
-import { ActionFunctionArgs, data, redirect } from '@vercel/remix';
+import { data } from 'react-router';
 import { Lang, Theme, getPrefsSession } from '~/utils/userPrefs.server';
+import { Route } from './+types/action.set-prefs';
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const prefsSession = await getPrefsSession(request);
   const formData = await request.formData();
 
@@ -26,6 +27,6 @@ export async function action({ request }: ActionFunctionArgs) {
   );
 }
 
-export async function loader() {
-  redirect('/', { status: 404 });
-}
+// export async function loader() {
+//   redirect('/', { status: 404 });
+// }

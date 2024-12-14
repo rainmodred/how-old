@@ -1,4 +1,8 @@
-import { flatRoutes } from '@remix-run/dev/dist/config/flat-routes';
-import type { RouteConfig } from '@remix-run/route-config';
+import { index, route, type RouteConfig } from '@react-router/dev/routes';
 
-export default [] satisfies RouteConfig;
+export default [
+  index('routes/index.tsx'),
+  route('movie/:id', './routes/movie.tsx'),
+  route('tv/:id/season/:sId', './routes/tv.tsx'),
+  route('/action/set-prefs', './routes/action.set-prefs.tsx'),
+] satisfies RouteConfig;

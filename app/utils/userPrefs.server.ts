@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from '@vercel/remix';
+import { createCookieSessionStorage } from 'react-router';
 
 const sessionSecret = process.env.SESSION_SECRET ?? 'DEFAULT_SECRET';
 

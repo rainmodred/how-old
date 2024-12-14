@@ -1,10 +1,10 @@
 import { Title, Flex, Box, Skeleton } from '@mantine/core';
-import { Await, useLoaderData, useNavigation } from '@remix-run/react';
-import { data, type MetaFunction } from '@vercel/remix';
+import { Await, data, MetaFunction, useNavigation } from 'react-router';
 import { Suspense } from 'react';
 import { MovieCard } from '~/components/MovieCard';
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { discover } from '~/utils/api.server';
+import type { Route } from './+types/index';
 
 export const meta: MetaFunction = () => {
   return [
@@ -25,8 +25,8 @@ export async function loader() {
   );
 }
 
-export default function Index() {
-  const { popularMovies } = useLoaderData<typeof loader>();
+export default function Index({ loaderData }: Route.ComponentProps) {
+  const { popularMovies } = loaderData;
   const navigation = useNavigation();
   if (navigation.state === 'loading') {
     return (

@@ -1,6 +1,5 @@
 import { Flex, Text, Title } from '@mantine/core';
-import { redirect, type LoaderFunctionArgs, data } from '@vercel/remix';
-import { Await, NavLink, useLoaderData, useLocation } from '@remix-run/react';
+import { Await, data, NavLink, redirect, useLocation } from 'react-router';
 import {
   CastWithAges,
   getCastWithAges,
@@ -10,8 +9,9 @@ import {
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Persons } from '~/components/Persons';
 import { Suspense } from 'react';
+import { Route } from './+types/tv';
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const tvId = url.pathname.split('/')[2];
   const seasonNumber = params.id;
@@ -51,8 +51,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   );
 }
 
-export default function TvPage() {
-  const { seasons, title, cast, releaseDate } = useLoaderData<typeof loader>();
+export default function TvPage({ loaderData }: Route.ComponentProps) {
+  const { seasons, title, cast, releaseDate } = loaderData;
 
   const location = useLocation();
 

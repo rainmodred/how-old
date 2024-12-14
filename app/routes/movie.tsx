@@ -1,11 +1,5 @@
 import { Title } from '@mantine/core';
-import {
-  redirect,
-  type LoaderFunctionArgs,
-  MetaFunction,
-  data,
-} from '@vercel/remix';
-import { Await, useLoaderData } from '@remix-run/react';
+import { Await, data, MetaFunction, redirect } from 'react-router';
 import { Persons } from '~/components/Persons';
 import {
   CastWithAges,
@@ -15,12 +9,13 @@ import {
 } from '~/utils/api.server';
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Suspense } from 'react';
+import { Route } from './+types/movie';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.title ?? 'Movie' }];
 };
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   if (!params.id) {
     throw redirect('/');
   }
@@ -33,8 +28,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
   return data({ title, releaseDate, cast: castWithAges });
 }
 
-export default function MoviePage() {
-  const { title, releaseDate, cast } = useLoaderData<typeof loader>();
+export default function MoviePage({ loaderData }: Route.ComponentProps) {
+  const { title, releaseDate, cast } = loaderData;
 
   return (
     <>

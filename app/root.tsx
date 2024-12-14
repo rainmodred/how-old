@@ -1,7 +1,5 @@
 import '@mantine/core/styles.css';
-import { LoaderFunctionArgs } from '@vercel/remix';
 import {
-  useLoaderData,
   useFetcher,
   useNavigate,
   Meta,
@@ -10,9 +8,7 @@ import {
   Outlet,
   ScrollRestoration,
   Scripts,
-  useNavigation,
-  useLocation,
-} from '@remix-run/react';
+} from 'react-router';
 import {
   Text,
   Stack,
@@ -27,13 +23,12 @@ import {
 import { Autocomplete, IGroup } from './components/Autocomplete';
 import { useState, useEffect, useRef } from 'react';
 import { multiSearch } from './utils/api.server';
-import { SkeletonTable } from './components/SkeletonTable';
 import { Lang, Theme, getPrefsSession } from './utils/userPrefs.server';
 import { IconSun, IconMoonStars } from '@tabler/icons-react';
-import { action } from './routes/action.set-prefs';
 import { useDebounce } from './utils/misc';
+import { Route } from './+types/root';
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const query = url.searchParams.get('search');
 
@@ -130,8 +125,8 @@ function Document({
   );
 }
 
-export default function App() {
-  const { theme: serverTheme, lang } = useLoaderData<typeof loader>();
+export default function App({ loaderData }: Route.ComponentProps) {
+  const { theme: serverTheme, lang } = loaderData;
   const [theme, setTheme] = useState(serverTheme);
 
   return (
@@ -188,6 +183,7 @@ export default function App() {
   );
 }
 
+//TOOD: FIX THEME
 export function ErrorBoundary() {
   return (
     <Document theme="light">
@@ -206,7 +202,7 @@ function ThemeSwitch({
   theme: Theme;
   onChange: (theme: Theme) => void;
 }) {
-  const fetcher = useFetcher<typeof action>();
+  const fetcher = useFetcher();
   const nextTheme = theme === 'light' ? 'dark' : 'light';
 
   return (

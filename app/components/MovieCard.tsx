@@ -1,5 +1,5 @@
 import { Card, CardSection, Image, Text } from '@mantine/core';
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 import { Movie } from '~/utils/api.server';
 
 type Props = { movie: Movie & { age: number } };
