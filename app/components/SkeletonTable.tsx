@@ -25,7 +25,7 @@ function PersonSkeleton() {
 
 export function SkeletonTable({ rows }: { rows: number }) {
   return (
-    <Table data-testid="skeleton-table">
+    <Table data-testid="loading">
       <Table.Tbody>
         {Array.from({ length: rows }).map((_, index) => (
           <PersonSkeleton key={index} />

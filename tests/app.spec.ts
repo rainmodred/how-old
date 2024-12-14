@@ -21,6 +21,7 @@ test('should work with movies', async ({ page }) => {
     }),
   ).toHaveText('The Lord of the Rings: The Fellowship of the Ring (2001)');
 
+  await expect(page.getByTestId('loading')).not.toBeAttached();
   const rows = page.getByRole('row');
   const rowsCount = await rows.count();
 
@@ -54,6 +55,8 @@ test('should work with tv series', async ({ page }) => {
       name: 'The Lord of the Rings: The Rings of Power (2022)',
     }),
   ).toBeVisible();
+
+  await expect(page.getByTestId('loading')).not.toBeAttached();
   const rows = page.getByRole('row');
   const rowsCount = await rows.count();
 

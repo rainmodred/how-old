@@ -1,6 +1,6 @@
 import { createCookieSessionStorage } from 'react-router';
 
-const sessionSecret = process.env.SESSION_SECRET ?? 'DEFAULT_SECRET';
+const sessionSecret = import.meta.env.VITE_SESSION_SECRET ?? 'DEFAULT_SECRET';
 
 export type Theme = 'light' | 'dark';
 export type Lang = 'en' | 'ru';

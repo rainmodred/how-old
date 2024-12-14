@@ -2,7 +2,7 @@ import { differenceInYears, sub } from 'date-fns';
 import { formatDate } from './dates.server';
 import { API_URL } from './constants';
 
-const token = process.env.API_TOKEN;
+const token = import.meta.env.VITE_API_TOKEN;
 if (!token) {
   throw new Error('token is missing');
 }
