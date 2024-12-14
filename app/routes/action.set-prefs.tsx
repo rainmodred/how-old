@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, json, redirect } from '@vercel/remix';
+import { ActionFunctionArgs, data, redirect } from '@vercel/remix';
 import { Lang, Theme, getPrefsSession } from '~/utils/userPrefs.server';
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -20,7 +20,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   prefsSession.setPrefs(theme, lang);
 
-  return json(
+  return data(
     { success: true },
     { headers: { 'Set-Cookie': await prefsSession.commit() } },
   );

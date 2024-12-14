@@ -1,5 +1,5 @@
 import '@mantine/core/styles.css';
-import { LoaderFunctionArgs, json } from '@vercel/remix';
+import { LoaderFunctionArgs } from '@vercel/remix';
 import {
   useLoaderData,
   useFetcher,
@@ -41,11 +41,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { theme, lang } = prefsSession.getPrefs();
 
   if (!query || query?.length === 0) {
-    return json({
+    return {
       options: [],
       theme,
       lang,
-    });
+    };
   }
 
   const data = await multiSearch(query, lang);
@@ -74,7 +74,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       });
     }
   }
-  return json({
+  return {
     options: [
       {
         ...movies,
@@ -91,7 +91,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     ],
     theme,
     lang,
-  });
+  };
 }
 
 //https://github.com/orgs/mantinedev/discussions/4829#discussioncomment-7071081

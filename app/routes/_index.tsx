@@ -1,6 +1,6 @@
 import { Title, Flex, Box, Skeleton } from '@mantine/core';
 import { Await, useLoaderData, useNavigation } from '@remix-run/react';
-import { defer, type MetaFunction } from '@vercel/remix';
+import { data, type MetaFunction } from '@vercel/remix';
 import { Suspense } from 'react';
 import { MovieCard } from '~/components/MovieCard';
 import { SkeletonTable } from '~/components/SkeletonTable';
@@ -15,7 +15,7 @@ export const meta: MetaFunction = () => {
 
 export async function loader() {
   const popularMovies = discover();
-  return defer(
+  return data(
     { popularMovies },
     {
       headers: {

@@ -3,7 +3,7 @@ import {
   redirect,
   type LoaderFunctionArgs,
   MetaFunction,
-  defer,
+  data,
 } from '@vercel/remix';
 import { Await, useLoaderData } from '@remix-run/react';
 import { Persons } from '~/components/Persons';
@@ -30,7 +30,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   ]);
   const castWithAges = getCastWithAges(cast, releaseDate);
 
-  return defer({ title, releaseDate, cast: castWithAges });
+  return data({ title, releaseDate, cast: castWithAges });
 }
 
 export default function MoviePage() {

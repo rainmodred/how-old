@@ -1,5 +1,5 @@
 import { Flex, Text, Title } from '@mantine/core';
-import { redirect, type LoaderFunctionArgs, defer } from '@vercel/remix';
+import { redirect, type LoaderFunctionArgs, data } from '@vercel/remix';
 import { Await, NavLink, useLoaderData, useLocation } from '@remix-run/react';
 import {
   CastWithAges,
@@ -26,7 +26,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     ]);
   const castWithAges = getCastWithAges(cast, releaseDate);
 
-  return defer(
+  return data(
     {
       title: name,
       seasons: seasons
