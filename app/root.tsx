@@ -1,93 +1,28 @@
 import '@mantine/core/styles.css';
 import {
-  useFetcher,
-  useNavigate,
-  Meta,
-  Links,
+  isRouteErrorResponse,
   Link,
+  Links,
+  Meta,
   Outlet,
-  ScrollRestoration,
   Scripts,
+  ScrollRestoration,
 } from 'react-router';
 import {
-  Text,
+  Container,
+  Group,
+  MantineProvider,
   Stack,
   Image,
-  MantineProvider,
-  Group,
-  Container,
-  Select,
-  Button,
-  Box,
+  Text,
 } from '@mantine/core';
-import { Autocomplete, IGroup } from './components/Autocomplete';
-import { useState, useEffect, useRef } from 'react';
-import { multiSearch } from './utils/api.server';
-import { Lang, Theme, getPrefsSession } from './utils/userPrefs.server';
-import { IconSun, IconMoonStars } from '@tabler/icons-react';
-import { useDebounce } from './utils/misc';
-import { Route } from './+types/root';
+import { getPrefsSession, Theme } from './utils/userPrefs.server';
+import { useState } from 'react';
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const url = new URL(request.url);
-  const query = url.searchParams.get('search');
-
-  const prefsSession = await getPrefsSession(request);
-  const { theme, lang } = prefsSession.getPrefs();
-
-  if (!query || query?.length === 0) {
-    return {
-      options: [],
-      theme,
-      lang,
-    };
-  }
-
-  const data = await multiSearch(query, lang);
-
-  const movies: IGroup = { label: 'Movies', options: [] };
-  const tvSeries: IGroup = { label: 'TV Series', options: [] };
-
-  for (const item of data.results) {
-    if (item.release_date && item.title) {
-      const label = `${item.title} (${item.release_date.slice(0, 4)})`;
-      movies.options.push({
-        label,
-        id: item.id,
-        title: item.title,
-        release_date: item.release_date,
-        media_type: 'movie',
-      });
-    } else if (item.first_air_date && item.name) {
-      const label = `${item.name} (${item.first_air_date.slice(0, 4)})`;
-      tvSeries.options.push({
-        label,
-        id: item.id,
-        title: item.name,
-        release_date: item.first_air_date,
-        media_type: 'tv',
-      });
-    }
-  }
-  return {
-    options: [
-      {
-        ...movies,
-        options: movies.options.sort(
-          (a, b) => Date.parse(a.release_date) - Date.parse(b.release_date),
-        ),
-      },
-      {
-        ...tvSeries,
-        options: tvSeries.options.sort(
-          (a, b) => Date.parse(a.release_date) - Date.parse(b.release_date),
-        ),
-      },
-    ],
-    theme,
-    lang,
-  };
-}
+import type { Route } from './+types/root';
+import { LangSwitch } from './components/LangsSwitch';
+import { Search } from './components/Search';
+import { ThemeSwitch } from './components/ThemeSwitch';
 
 //https://github.com/orgs/mantinedev/discussions/4829#discussioncomment-7071081
 const colorSchemeManager = {
@@ -97,7 +32,7 @@ const colorSchemeManager = {
   clear: () => null,
 };
 
-function Document({
+export function Document({
   children,
   theme,
 }: {
@@ -123,6 +58,16 @@ function Document({
       </body>
     </html>
   );
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const prefsSession = await getPrefsSession(request);
+  const { theme, lang } = prefsSession.getPrefs();
+
+  return {
+    theme,
+    lang,
+  };
 }
 
 export default function App({ loaderData }: Route.ComponentProps) {
@@ -183,121 +128,32 @@ export default function App({ loaderData }: Route.ComponentProps) {
   );
 }
 
-//TOOD: FIX THEME
-export function ErrorBoundary() {
-  return (
-    <Document theme="light">
-      <Stack p={'sm'}>
-        <h1>Something went wrong</h1>
-        <Link to="/">go back</Link>
-      </Stack>
-    </Document>
-  );
-}
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  let message = 'Oops!';
+  let details = 'An unexpected error occurred.';
+  let stack: string | undefined;
 
-function ThemeSwitch({
-  theme,
-  onChange,
-}: {
-  theme: Theme;
-  onChange: (theme: Theme) => void;
-}) {
-  const fetcher = useFetcher();
-  const nextTheme = theme === 'light' ? 'dark' : 'light';
+  if (isRouteErrorResponse(error)) {
+    message = error.status === 404 ? '404' : 'Error';
+    details =
+      error.status === 404
+        ? 'The requested page could not be found.'
+        : error.statusText || details;
+  } else if (import.meta.env.DEV && error && error instanceof Error) {
+    details = error.message;
+    stack = error.stack;
+  }
 
   return (
-    <Button
-      aria-label="theme switch"
-      type="button"
-      variant="default"
-      styles={{ root: { padding: '5px 10px' } }}
-      onClick={() => {
-        onChange(nextTheme);
-        fetcher.submit(
-          { intent: 'change-theme', theme: nextTheme },
-          { action: '/action/set-prefs', method: 'post' },
-        );
-      }}
-    >
-      {theme === 'dark' ? <IconSun /> : <IconMoonStars />}
-    </Button>
-  );
-}
-
-function Search() {
-  const fetcher = useFetcher<typeof loader>();
-  const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 300);
-
-  const navigate = useNavigate();
-
-  const fetcherRef = useRef(fetcher);
-  useEffect(() => {
-    fetcherRef.current = fetcher;
-  }, [fetcher]);
-
-  useEffect(() => {
-    if (debouncedQuery.length <= 2) {
-      return;
-    }
-    fetcherRef.current.submit({ intent: 'search', search: debouncedQuery });
-  }, [debouncedQuery]);
-
-  return (
-    <Box style={{ flexGrow: 1, maxWidth: '350px' }}>
-      <Autocomplete
-        data={fetcher.data?.options ? fetcher.data.options : null}
-        isLoading={
-          fetcher.state !== 'idle' &&
-          fetcher.formData?.get('intent') === 'search'
-        }
-        value={query}
-        onChange={value => setQuery(value)}
-        onOptionSubmit={item => {
-          const params = new URLSearchParams({
-            title: item.title,
-            release_date: item.release_date,
-          });
-          navigate(
-            item.media_type === 'movie'
-              ? `/movie/${item.id}`
-              : `/tv/${item.id}/season/1`,
-            // item.media_type === 'movie'
-            //   ? `/movie/${item.id}?${params.toString()}`
-            //   : `/tv/${item.id}/season/1?${params.toString()}`,
-          );
-        }}
-      />
-    </Box>
-  );
-}
-
-function LangSwitch({ lang }: { lang: Lang }) {
-  const fetcher = useFetcher<typeof loader>();
-
-  return (
-    <Select
-      aria-label="lang switch"
-      data={['en', 'ru']}
-      defaultValue={lang}
-      withCheckIcon={false}
-      allowDeselect={false}
-      onChange={value =>
-        fetcher.submit(
-          { intent: 'change-lang', lang: value },
-          { action: 'action/set-prefs', method: 'POST' },
-        )
-      }
-      styles={{
-        wrapper: { width: '45px' },
-        section: { display: 'none' },
-        input: { padding: 0, textAlign: 'center' },
-        option: {
-          padding: '2px',
-          display: 'flex',
-          justifyContent: 'center',
-        },
-      }}
-    />
+    <main className="pt-16 p-4 container mx-auto">
+      <h1>{message}</h1>
+      <p>{details}</p>
+      <Link to="/">go back</Link>
+      {stack && (
+        <pre className="w-full p-4 overflow-x-auto">
+          <code>{stack}</code>
+        </pre>
+      )}
+    </main>
   );
 }

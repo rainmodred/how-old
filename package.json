@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "react-router dev",
-    "build": "react-router build",
+    "build": "cross-env NODE_ENV=production react-router build",
     "start": "cross-env NODE_ENV=production react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
     "test": "playwright test --ui",
@@ -16,9 +16,9 @@
     "@mantine/hooks": "^7.15.1",
     "@react-router/node": "^7.0.2",
     "@react-router/serve": "^7.0.2",
-    "@tabler/icons-react": "^3.24.0",
     "date-fns": "^4.1.0",
     "isbot": "^5.1.17",
+    "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7.0.2"
@@ -28,8 +28,6 @@
     "@playwright/test": "^1.49.1",
     "@react-router/dev": "^7.0.2",
     "@react-router/fs-routes": "^7.0.2",
-    "@react-router/remix-routes-option-adapter": "^7.0.2",
-    "@remix-run/eslint-config": "^2.15.1",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
@@ -47,7 +45,7 @@
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.4.2",
     "typescript": "^5.7.2",
-    "vite": "^6.0.3",
+    "vite": "^5.4.11",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "engines": {

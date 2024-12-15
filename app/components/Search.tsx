@@ -1,6 +1,60 @@
-import { useState } from 'react';
-import { Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
-import { IconSearch } from '@tabler/icons-react';
+import { useState, useRef, useEffect } from 'react';
+import { useFetcher, useNavigate } from 'react-router';
+import { useDebounce } from '~/utils/misc';
+import { Box, Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
+import { Search as SearchIcon } from 'lucide-react';
+import type { loader } from '~/routes/action.search';
+
+export function Search() {
+  const fetcher = useFetcher<typeof loader>();
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+
+  const navigate = useNavigate();
+
+  const fetcherRef = useRef(fetcher);
+  useEffect(() => {
+    fetcherRef.current = fetcher;
+  }, [fetcher]);
+
+  useEffect(() => {
+    if (debouncedQuery.length <= 2) {
+      return;
+    }
+    fetcherRef.current.submit(
+      { intent: 'search', search: debouncedQuery },
+      { action: 'action/search', method: 'get' },
+    );
+  }, [debouncedQuery]);
+
+  return (
+    <Box style={{ flexGrow: 1, maxWidth: '350px' }}>
+      <Autocomplete
+        data={fetcher.data?.options ? fetcher.data.options : null}
+        isLoading={
+          fetcher.state !== 'idle' &&
+          fetcher.formData?.get('intent') === 'search'
+        }
+        value={query}
+        onChange={value => setQuery(value)}
+        onOptionSubmit={item => {
+          const params = new URLSearchParams({
+            title: item.title,
+            release_date: item.release_date,
+          });
+          navigate(
+            item.media_type === 'movie'
+              ? `/movie/${item.id}`
+              : `/tv/${item.id}/season/1`,
+            // item.media_type === 'movie'
+            //   ? `/movie/${item.id}?${params.toString()}`
+            //   : `/tv/${item.id}/season/1?${params.toString()}`,
+          );
+        }}
+      />
+    </Box>
+  );
+}
 
 export interface IGroup {
   label: string;
@@ -23,7 +77,7 @@ interface Props {
   onOptionSubmit: (item: GroupItem) => void;
 }
 
-export function Autocomplete({
+function Autocomplete({
   data,
   isLoading = false,
   value,
@@ -103,7 +157,7 @@ export function Autocomplete({
           }}
           onBlur={() => combobox.closeDropdown()}
           leftSection={
-            isLoading ? <Loader size={16} /> : <IconSearch size={16} />
+            isLoading ? <Loader size={16} /> : <SearchIcon size={16} />
           }
         />
       </Combobox.Target>
