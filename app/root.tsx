@@ -10,8 +10,6 @@ import {
   Outlet,
   ScrollRestoration,
   Scripts,
-  useNavigation,
-  useLocation,
 } from '@remix-run/react';
 import {
   Text,
@@ -27,7 +25,6 @@ import {
 import { Autocomplete, IGroup } from './components/Autocomplete';
 import { useState, useEffect, useRef } from 'react';
 import { multiSearch } from './utils/api.server';
-import { SkeletonTable } from './components/SkeletonTable';
 import { Lang, Theme, getPrefsSession } from './utils/userPrefs.server';
 import { IconSun, IconMoonStars } from '@tabler/icons-react';
 import { action } from './routes/action.set-prefs';
@@ -258,17 +255,10 @@ function Search() {
         value={query}
         onChange={value => setQuery(value)}
         onOptionSubmit={item => {
-          const params = new URLSearchParams({
-            title: item.title,
-            release_date: item.release_date,
-          });
           navigate(
             item.media_type === 'movie'
               ? `/movie/${item.id}`
               : `/tv/${item.id}/season/1`,
-            // item.media_type === 'movie'
-            //   ? `/movie/${item.id}?${params.toString()}`
-            //   : `/tv/${item.id}/season/1?${params.toString()}`,
           );
         }}
       />

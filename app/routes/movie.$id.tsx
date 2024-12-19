@@ -4,6 +4,7 @@ import {
   type LoaderFunctionArgs,
   MetaFunction,
   defer,
+  HeadersFunction,
 } from '@vercel/remix';
 import { Await, useLoaderData } from '@remix-run/react';
 import { Persons } from '~/components/Persons';
@@ -20,6 +21,10 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.title ?? 'Movie' }];
 };
 
+export const headers: HeadersFunction = ({ loaderHeaders }) => ({
+  'Cache-Control': loaderHeaders.get('Cache-Control')!,
+});
+
 export async function loader({ params }: LoaderFunctionArgs) {
   if (!params.id) {
     throw redirect('/');
@@ -30,7 +35,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
   ]);
   const castWithAges = getCastWithAges(cast, releaseDate);
 
-  return defer({ title, releaseDate, cast: castWithAges });
+  return defer(
+    { title, releaseDate, cast: castWithAges },
+    {
+      headers: {
+        'Cache-Control': 'max-age=86400, public',
+      },
+    },
+  );
 }
 
 export default function MoviePage() {

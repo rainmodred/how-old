@@ -1,5 +1,10 @@
 import { Flex, Text, Title } from '@mantine/core';
-import { redirect, type LoaderFunctionArgs, defer } from '@vercel/remix';
+import {
+  redirect,
+  type LoaderFunctionArgs,
+  defer,
+  HeadersFunction,
+} from '@vercel/remix';
 import { Await, NavLink, useLoaderData, useLocation } from '@remix-run/react';
 import {
   CastWithAges,
@@ -10,6 +15,10 @@ import {
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Persons } from '~/components/Persons';
 import { Suspense } from 'react';
+
+export const headers: HeadersFunction = ({ loaderHeaders }) => ({
+  'Cache-Control': loaderHeaders.get('Cache-Control')!,
+});
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);

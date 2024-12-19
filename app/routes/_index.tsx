@@ -1,6 +1,6 @@
 import { Title, Flex, Box, Skeleton } from '@mantine/core';
 import { Await, useLoaderData, useNavigation } from '@remix-run/react';
-import { defer, type MetaFunction } from '@vercel/remix';
+import { defer, HeadersFunction, type MetaFunction } from '@vercel/remix';
 import { Suspense } from 'react';
 import { MovieCard } from '~/components/MovieCard';
 import { SkeletonTable } from '~/components/SkeletonTable';
@@ -9,9 +9,13 @@ import { discover } from '~/utils/api.server';
 export const meta: MetaFunction = () => {
   return [
     { title: 'How Old' },
-    { name: 'description', content: 'Welcome to Mantine!' },
+    { name: 'description', content: 'See actor age in movies and tv shows' },
   ];
 };
+
+export const headers: HeadersFunction = ({ loaderHeaders }) => ({
+  'Cache-Control': loaderHeaders.get('Cache-Control')!,
+});
 
 export async function loader() {
   const popularMovies = discover();
