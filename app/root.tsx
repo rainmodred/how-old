@@ -29,6 +29,7 @@ import { Lang, Theme, getPrefsSession } from './utils/userPrefs.server';
 import { IconSun, IconMoonStars } from '@tabler/icons-react';
 import { action } from './routes/action.set-prefs';
 import { useDebounce } from './utils/misc';
+import { ServerError } from './components/ServerError/ServerError';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -188,10 +189,7 @@ export default function App() {
 export function ErrorBoundary() {
   return (
     <Document theme="light">
-      <Stack p={'sm'}>
-        <h1>Something went wrong</h1>
-        <Link to="/">go back</Link>
-      </Stack>
+      <ServerError />
     </Document>
   );
 }
