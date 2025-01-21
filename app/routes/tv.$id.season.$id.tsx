@@ -9,6 +9,7 @@ import { Await, NavLink, useLoaderData, useLocation } from '@remix-run/react';
 import {
   CastWithAges,
   getCastWithAges,
+  getSeasonDetails,
   getTvCast,
   getTvDetails,
 } from '~/utils/api.server';
@@ -23,15 +24,16 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => ({
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const tvId = url.pathname.split('/')[2];
-  const seasonNumber = params.id;
+  const seasonNumber = params.id as string;
   if (!seasonNumber || !tvId) {
     throw redirect('/');
   }
 
-  const [{ first_air_date: releaseDate, name, seasons }, cast] =
+  const [{ air_date: releaseDate }, { name, seasons }, cast] =
     await Promise.all([
+      getSeasonDetails(tvId, seasonNumber),
       getTvDetails(tvId),
-      getTvCast(tvId, seasonNumber.toString()),
+      getTvCast(tvId, seasonNumber),
     ]);
   const castWithAges = getCastWithAges(cast, releaseDate);
 

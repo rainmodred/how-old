@@ -103,6 +103,13 @@ export async function getTvCast(id: string, season: string) {
   return cast;
 }
 
+export async function getSeasonDetails(id: string, season: string) {
+  const details = await fetcher<{ air_date: string }>(
+    `/tv/${id}/season/${season}`,
+  );
+  return details;
+}
+
 export async function getPerson(id: number, character: string) {
   const person = await fetcher<Person>(`/person/${id}`);
   return { ...person, character };
