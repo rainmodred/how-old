@@ -1,6 +1,6 @@
 import { createCookieSessionStorage } from '@vercel/remix';
 
-const sessionSecret = process.env.SESSION_SECRET ?? 'DEFAULT_SECRET';
+const sessionSecret = import.meta.env.VITE_SESSION_SECRET ?? 'DEFAULT_SECRET';
 
 export type Theme = 'light' | 'dark';
 export type Lang = 'en' | 'ru';
@@ -16,7 +16,7 @@ export function isLang(value: unknown): value is Lang {
 const prefsStorage = createCookieSessionStorage({
   cookie: {
     name: 'user-prefs',
-    secure: true,
+    secure: import.meta.env.MODE == 'production' ? true : false,
     secrets: [sessionSecret],
     sameSite: 'lax',
     path: '/',

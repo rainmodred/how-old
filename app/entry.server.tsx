@@ -17,12 +17,12 @@ import { drop } from '@mswjs/data';
 
 const ABORT_DELAY = 5_000;
 
-if (process.env.NODE_ENV === 'development') {
-  drop(db);
-  initDb();
+// if (process.env.NODE_ENV === 'development') {
+//   drop(db);
+//   initDb();
 
-  server.listen();
-}
+//   server.listen();
+// }
 
 export default function handleRequest(
   request: Request,

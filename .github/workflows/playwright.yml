@@ -5,8 +5,8 @@ on:
   pull_request:
     branches: [ main, master ]
 env:
-  API_TOKEN: secret
-  SESSION_SECRET: secret
+  VITE_API_TOKEN: secret
+  VITE_SESSION_SECRET: secret
 jobs:
   test:
     timeout-minutes: 60
