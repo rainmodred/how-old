@@ -36,7 +36,7 @@ export default function Index() {
     return (
       <>
         <Skeleton height={40} width={'95%'} />
-        <SkeletonTable rows={5} />;
+        <SkeletonTable rows={5} />
       </>
     );
   }
