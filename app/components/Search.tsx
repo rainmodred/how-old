@@ -1,10 +1,9 @@
-import { Box } from '@mantine/core';
 import { useFetcher, useNavigate } from '@remix-run/react';
 import { useState, useRef, useEffect } from 'react';
 import { loader } from '~/routes/action.search';
 import { useDebounce } from '~/utils/misc';
-import { Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
+import { Box, Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
 
 export function Search() {
   const fetcher = useFetcher<typeof loader>();

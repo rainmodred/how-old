@@ -1,0 +1,17 @@
+.darkIcon,
+.lightIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.darkIcon {
+  @mixin light {
+    display: none;
+  }
+}
+
+.lightIcon {
+  @mixin dark {
+    display: none;
+  }
+}

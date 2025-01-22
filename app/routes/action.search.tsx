@@ -1,7 +1,6 @@
 import { LoaderFunctionArgs } from 'react-router';
 import { IGroup } from '~/components/Search';
 import { multiSearch } from '~/utils/api.server';
-import { getPrefsSession } from '~/utils/userPrefs.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -13,9 +12,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     };
   }
 
-  const prefsSession = await getPrefsSession(request);
-  const { lang } = prefsSession.getPrefs();
-  const data = await multiSearch(query, lang);
+  const data = await multiSearch(query);
 
   const movies: IGroup = { label: 'Movies', options: [] };
   const tvSeries: IGroup = { label: 'TV Series', options: [] };

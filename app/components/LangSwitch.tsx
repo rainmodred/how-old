@@ -1,24 +1,20 @@
 import { Select } from '@mantine/core';
-import { useFetcher } from '@remix-run/react';
-import { loader } from '~/root';
-import { Lang } from '~/utils/userPrefs.server';
+import { useLocalStorage } from '@mantine/hooks';
 
-export function LangSwitch({ lang }: { lang: Lang }) {
-  const fetcher = useFetcher<typeof loader>();
+export function LangSwitch() {
+  const [value, setValue] = useLocalStorage({
+    key: 'lang',
+    defaultValue: 'en',
+  });
 
   return (
     <Select
       aria-label="lang switch"
       data={['en', 'ru']}
-      defaultValue={lang}
+      defaultValue={value}
       withCheckIcon={false}
       allowDeselect={false}
-      onChange={value =>
-        fetcher.submit(
-          { intent: 'change-lang', lang: value },
-          { action: 'action/set-prefs', method: 'post' },
-        )
-      }
+      onChange={v => v && setValue(v)}
       styles={{
         wrapper: { width: '45px' },
         section: { display: 'none' },
