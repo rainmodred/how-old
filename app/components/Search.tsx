@@ -1,6 +1,56 @@
-import { useState } from 'react';
-import { Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
+import { useFetcher, useNavigate } from '@remix-run/react';
+import { useState, useRef, useEffect } from 'react';
+import { loader } from '~/routes/action.search';
+import { useDebounce } from '~/utils/misc';
 import { IconSearch } from '@tabler/icons-react';
+import { Box, Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
+
+export function Search() {
+  const fetcher = useFetcher<typeof loader>();
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+
+  const navigate = useNavigate();
+
+  const fetcherRef = useRef(fetcher);
+  useEffect(() => {
+    fetcherRef.current = fetcher;
+  }, [fetcher]);
+
+  useEffect(() => {
+    if (debouncedQuery.length <= 2) {
+      return;
+    }
+    fetcherRef.current.submit(
+      {
+        intent: 'search',
+        search: debouncedQuery,
+      },
+      { action: 'action/search', method: 'get' },
+    );
+  }, [debouncedQuery]);
+
+  return (
+    <Box style={{ flexGrow: 1, maxWidth: '350px' }}>
+      <Autocomplete
+        data={fetcher.data?.options ? fetcher.data.options : null}
+        isLoading={
+          fetcher.state !== 'idle' &&
+          fetcher.formData?.get('intent') === 'search'
+        }
+        value={query}
+        onChange={value => setQuery(value)}
+        onOptionSubmit={item => {
+          navigate(
+            item.media_type === 'movie'
+              ? `/movie/${item.id}`
+              : `/tv/${item.id}/season/1`,
+          );
+        }}
+      />
+    </Box>
+  );
+}
 
 export interface IGroup {
   label: string;
