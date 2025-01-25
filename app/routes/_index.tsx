@@ -32,15 +32,7 @@ export async function loader() {
 
 export default function Index() {
   const { popularMovies } = useLoaderData<typeof loader>();
-  const navigation = useNavigation();
-  if (navigation.state === 'loading') {
-    return (
-      <>
-        <Skeleton height={40} width={'95%'} />
-        <SkeletonTable rows={5} />
-      </>
-    );
-  }
+
   return (
     <Box>
       <Title mb="lg" styles={{ root: { textAlign: 'center' } }}>

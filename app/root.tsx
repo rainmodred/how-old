@@ -1,4 +1,5 @@
 import '@mantine/core/styles.css';
+import '@mantine/nprogress/styles.css';
 import {
   Meta,
   Links,
@@ -6,6 +7,7 @@ import {
   Outlet,
   ScrollRestoration,
   Scripts,
+  useNavigation,
 } from '@remix-run/react';
 import {
   Text,
@@ -19,6 +21,8 @@ import {
 } from '@mantine/core';
 import { ServerError } from './components/ServerError/ServerError';
 import Header from './components/Header';
+import { NavigationProgress, nprogress } from '@mantine/nprogress';
+import { useEffect } from 'react';
 
 // export const headers: HeadersFunction = ({ loaderHeaders }) => ({
 //   'Cache-Control': loaderHeaders.get('Cache-Control')!,
@@ -36,6 +40,7 @@ function Document({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <MantineProvider>
+          <NavigationProgress />
           {children}
           <ScrollRestoration />
           <Scripts />
@@ -46,6 +51,18 @@ function Document({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const navigation = useNavigation();
+  useEffect(() => {
+    console.log('navigation:', navigation.state, navigation.location);
+    if (navigation.state === 'loading') {
+      nprogress.start();
+    }
+
+    if (navigation.state === 'idle') {
+      nprogress.complete();
+    }
+  }, [navigation.state, navigation.location]);
+
   return (
     <Document>
       <Stack p={'sm'} h={'100dvh'}>
