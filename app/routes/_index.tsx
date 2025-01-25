@@ -1,6 +1,7 @@
 import { Title, Flex, Box, Skeleton } from '@mantine/core';
 import { Await, useLoaderData, useNavigation } from '@remix-run/react';
 import { defer, HeadersFunction, type MetaFunction } from '@vercel/remix';
+import { formatDistance } from 'date-fns';
 import { Suspense } from 'react';
 import { MovieCard } from '~/components/MovieCard';
 import { SkeletonTable } from '~/components/SkeletonTable';
@@ -62,7 +63,10 @@ export default function Index() {
               return (
                 <>
                   {popularMovies.map(movie => {
-                    return <MovieCard movie={movie} key={movie.id} />;
+                    const text = `${formatDistance(movie.release_date, new Date())}`;
+                    return (
+                      <MovieCard movie={movie} text={text} key={movie.id} />
+                    );
                   })}
                 </>
               );

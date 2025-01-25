@@ -1,5 +1,5 @@
 import { differenceInYears, sub } from 'date-fns';
-import { formatDate } from './dates.server';
+import { formatDate } from './dates';
 import { API_URL } from './constants';
 
 const token = process.env.API_TOKEN;
@@ -59,7 +59,13 @@ export async function multiSearch(query: string, language: string = 'en') {
 }
 
 export async function getCastWithAges(cast: Actor[], releaseDate: string) {
-  const promises = cast.map(actor => getPerson(actor.id, actor.character));
+  const promises = cast.map(async actor => {
+    const person = await getPerson(actor.id);
+    return {
+      ...person,
+      character: actor.character,
+    };
+  });
 
   const result = await Promise.all(promises);
 
@@ -110,9 +116,9 @@ export async function getSeasonDetails(id: string, season: string) {
   return details;
 }
 
-export async function getPerson(id: number, character: string) {
+export async function getPerson(id: number) {
   const person = await fetcher<Person>(`/person/${id}`);
-  return { ...person, character };
+  return person;
 }
 
 export async function getTvDetails(id: number | string) {
@@ -144,11 +150,7 @@ export async function discover() {
     `/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&primary_release_date.lte=${prevYear}&sort_by=vote_count.desc&without_genres=16&vote_count.gte=${vote_count}`,
   );
 
-  return data.results.map(m => ({
-    ...m,
-    release_date: formatDate(m.release_date),
-    age: differenceInYears(new Date(), m.release_date),
-  }));
+  return data.results;
 }
 
 export async function getMovie(id: string) {
