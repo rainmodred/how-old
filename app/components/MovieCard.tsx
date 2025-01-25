@@ -19,8 +19,11 @@ export function MovieCard({ movie, text }: Props) {
       <CardSection>
         <Link to={`/movie/${movie.id}`}>
           <Image
+            fallbackSrc="/movieFallback.svg"
+            onError={e => {
+              e.currentTarget.src = '/movieFallback.svg';
+            }}
             loading="lazy"
-            alt="movie poster"
             alt={movie.title}
             src={`https://image.tmdb.org/t/p/w185/${movie.poster_path}`}
             w="185"
@@ -35,7 +38,6 @@ export function MovieCard({ movie, text }: Props) {
         <Text size="sm">{formatDate(movie.release_date)}</Text>
         <Text size="sm">
           <strong>{text}</strong>
-          {/* {movie.age} {movie.age === 1 ? 'year' : 'years'} ago */}
         </Text>
       </CardSection>
     </Card>

@@ -1,11 +1,11 @@
 import { Title, Flex, Box, Skeleton } from '@mantine/core';
 import { Await, useLoaderData, useNavigation } from '@remix-run/react';
 import { defer, HeadersFunction, type MetaFunction } from '@vercel/remix';
-import { formatDistance } from 'date-fns';
 import { Suspense } from 'react';
 import { MovieCard } from '~/components/MovieCard';
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { discover } from '~/utils/api.server';
+import { formatDiff } from '~/utils/dates';
 
 export const meta: MetaFunction = () => {
   return [
@@ -43,7 +43,7 @@ export default function Index() {
   }
   return (
     <Box>
-      <Title m="lg" styles={{ root: { textAlign: 'center' } }}>
+      <Title mb="lg" styles={{ root: { textAlign: 'center' } }}>
         Popular Movies
       </Title>
 
@@ -63,7 +63,7 @@ export default function Index() {
               return (
                 <>
                   {popularMovies.map(movie => {
-                    const text = `${formatDistance(movie.release_date, new Date())}`;
+                    const text = `${formatDiff(movie.release_date, new Date())} old`;
                     return (
                       <MovieCard movie={movie} text={text} key={movie.id} />
                     );

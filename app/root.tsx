@@ -51,6 +51,7 @@ export default function App() {
       <Stack p={'sm'} h={'100dvh'}>
         <Header />
         <Container
+          mt="md"
           component={'main'}
           px="0"
           w={'100%'}

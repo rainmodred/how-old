@@ -1,4 +1,4 @@
-import { differenceInYears, sub } from 'date-fns';
+import { differenceInYears, isBefore, sub } from 'date-fns';
 import { formatDate } from './dates';
 import { API_URL } from './constants';
 
@@ -121,6 +121,19 @@ export async function getPerson(id: number) {
   return person;
 }
 
+export async function getPersonMovies(id: number) {
+  //TODO:
+  //https://api.themoviedb.org/3/person/{person_id}/combined_credits
+
+  const { cast } = await fetcher<{ cast: Movie[] }>(
+    `/person/${id}/movie_credits`,
+  );
+
+  return cast.filter(
+    m => m.release_date && isBefore(m.release_date, new Date()) && !m.video,
+  );
+}
+
 export async function getTvDetails(id: number | string) {
   const data = await fetcher<{
     id: number;
@@ -163,6 +176,8 @@ export interface Movie {
   release_date: string;
   title: string;
   poster_path: string;
+  video: boolean;
+  popularity: number;
 }
 
 export interface Tv {
@@ -182,6 +197,7 @@ export interface Person {
   deathday?: string;
   name: string;
   profile_path: string;
+  place_of_birth: string;
 }
 
 export interface Actor {

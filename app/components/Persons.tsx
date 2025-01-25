@@ -1,15 +1,17 @@
 import { Box, Image, Group, Table, Text } from '@mantine/core';
+import { Link } from '@remix-run/react';
 import { CastWithAges } from '~/utils/api.server';
 import { baseImageUrl } from '~/utils/constants';
 
 interface ProfileImageProps {
+  id: number;
   src: string;
   alt: string;
 }
 
-function ProfileImage({ src, alt }: ProfileImageProps) {
+function ProfileImage({ id, src, alt }: ProfileImageProps) {
   return (
-    <Box style={{ width: '85px' }}>
+    <Box component={Link} to={`/person/${id}`} style={{ width: '85px' }}>
       <Image
         loading="lazy"
         src={src ? `${baseImageUrl}/${src}` : '/profileFallback.svg'}
@@ -50,7 +52,7 @@ export function Persons({ cast }: PersonsProps) {
               <Table.Tr key={id}>
                 <Table.Td>
                   <Group wrap="nowrap">
-                    <ProfileImage src={profile_path} alt={`${name} image`} />
+                    <ProfileImage id={id} src={profile_path} alt={name} />
                     <Box>
                       <Text fw="700">{name}</Text>
                       <Text>{character}</Text>
