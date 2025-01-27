@@ -1,9 +1,8 @@
 import { Title, Flex, Box, Skeleton } from '@mantine/core';
-import { Await, useLoaderData, useNavigation } from '@remix-run/react';
+import { Await, useLoaderData } from '@remix-run/react';
 import { defer, HeadersFunction, type MetaFunction } from '@vercel/remix';
 import { Suspense } from 'react';
 import { MovieCard } from '~/components/MovieCard';
-import { SkeletonTable } from '~/components/SkeletonTable';
 import { discover } from '~/utils/api.server';
 import { formatDiff } from '~/utils/dates';
 

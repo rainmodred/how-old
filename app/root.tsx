@@ -53,7 +53,6 @@ function Document({ children }: { children: React.ReactNode }) {
 export default function App() {
   const navigation = useNavigation();
   useEffect(() => {
-    console.log('navigation:', navigation.state, navigation.location);
     if (navigation.state === 'loading') {
       nprogress.start();
     }
