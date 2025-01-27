@@ -14,6 +14,7 @@ export function MovieCard({ movie, text }: Props) {
       data-testid="movie-card"
       radius="md"
       shadow="sm"
+      h="100%"
       styles={{ root: { flexShrink: 0 } }}
     >
       <CardSection>
@@ -25,9 +26,9 @@ export function MovieCard({ movie, text }: Props) {
             }}
             loading="lazy"
             alt={movie.title}
-            src={`https://image.tmdb.org/t/p/w185/${movie.poster_path}`}
-            w="185"
-            h="278"
+            src={`https://image.tmdb.org/t/p/w342/${movie.poster_path}`}
+            // width={185}
+            // height={278}
           />
         </Link>
       </CardSection>

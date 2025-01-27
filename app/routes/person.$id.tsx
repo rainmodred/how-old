@@ -1,4 +1,11 @@
-import { ComboboxItem, Flex, Select, Skeleton, Title } from '@mantine/core';
+import {
+  ComboboxItem,
+  Flex,
+  Grid,
+  Select,
+  Skeleton,
+  Title,
+} from '@mantine/core';
 import {
   redirect,
   type LoaderFunctionArgs,
@@ -7,7 +14,7 @@ import {
   HeadersFunction,
 } from '@vercel/remix';
 import { Await, useLoaderData } from '@remix-run/react';
-import { getPerson, getPersonMovies } from '~/utils/api.server';
+import { getPerson, getPersonMovies, Movie } from '~/utils/api.server';
 import { Suspense, useState } from 'react';
 import { MovieCard } from '~/components/MovieCard';
 import PersonCard from '~/components/PersonCard/PersonCard';
@@ -51,8 +58,10 @@ export default function PersonPage() {
   const [sort, setSort] = useState<ComboboxItem | null>(items[0]);
 
   return (
-    <Flex direction="column" gap="md">
-      <PersonCard person={person} />
+    <Grid gutter={'md'}>
+      <Grid.Col span={12}>
+        <PersonCard person={person} />
+      </Grid.Col>
 
       <Suspense
         fallback={
@@ -67,43 +76,59 @@ export default function PersonPage() {
       >
         <Await resolve={movies}>
           {movies => {
+            const unique = new Set();
             return (
               <>
-                <Flex justify="space-between">
-                  <Title order={2}>Filmography</Title>
-                  <Select
-                    value={sort ? sort.value : null}
-                    onChange={(_, option) => setSort(option)}
-                    placeholder="sort by..."
-                    data={items}
-                  />
-                </Flex>
-                <Flex gap="sm" wrap="wrap" justify="space-between">
-                  {movies
-                    .sort((a, b) => {
-                      if (sort?.value === 'Popularity') {
-                        return b.popularity - a.popularity;
-                      }
-                      if (sort?.value === 'Release Date') {
-                        return (
-                          new Date(a.release_date).getTime() -
-                          new Date(b.release_date).getTime()
-                        );
-                      }
-                      throw new Error('invalid sort');
-                    })
-                    .map(movie => {
-                      const text = `${formatDiff(person.birthday, movie.release_date)} old`;
+                <Grid.Col span={12}>
+                  <Flex justify="space-between">
+                    <Title order={2}>Filmography</Title>
+                    <Select
+                      value={sort ? sort.value : null}
+                      onChange={(_value, option) => {
+                        option && setSort(option);
+                      }}
+                      placeholder="sort by..."
+                      data={items}
+                    />
+                  </Flex>
+                </Grid.Col>
+
+                {movies
+                  .reduce((accum, current) => {
+                    //Fix duplicated movies
+                    if (unique.has(current.id)) {
+                      return accum;
+                    }
+
+                    unique.add(current.id);
+                    accum.push(current);
+
+                    return accum;
+                  }, [] as Movie[])
+                  .sort((a, b) => {
+                    if (sort?.value === 'Popularity') {
+                      return b.popularity - a.popularity;
+                    } else if (sort?.value === 'Release Date') {
                       return (
-                        <MovieCard movie={movie} text={text} key={movie.id} />
+                        new Date(a.release_date).getTime() -
+                        new Date(b.release_date).getTime()
                       );
-                    })}
-                </Flex>
+                    }
+                    throw new Error('invalid sort');
+                  })
+                  .map(movie => {
+                    const text = `${formatDiff(person.birthday, movie.release_date)} old`;
+                    return (
+                      <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
+                        <MovieCard movie={movie} text={text} key={movie.id} />
+                      </Grid.Col>
+                    );
+                  })}
               </>
             );
           }}
         </Await>
       </Suspense>
-    </Flex>
+    </Grid>
   );
 }
