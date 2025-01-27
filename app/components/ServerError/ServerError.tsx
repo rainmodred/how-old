@@ -1,4 +1,4 @@
-import { Button, Container, Group, Text, Title } from '@mantine/core';
+import { Button, Container, Group, Title } from '@mantine/core';
 import classes from './ServerError.module.css';
 import { Link } from '@remix-run/react';
 

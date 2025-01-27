@@ -1,5 +1,5 @@
-import { differenceInYears, sub } from 'date-fns';
-import { formatDate } from './dates.server';
+import { differenceInYears, isBefore, sub } from 'date-fns';
+import { formatDate } from './dates';
 import { API_URL } from './constants';
 
 const token = process.env.API_TOKEN;
@@ -45,21 +45,70 @@ export async function multiSearch(query: string, language: string = 'en') {
   const params = new URLSearchParams({ query, language });
   const data = await fetcher<{
     page: number;
-    results: {
-      id: number;
-      title?: string;
-      name?: string;
-      media_type: 'movie' | 'tv' | 'person';
-      release_date?: string;
-      first_air_date?: string;
-    }[];
+    results: SearchRes[];
   }>(`/search/multi?${params.toString()}`);
 
-  return data;
+  return {
+    page: data.page,
+    results: data.results.map(item => {
+      if (item.media_type === 'person') {
+        return {
+          id: item.id,
+          name: item.name,
+          media_type: item.media_type,
+        } as PersonRes;
+      }
+
+      if (item.media_type === 'movie') {
+        return {
+          id: item.id,
+          title: item.title,
+          media_type: item.media_type,
+          release_date: item.release_date,
+        } as MovieRes;
+      }
+
+      if (item.media_type === 'tv') {
+        return {
+          id: item.id,
+          name: item.name,
+          media_type: item.media_type,
+          first_air_date: item.first_air_date,
+        } as TvRes;
+      }
+      return item;
+    }),
+  };
+}
+
+export type SearchRes = MovieRes | TvRes | PersonRes;
+
+export interface MovieRes {
+  id: number;
+  title: string;
+  media_type: 'movie';
+  release_date: string;
+}
+export interface TvRes {
+  id: number;
+  name: string;
+  media_type: 'tv';
+  first_air_date: string;
+}
+export interface PersonRes {
+  id: number;
+  name: string;
+  media_type: 'person';
 }
 
 export async function getCastWithAges(cast: Actor[], releaseDate: string) {
-  const promises = cast.map(actor => getPerson(actor.id, actor.character));
+  const promises = cast.map(async actor => {
+    const person = await getPerson(actor.id);
+    return {
+      ...person,
+      character: actor.character,
+    };
+  });
 
   const result = await Promise.all(promises);
 
@@ -110,9 +159,22 @@ export async function getSeasonDetails(id: string, season: string) {
   return details;
 }
 
-export async function getPerson(id: number, character: string) {
+export async function getPerson(id: number) {
   const person = await fetcher<Person>(`/person/${id}`);
-  return { ...person, character };
+  return person;
+}
+
+export async function getPersonMovies(id: number) {
+  //TODO:
+  //https://api.themoviedb.org/3/person/{person_id}/combined_credits
+
+  const { cast } = await fetcher<{ cast: Movie[] }>(
+    `/person/${id}/movie_credits`,
+  );
+
+  return cast.filter(
+    m => m.release_date && isBefore(m.release_date, new Date()) && !m.video,
+  );
 }
 
 export async function getTvDetails(id: number | string) {
@@ -144,11 +206,7 @@ export async function discover() {
     `/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&primary_release_date.lte=${prevYear}&sort_by=vote_count.desc&without_genres=16&vote_count.gte=${vote_count}`,
   );
 
-  return data.results.map(m => ({
-    ...m,
-    release_date: formatDate(m.release_date),
-    age: differenceInYears(new Date(), m.release_date),
-  }));
+  return data.results;
 }
 
 export async function getMovie(id: string) {
@@ -161,6 +219,8 @@ export interface Movie {
   release_date: string;
   title: string;
   poster_path: string;
+  video: boolean;
+  popularity: number;
 }
 
 export interface Tv {
@@ -180,6 +240,7 @@ export interface Person {
   deathday?: string;
   name: string;
   profile_path: string;
+  place_of_birth: string;
 }
 
 export interface Actor {

@@ -1,33 +1,45 @@
 import { Card, CardSection, Image, Text } from '@mantine/core';
 import { Link } from '@remix-run/react';
 import { Movie } from '~/utils/api.server';
+import { formatDate } from '~/utils/dates';
 
-type Props = { movie: Movie & { age: number } };
+interface Props {
+  movie: Movie;
+  text: string;
+}
 
-export function MovieCard({ movie }: Props) {
+export function MovieCard({ movie, text }: Props) {
   return (
     <Card
       data-testid="movie-card"
       radius="md"
       shadow="sm"
+      h="100%"
       styles={{ root: { flexShrink: 0 } }}
     >
       <CardSection>
         <Link to={`/movie/${movie.id}`}>
           <Image
+            fallbackSrc="/movieFallback.svg"
+            onError={e => {
+              e.currentTarget.src = '/movieFallback.svg';
+            }}
             loading="lazy"
-            alt="movie poster"
-            src={`https://image.tmdb.org/t/p/w185/${movie.poster_path}`}
-            w="185"
-            h="278"
+            alt={movie.title}
+            src={`https://image.tmdb.org/t/p/w342/${movie.poster_path}`}
+            width={342}
+            height={513}
+            h="auto"
           />
         </Link>
       </CardSection>
       <CardSection w="185" p="sm">
-        <Text fw={700}>{movie.title}</Text>
-        <Text>{movie.release_date}</Text>
-        <Text>
-          {movie.age} {movie.age === 1 ? 'year' : 'years'} ago
+        <Text fw={700} size="md">
+          {movie.title}
+        </Text>
+        <Text size="sm">{formatDate(movie.release_date)}</Text>
+        <Text size="sm">
+          <strong>{text}</strong>
         </Text>
       </CardSection>
     </Card>
