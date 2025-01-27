@@ -27,8 +27,9 @@ export function MovieCard({ movie, text }: Props) {
             loading="lazy"
             alt={movie.title}
             src={`https://image.tmdb.org/t/p/w342/${movie.poster_path}`}
-            // width={185}
-            // height={278}
+            width={342}
+            height={513}
+            h="auto"
           />
         </Link>
       </CardSection>

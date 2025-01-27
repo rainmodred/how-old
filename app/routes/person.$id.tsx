@@ -1,7 +1,7 @@
 import {
   ComboboxItem,
-  Flex,
   Grid,
+  Group,
   Select,
   Skeleton,
   Title,
@@ -19,6 +19,7 @@ import { Suspense, useState } from 'react';
 import { MovieCard } from '~/components/MovieCard';
 import PersonCard from '~/components/PersonCard/PersonCard';
 import { formatDiff } from '~/utils/dates';
+import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.title ?? 'Movie' }];
@@ -65,12 +66,14 @@ export default function PersonPage() {
 
       <Suspense
         fallback={
-          // TODO: FIXME
           <>
-            <Skeleton height={278} width={185} />
-            <Skeleton height={278} width={185} />
-            <Skeleton height={278} width={185} />
-            <Skeleton height={278} width={185} />
+            <Grid.Col span={12}>
+              <Group justify="space-between">
+                <Skeleton height={36} width={156} />
+                <Skeleton height={36} width={167} />
+              </Group>
+            </Grid.Col>
+            <MoviesSkeleton />
           </>
         }
       >
@@ -80,7 +83,7 @@ export default function PersonPage() {
             return (
               <>
                 <Grid.Col span={12}>
-                  <Flex justify="space-between">
+                  <Group justify="space-between">
                     <Title order={2}>Filmography</Title>
                     <Select
                       value={sort ? sort.value : null}
@@ -90,12 +93,12 @@ export default function PersonPage() {
                       placeholder="sort by..."
                       data={items}
                     />
-                  </Flex>
+                  </Group>
                 </Grid.Col>
 
                 {movies
                   .reduce((accum, current) => {
-                    //Fix duplicated movies
+                    //Remove duplicated movies
                     if (unique.has(current.id)) {
                       return accum;
                     }

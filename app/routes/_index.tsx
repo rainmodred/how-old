@@ -1,8 +1,9 @@
-import { Title, Flex, Box, Skeleton } from '@mantine/core';
+import { Title, Box, Grid } from '@mantine/core';
 import { Await, useLoaderData } from '@remix-run/react';
 import { defer, HeadersFunction, type MetaFunction } from '@vercel/remix';
 import { Suspense } from 'react';
 import { MovieCard } from '~/components/MovieCard';
+import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
 import { discover } from '~/utils/api.server';
 import { formatDiff } from '~/utils/dates';
 
@@ -38,25 +39,19 @@ export default function Index() {
         Popular Movies
       </Title>
 
-      <Flex gap="md" wrap="wrap" justify="center">
-        <Suspense
-          fallback={
-            <>
-              <Skeleton height={278} width={185} />
-              <Skeleton height={278} width={185} />
-              <Skeleton height={278} width={185} />
-              <Skeleton height={278} width={185} />
-            </>
-          }
-        >
+      <Grid gutter={'md'}>
+        <Suspense fallback={<MoviesSkeleton />}>
           <Await resolve={popularMovies}>
             {popularMovies => {
               return (
                 <>
                   {popularMovies.map(movie => {
                     const text = `${formatDiff(movie.release_date, new Date())} old`;
+
                     return (
-                      <MovieCard movie={movie} text={text} key={movie.id} />
+                      <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
+                        <MovieCard movie={movie} text={text} key={movie.id} />
+                      </Grid.Col>
                     );
                   })}
                 </>
@@ -64,7 +59,7 @@ export default function Index() {
             }}
           </Await>
         </Suspense>
-      </Flex>
+      </Grid>
     </Box>
   );
 }
