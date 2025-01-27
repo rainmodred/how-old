@@ -1,7 +1,8 @@
 import { Card, Image, Title, Text, Box } from '@mantine/core';
 import { Person } from '~/utils/api.server';
-import { formatDate, formatDiff } from '~/utils/dates';
+import { formatDate } from '~/utils/dates';
 import classes from './PersonCard.module.css';
+import { formatDistanceStrict } from 'date-fns';
 
 interface Props {
   person: Person;
@@ -20,8 +21,8 @@ export default function PersonCard({ person }: Props) {
           src={`https://image.tmdb.org/t/p/w185/${person.profile_path}`}
           radius={4}
           alt={person.name}
-          w="185"
-          h="278"
+          width="185"
+          height="278"
         />
       </Card.Section>
       <Box>
@@ -32,14 +33,14 @@ export default function PersonCard({ person }: Props) {
           <strong style={{ display: 'block' }}>Brithday</strong>
           {formatDate(person.birthday)}
           {!person.deathday &&
-            ` (${formatDiff(new Date(), person.birthday)} old)`}
+            ` (${formatDistanceStrict(new Date(), person.birthday)} old)`}
         </Text>
 
         {person.deathday && (
           <Text>
             <strong style={{ display: 'block' }}>Day of Death</strong>
             {formatDate(person.deathday)} (
-            {formatDiff(person.deathday, person.birthday)} old)
+            {formatDistanceStrict(person.deathday, person.birthday)} old)
           </Text>
         )}
 

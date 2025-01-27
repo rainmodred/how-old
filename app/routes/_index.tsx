@@ -1,11 +1,11 @@
 import { Title, Box, Grid } from '@mantine/core';
 import { Await, useLoaderData } from '@remix-run/react';
 import { defer, HeadersFunction, type MetaFunction } from '@vercel/remix';
+import { formatDistanceStrict } from 'date-fns';
 import { Suspense } from 'react';
 import { MovieCard } from '~/components/MovieCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
 import { discover } from '~/utils/api.server';
-import { formatDiff } from '~/utils/dates';
 
 export const meta: MetaFunction = () => {
   return [
@@ -46,7 +46,7 @@ export default function Index() {
               return (
                 <>
                   {popularMovies.map(movie => {
-                    const text = `${formatDiff(movie.release_date, new Date())} old`;
+                    const text = `${formatDistanceStrict(movie.release_date, new Date())} old`;
 
                     return (
                       <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>

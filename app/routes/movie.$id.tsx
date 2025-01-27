@@ -34,7 +34,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
     getCast(params.id),
   ]);
   const castWithAges = getCastWithAges(cast, releaseDate);
-  await new Promise(resolve => setTimeout(resolve, 10000));
 
   return defer(
     { title, releaseDate, cast: castWithAges },

@@ -18,8 +18,8 @@ import { getPerson, getPersonMovies, Movie } from '~/utils/api.server';
 import { Suspense, useState } from 'react';
 import { MovieCard } from '~/components/MovieCard';
 import PersonCard from '~/components/PersonCard/PersonCard';
-import { formatDiff } from '~/utils/dates';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
+import { formatDistanceStrict } from 'date-fns';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.title ?? 'Movie' }];
@@ -120,7 +120,7 @@ export default function PersonPage() {
                     throw new Error('invalid sort');
                   })
                   .map(movie => {
-                    const text = `${formatDiff(person.birthday, movie.release_date)} old`;
+                    const text = `${formatDistanceStrict(person.birthday, movie.release_date)} old`;
                     return (
                       <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
                         <MovieCard movie={movie} text={text} key={movie.id} />
