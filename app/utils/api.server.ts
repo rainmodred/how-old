@@ -45,17 +45,60 @@ export async function multiSearch(query: string, language: string = 'en') {
   const params = new URLSearchParams({ query, language });
   const data = await fetcher<{
     page: number;
-    results: {
-      id: number;
-      title?: string;
-      name?: string;
-      media_type: 'movie' | 'tv' | 'person';
-      release_date?: string;
-      first_air_date?: string;
-    }[];
+    results: SearchRes[];
   }>(`/search/multi?${params.toString()}`);
 
-  return data;
+  return {
+    page: data.page,
+    results: data.results.map(item => {
+      if (item.media_type === 'person') {
+        return {
+          id: item.id,
+          name: item.name,
+          media_type: item.media_type,
+        } as PersonRes;
+      }
+
+      if (item.media_type === 'movie') {
+        return {
+          id: item.id,
+          title: item.title,
+          media_type: item.media_type,
+          release_date: item.release_date,
+        } as MovieRes;
+      }
+
+      if (item.media_type === 'tv') {
+        return {
+          id: item.id,
+          name: item.name,
+          media_type: item.media_type,
+          first_air_date: item.first_air_date,
+        } as TvRes;
+      }
+      return item;
+    }),
+  };
+}
+
+export type SearchRes = MovieRes | TvRes | PersonRes;
+
+export interface MovieRes {
+  id: number;
+  title: string;
+  media_type: 'movie';
+  release_date: string;
+}
+export interface TvRes {
+  id: number;
+  name: string;
+  media_type: 'tv';
+  first_air_date: string;
+}
+export interface PersonRes {
+  id: number;
+  name: string;
+  media_type: 'person';
 }
 
 export async function getCastWithAges(cast: Actor[], releaseDate: string) {

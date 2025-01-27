@@ -1,12 +1,13 @@
 import { useFetcher, useNavigate } from '@remix-run/react';
 import { useState, useRef, useEffect } from 'react';
-import { loader } from '~/routes/action.search';
 import { useDebounce } from '~/utils/misc';
 import { IconSearch } from '@tabler/icons-react';
 import { Box, Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
+import { SearchRes } from '~/utils/api.server';
+import { getYear } from 'date-fns';
 
 export function Search() {
-  const fetcher = useFetcher<typeof loader>();
+  const fetcher = useFetcher<{ results: SearchRes[] }>();
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
 
@@ -30,10 +31,12 @@ export function Search() {
     );
   }, [debouncedQuery]);
 
+  const data = transformData(fetcher?.data?.results);
+
   return (
     <Box style={{ flexGrow: 1, maxWidth: '350px' }}>
       <Autocomplete
-        data={fetcher.data?.options ? fetcher.data.options : null}
+        data={data}
         isLoading={
           fetcher.state !== 'idle' &&
           fetcher.formData?.get('intent') === 'search'
@@ -41,11 +44,7 @@ export function Search() {
         value={query}
         onChange={value => setQuery(value)}
         onOptionSubmit={item => {
-          navigate(
-            item.media_type === 'movie'
-              ? `/movie/${item.id}`
-              : `/tv/${item.id}/season/1`,
-          );
+          navigate(getLink(item));
         }}
       />
     </Box>
@@ -59,10 +58,8 @@ export interface IGroup {
 
 export interface GroupItem {
   label: string;
+  media_type: 'movie' | 'tv' | 'person';
   id: number;
-  title: string;
-  release_date: string;
-  media_type: 'tv' | 'movie';
 }
 
 interface Props {
@@ -115,7 +112,7 @@ export function Autocomplete({
   const map = data
     ?.map(group => group.options)
     .flat()
-    .reduce<Record<number, GroupItem>>((acc, curr) => {
+    .reduce<Record<string, GroupItem>>((acc, curr) => {
       acc[curr.id] = curr;
 
       return acc;
@@ -125,6 +122,9 @@ export function Autocomplete({
     <Combobox
       onOptionSubmit={optionValue => {
         combobox.closeDropdown();
+        if (!map) {
+          return;
+        }
         onOptionSubmit(map[optionValue]);
       }}
       withinPortal={false}
@@ -169,4 +169,63 @@ export function Autocomplete({
       </Combobox.Dropdown>
     </Combobox>
   );
+}
+
+function transformData(data: undefined | SearchRes[]): IGroup[] | null {
+  if (!data) {
+    return null;
+  }
+
+  const initialGroups: IGroup[] = [
+    { label: 'Movies', options: [] },
+    { label: 'TV Series', options: [] },
+    { label: 'Persons', options: [] },
+  ];
+
+  const processMedia = (accum: IGroup[], current: SearchRes) => {
+    if (
+      current.media_type === 'movie' &&
+      current.release_date &&
+      current.title
+    ) {
+      const label = `${current.title} (${getYear(current.release_date)})`;
+      accum[0].options.push({
+        id: current.id,
+        label,
+        media_type: current.media_type,
+      });
+    }
+
+    if (current.media_type === 'tv' && current.first_air_date && current.name) {
+      const label = `${current.name} (${getYear(current.first_air_date.slice(0, 4))})`;
+      accum[1].options.push({
+        id: current.id,
+        label,
+        media_type: current.media_type,
+      });
+    }
+
+    if (current.media_type === 'person' && current.name) {
+      const label = `${current.name}`;
+      accum[2].options.push({
+        id: current.id,
+        label,
+        media_type: current.media_type,
+      });
+    }
+
+    return accum;
+  };
+
+  return data.reduce(processMedia, initialGroups);
+}
+
+function getLink(item: GroupItem) {
+  if (item.media_type === 'movie') {
+    return `/movie/${item.id}`;
+  }
+  if (item.media_type === 'tv') {
+    return `/tv/${item.id}/season/1`;
+  }
+  return `/person/${item.id}`;
 }
