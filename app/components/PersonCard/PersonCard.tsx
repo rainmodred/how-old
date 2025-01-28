@@ -31,24 +31,47 @@ export default function PersonCard({ person }: Props) {
         </Title>
         <Text>
           <strong style={{ display: 'block' }}>Brithday</strong>
-          {formatDate(person.birthday)}
-          {!person.deathday &&
-            ` (${formatDistanceStrict(new Date(), person.birthday)} old)`}
+          {formatBirthday(person)}
         </Text>
 
         {person.deathday && (
           <Text>
             <strong style={{ display: 'block' }}>Day of Death</strong>
-            {formatDate(person.deathday)} (
-            {formatDistanceStrict(person.deathday, person.birthday)} old)
+            {formatDeathday(person)}
           </Text>
         )}
 
-        <Text>
-          <strong style={{ display: 'block' }}>Place of Birth</strong>
-          {person.place_of_birth}
-        </Text>
+        {person.place_of_birth && (
+          <Text>
+            <strong style={{ display: 'block' }}>Place of Birth</strong>
+            {person.place_of_birth}
+          </Text>
+        )}
       </Box>
     </Card>
   );
+}
+
+function formatBirthday(person: Person) {
+  if (!person.birthday) {
+    return 'unknown';
+  }
+
+  const formattedDate = formatDate(person.birthday);
+  const years = !person.deathday
+    ? `(${formatDistanceStrict(new Date(), person.birthday)} old)`
+    : '';
+
+  return `${formattedDate} ${years}`;
+}
+
+function formatDeathday(person: Person) {
+  if (!person.deathday) {
+    return 'unknown';
+  }
+
+  const formattedDate = formatDate(person.deathday);
+  const years = `(${formatDistanceStrict(person.deathday, person.birthday)} old)`;
+
+  return `${formattedDate} ${years}`;
 }
