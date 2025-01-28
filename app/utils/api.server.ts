@@ -99,6 +99,7 @@ export interface PersonRes {
   id: number;
   name: string;
   media_type: 'person';
+  popularity: number;
 }
 
 export async function getCastWithAges(cast: Actor[], releaseDate: string) {
