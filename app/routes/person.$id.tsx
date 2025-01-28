@@ -120,7 +120,13 @@ export default function PersonPage() {
                     throw new Error('invalid sort');
                   })
                   .map(movie => {
-                    const text = `${formatDistanceStrict(person.birthday, movie.release_date)} old`;
+                    let text = '';
+                    try {
+                      text = `${formatDistanceStrict(person.birthday, movie.release_date)} old`;
+                    } catch (err) {
+                      text = 'unknown age';
+                    }
+
                     return (
                       <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
                         <MovieCard movie={movie} text={text} key={movie.id} />
