@@ -9,7 +9,7 @@ import {
 import {
   Await,
   Outlet,
-  // ShouldRevalidateFunctionArgs,
+  ShouldRevalidateFunctionArgs,
   useLoaderData,
 } from '@remix-run/react';
 import { Persons } from '~/components/Persons';
@@ -31,17 +31,17 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
 });
 
-// export function shouldRevalidate({
-//   currentParams,
-//   nextParams,
-//   defaultShouldRevalidate,
-// }: ShouldRevalidateFunctionArgs) {
-//   if (currentParams.id === nextParams.id) {
-//     return false;
-//   }
-//
-//   return defaultShouldRevalidate;
-// }
+export function shouldRevalidate({
+  currentParams,
+  nextParams,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) {
+  if (currentParams.id === nextParams.id) {
+    return false;
+  }
+
+  return defaultShouldRevalidate;
+}
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   if (!params.id) {

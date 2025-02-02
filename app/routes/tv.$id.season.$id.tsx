@@ -8,6 +8,7 @@ import {
 import {
   Await,
   NavLink,
+  ShouldRevalidateFunctionArgs,
   useLoaderData,
   useLocation,
   useSearchParams,
@@ -27,6 +28,18 @@ import { LIMIT } from '~/utils/constants';
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
 });
+
+export function shouldRevalidate({
+  currentParams,
+  nextParams,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) {
+  if (currentParams.id === nextParams.id) {
+    return false;
+  }
+
+  return defaultShouldRevalidate;
+}
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
