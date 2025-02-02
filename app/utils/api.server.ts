@@ -190,11 +190,8 @@ export async function getSeasonDetails(id: string, season: string) {
 export async function getPerson(id: number) {
   const path = `/person/${id}`;
   if (cache.has(path)) {
-    console.log('getPerson hit', id);
     return cache.get(path) as Person;
   }
-
-  console.log('getPerson miss', id);
 
   const person = await fetcher<Person>(path);
   cache.set(path, person);
