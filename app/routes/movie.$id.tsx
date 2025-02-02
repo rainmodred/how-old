@@ -62,7 +62,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   });
 
   return defer(
-    { title, releaseDate, cast: castWithAges },
+    {
+      title,
+      releaseDate,
+      cast: castWithAges,
+      done: offset + LIMIT >= cast.length,
+    },
     {
       headers: {
         'Cache-Control': 'max-age=86400, public',
@@ -72,7 +77,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 }
 
 export default function MoviePage() {
-  const { title, releaseDate, cast } = useLoaderData<typeof loader>();
+  const { title, releaseDate, cast, done } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -95,6 +100,7 @@ export default function MoviePage() {
               <Persons
                 initialCast={cast as CastWithAges}
                 releaseDate={releaseDate}
+                done={done}
               />
             );
           }}

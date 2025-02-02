@@ -27,9 +27,10 @@ function ProfileImage({ id, src, alt }: ProfileImageProps) {
 interface PersonsProps {
   initialCast: CastWithAges;
   releaseDate: string;
+  done: boolean;
 }
 
-export function Persons({ initialCast, releaseDate }: PersonsProps) {
+export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
   const [persons, setPersons] = useState(initialCast);
   const fetcher = useFetcher<typeof loader>();
   const [, setSearchParams] = useSearchParams();
@@ -61,7 +62,14 @@ export function Persons({ initialCast, releaseDate }: PersonsProps) {
     fetcher.load(`cast?${newParams.toString()}`);
   }
 
-  const isDone = fetcher?.data?.done ? fetcher?.data.done : false;
+  //Hide button if loaded all cast
+  let isDone = false;
+  if (done) {
+    isDone = true;
+  } else {
+    isDone = fetcher?.data?.done ? fetcher?.data.done : false;
+  }
+
   return (
     <>
       <Table className="table-sm" id="persons">

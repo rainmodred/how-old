@@ -65,6 +65,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }),
       cast: castWithAges,
       releaseDate,
+      done: offset + LIMIT >= cast.length,
     },
     {
       headers: {
@@ -75,7 +76,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function TvPage() {
-  const { seasons, title, cast, releaseDate } = useLoaderData<typeof loader>();
+  const { seasons, title, cast, releaseDate, done } =
+    useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
 
   const location = useLocation();
@@ -114,6 +116,7 @@ export default function TvPage() {
                 <Persons
                   initialCast={cast as CastWithAges}
                   releaseDate={releaseDate}
+                  done={done}
                 />
               );
             }}
