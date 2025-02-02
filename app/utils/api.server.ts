@@ -1,6 +1,7 @@
 import { differenceInYears, isBefore, sub } from 'date-fns';
 import { formatDate } from './dates';
-import { API_URL } from './constants';
+import { API_URL, LIMIT } from './constants';
+import { cache } from './cache.server';
 
 const token = process.env.API_TOKEN;
 if (!token) {
@@ -102,8 +103,12 @@ export interface PersonRes {
   popularity: number;
 }
 
-export async function getCastWithAges(cast: Actor[], releaseDate: string) {
-  const promises = cast.map(async actor => {
+export async function getCastWithAges(
+  cast: Actor[],
+  releaseDate: string,
+  { offset, limit = LIMIT }: { offset: number; limit?: number },
+) {
+  const promises = cast.slice(offset, offset + limit).map(async actor => {
     const person = await getPerson(actor.id);
     return {
       ...person,
@@ -114,7 +119,7 @@ export async function getCastWithAges(cast: Actor[], releaseDate: string) {
   const result = await Promise.all(promises);
 
   const castWithAges = result
-    .filter(person => person.birthday)
+    // .filter(person => person.birthday)
     .map(person => {
       const end = person.deathday ? new Date(person.deathday) : new Date();
 
@@ -122,11 +127,15 @@ export async function getCastWithAges(cast: Actor[], releaseDate: string) {
         id: person.id,
         name: person.name,
         character: person.character,
-        birthday: formatDate(person.birthday),
+        birthday: person.birthday ? formatDate(person.birthday) : null,
         deathday: person.deathday && formatDate(person.deathday),
         profile_path: person.profile_path,
-        ageNow: differenceInYears(end, person.birthday),
-        ageThen: differenceInYears(new Date(releaseDate), person.birthday),
+        ageNow: person.birthday
+          ? differenceInYears(end, person.birthday)
+          : null,
+        ageThen: person.birthday
+          ? differenceInYears(new Date(releaseDate), person.birthday)
+          : null,
       };
     });
 
@@ -136,32 +145,57 @@ export async function getCastWithAges(cast: Actor[], releaseDate: string) {
 export type CastWithAges = Awaited<ReturnType<typeof getCastWithAges>>;
 
 export async function getCast(id: string) {
-  const { cast } = await fetcher<{ cast: Actor[] }>(`/movie/${id}/credits`);
+  const path = `/movie/${id}/credits`;
 
-  return cast.filter(
+  if (cache.has(path)) {
+    return cache.get(path) as Actor[];
+  }
+
+  const { cast } = await fetcher<{ cast: Actor[] }>(path);
+  const filteredCast = cast.filter(
     actor =>
       actor.known_for_department === 'Acting' &&
       !actor.character.includes('uncredited'),
   );
+
+  cache.set(path, filteredCast);
+
+  return filteredCast;
 }
 
 export async function getTvCast(id: string, season: string) {
-  const { cast } = await fetcher<{ cast: Actor[] }>(
-    `/tv/${id}/season/${season}/credits`,
-  );
+  const path = `/tv/${id}/season/${season}/credits`;
+
+  if (cache.has(path)) {
+    return cache.get(path) as Actor[];
+  }
+
+  const { cast } = await fetcher<{ cast: Actor[] }>(path);
+  cache.set(path, cast);
 
   return cast;
 }
 
 export async function getSeasonDetails(id: string, season: string) {
-  const details = await fetcher<{ air_date: string }>(
-    `/tv/${id}/season/${season}`,
-  );
+  const path = `/tv/${id}/season/${season}`;
+  if (cache.has(path)) {
+    return cache.get(path) as SeasonDetails;
+  }
+
+  const details = await fetcher<SeasonDetails>(path);
+  cache.set(path, details);
   return details;
 }
 
 export async function getPerson(id: number) {
-  const person = await fetcher<Person>(`/person/${id}`);
+  const path = `/person/${id}`;
+  if (cache.has(path)) {
+    return cache.get(path) as Person;
+  }
+
+  const person = await fetcher<Person>(path);
+  cache.set(path, person);
+
   return person;
 }
 
@@ -169,28 +203,28 @@ export async function getPersonMovies(id: number) {
   //TODO:
   //https://api.themoviedb.org/3/person/{person_id}/combined_credits
 
-  const { cast } = await fetcher<{ cast: Movie[] }>(
-    `/person/${id}/movie_credits`,
-  );
+  const path = `/person/${id}/movie_credits`;
+  if (cache.has(path)) {
+    return cache.get(path) as Movie[];
+  }
 
-  return cast.filter(
+  const { cast } = await fetcher<{ cast: Movie[] }>(path);
+  const filteredMovies = cast.filter(
     m => m.release_date && isBefore(m.release_date, new Date()) && !m.video,
   );
+  cache.set(path, filteredMovies);
+
+  return filteredMovies;
 }
 
 export async function getTvDetails(id: number | string) {
-  const data = await fetcher<{
-    id: number;
-    name: string;
-    first_air_date: string;
-    seasons: {
-      id: number;
-      air_date: string | null;
-      season_number: number;
-      poster_path: string;
-      name: string;
-    }[];
-  }>(`/tv/${id}`);
+  const path = `/tv/${id}`;
+  if (cache.has(path)) {
+    return cache.get(path) as TvDetails;
+  }
+
+  const data = await fetcher<TvDetails>(path);
+  cache.set(path, data);
 
   return data;
 }
@@ -211,7 +245,13 @@ export async function discover() {
 }
 
 export async function getMovie(id: string) {
-  const movie = await fetcher<Movie>(`/movie/${id}`);
+  const path = `/movie/${id}`;
+  if (cache.has(path)) {
+    return cache.get(path) as Movie;
+  }
+
+  const movie = await fetcher<Movie>(path);
+  cache.set(path, movie);
   return movie;
 }
 
@@ -250,4 +290,21 @@ export interface Actor {
   profile_path: string;
   character: string;
   known_for_department: string;
+}
+
+interface TvDetails {
+  id: number;
+  name: string;
+  first_air_date: string;
+  seasons: {
+    id: number;
+    air_date: string | null;
+    season_number: number;
+    poster_path: string;
+    name: string;
+  }[];
+}
+
+interface SeasonDetails {
+  air_date: string;
 }

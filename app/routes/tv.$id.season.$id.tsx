@@ -5,7 +5,14 @@ import {
   defer,
   HeadersFunction,
 } from '@vercel/remix';
-import { Await, NavLink, useLoaderData, useLocation } from '@remix-run/react';
+import {
+  Await,
+  NavLink,
+  ShouldRevalidateFunctionArgs,
+  useLoaderData,
+  useLocation,
+  useSearchParams,
+} from '@remix-run/react';
 import {
   CastWithAges,
   getCastWithAges,
@@ -16,10 +23,23 @@ import {
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Persons } from '~/components/Persons';
 import { Suspense } from 'react';
+import { LIMIT } from '~/utils/constants';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
 });
+
+export function shouldRevalidate({
+  currentParams,
+  nextParams,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) {
+  if (currentParams.id === nextParams.id) {
+    return false;
+  }
+
+  return defaultShouldRevalidate;
+}
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -29,13 +49,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     throw redirect('/');
   }
 
+  const offset = Number(url.searchParams.get('offset')) || 0;
+
   const [{ air_date: releaseDate }, { name, seasons }, cast] =
     await Promise.all([
       getSeasonDetails(tvId, seasonNumber),
       getTvDetails(tvId),
       getTvCast(tvId, seasonNumber),
     ]);
-  const castWithAges = getCastWithAges(cast, releaseDate);
+  const castWithAges = getCastWithAges(cast, releaseDate, {
+    offset: 0,
+    limit: offset + LIMIT,
+  });
 
   return defer(
     {
@@ -53,6 +78,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }),
       cast: castWithAges,
       releaseDate,
+      done: offset + LIMIT >= cast.length,
     },
     {
       headers: {
@@ -63,7 +89,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function TvPage() {
-  const { seasons, title, cast, releaseDate } = useLoaderData<typeof loader>();
+  const { seasons, title, cast, releaseDate, done } =
+    useLoaderData<typeof loader>();
+  const [searchParams] = useSearchParams();
 
   const location = useLocation();
 
@@ -83,7 +111,7 @@ export default function TvPage() {
               }}
               key={season.id}
               relative="path"
-              to={`/tv/${location.pathname.split('/')[2]}/season/${season.seasonNumber}`}
+              to={`/tv/${location.pathname.split('/')[2]}/season/${season.seasonNumber}?${searchParams.toString()}`}
             >
               {season.seasonNumber}
             </NavLink>
@@ -97,7 +125,13 @@ export default function TvPage() {
         <Suspense fallback={<SkeletonTable rows={5} />}>
           <Await resolve={cast}>
             {cast => {
-              return <Persons cast={cast as CastWithAges} />;
+              return (
+                <Persons
+                  initialCast={cast as CastWithAges}
+                  releaseDate={releaseDate}
+                  done={done}
+                />
+              );
             }}
           </Await>
         </Suspense>
