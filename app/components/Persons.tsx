@@ -33,7 +33,7 @@ interface PersonsProps {
 export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
   const [persons, setPersons] = useState(initialCast);
   const fetcher = useFetcher<typeof loader>();
-  const [, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     setPersons(initialCast);
@@ -52,7 +52,9 @@ export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
   }, [fetcher.data, fetcher.state]);
 
   function loadMore() {
-    const offset = fetcher.data ? +fetcher.data?.offset + LIMIT : LIMIT;
+    const offset = searchParams.has('offset')
+      ? Number(searchParams.get('offset')!) + LIMIT
+      : LIMIT;
 
     const newParams = new URLSearchParams();
     newParams.set('offset', offset.toString());
