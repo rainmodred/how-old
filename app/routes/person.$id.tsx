@@ -1,11 +1,4 @@
-import {
-  ComboboxItem,
-  Grid,
-  Group,
-  Select,
-  Skeleton,
-  Title,
-} from '@mantine/core';
+import { Grid, Group, Skeleton } from '@mantine/core';
 import {
   redirect,
   type LoaderFunctionArgs,
@@ -15,11 +8,10 @@ import {
 } from '@vercel/remix';
 import { Await, useLoaderData } from '@remix-run/react';
 import { getPerson, getPersonMovies, Movie } from '~/utils/api.server';
-import { Suspense, useState } from 'react';
-import { MovieCard } from '~/components/MovieCard';
+import { Suspense } from 'react';
 import PersonCard from '~/components/PersonCard/PersonCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
-import { formatDistanceStrict } from 'date-fns';
+import { MoviesGrid } from '~/components/MoviesGrid';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.title ?? 'Movie' }];
@@ -49,14 +41,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
   );
 }
 
-const items = [
-  { value: 'Popularity', label: 'Popularity' },
-  { value: 'Release Date', label: 'Release Date' },
-];
-
 export default function PersonPage() {
   const { person, movies } = useLoaderData<typeof loader>();
-  const [sort, setSort] = useState<ComboboxItem | null>(items[0]);
 
   return (
     <Grid gutter={'md'}>
@@ -67,7 +53,7 @@ export default function PersonPage() {
       <Suspense
         fallback={
           <>
-            <Grid.Col span={12}>
+            <Grid.Col data-testid="skeleton" span={12}>
               <Group justify="space-between">
                 <Skeleton height={36} width={156} />
                 <Skeleton height={36} width={167} />
@@ -80,61 +66,18 @@ export default function PersonPage() {
         <Await resolve={movies}>
           {movies => {
             const unique = new Set();
-            return (
-              <>
-                <Grid.Col span={12}>
-                  <Group justify="space-between">
-                    <Title order={2}>Filmography</Title>
-                    <Select
-                      value={sort ? sort.value : null}
-                      onChange={(_value, option) => {
-                        option && setSort(option);
-                      }}
-                      placeholder="sort by..."
-                      data={items}
-                    />
-                  </Group>
-                </Grid.Col>
+            const uniqueMovies = movies.reduce((accum, current) => {
+              if (unique.has(current.id)) {
+                return accum;
+              }
 
-                {movies
-                  .reduce((accum, current) => {
-                    //Remove duplicated movies
-                    if (unique.has(current.id)) {
-                      return accum;
-                    }
+              unique.add(current.id);
+              accum.push(current);
 
-                    unique.add(current.id);
-                    accum.push(current);
+              return accum;
+            }, [] as Movie[]);
 
-                    return accum;
-                  }, [] as Movie[])
-                  .sort((a, b) => {
-                    if (sort?.value === 'Popularity') {
-                      return b.popularity - a.popularity;
-                    } else if (sort?.value === 'Release Date') {
-                      return (
-                        new Date(a.release_date).getTime() -
-                        new Date(b.release_date).getTime()
-                      );
-                    }
-                    throw new Error('invalid sort');
-                  })
-                  .map(movie => {
-                    let text = '';
-                    try {
-                      text = `${formatDistanceStrict(person.birthday, movie.release_date)} old`;
-                    } catch (err) {
-                      text = 'unknown age';
-                    }
-
-                    return (
-                      <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
-                        <MovieCard movie={movie} text={text} key={movie.id} />
-                      </Grid.Col>
-                    );
-                  })}
-              </>
-            );
+            return <MoviesGrid movies={uniqueMovies} person={person} />;
           }}
         </Await>
       </Suspense>

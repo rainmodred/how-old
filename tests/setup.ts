@@ -6,6 +6,12 @@ import { db, initDb } from './mocks/db';
 import { drop } from '@mswjs/data';
 
 beforeAll(() => {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+
   drop(db);
   initDb();
   server.listen();
@@ -20,6 +26,8 @@ server.events.on('request:start', ({ request }) => {
 });
 
 expect.extend(matchers);
+
+window.HTMLElement.prototype.scrollIntoView = function () {};
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

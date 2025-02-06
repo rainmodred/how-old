@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 import { API_URL } from '~/utils/constants';
-import { db } from './db';
+import { db, mswPersonMovies } from './db';
 
 export const handlers = [
   http.get(`${API_URL}/search/multi`, async ({ request }) => {
@@ -154,33 +154,16 @@ export const handlers = [
   }),
 
   http.get(`${API_URL}/person/:id/movie_credits`, async ({ params }) => {
-    await delay();
-    const { id } = params;
-    const cast = db.cast.findMany({
-      where: {
-        actors: {
-          id: {
-            equals: Number(id),
-          },
-        },
-      },
-    });
-    const movies = db.movie.findMany({
-      where: {
-        id: {
-          in: cast.map(cast => cast.id),
-        },
-      },
-    });
+    await delay(100);
+    const id = Number(params.id);
+    const movies = mswPersonMovies(id);
 
-    if (typeof id === 'string') {
-      return HttpResponse.json({ cast: movies });
-    }
+    return HttpResponse.json({ cast: movies });
 
-    return HttpResponse.json({
-      success: false,
-      status_code: 34,
-      status_message: 'The resource you requested could not be found.',
-    });
+    // return HttpResponse.json({
+    //   success: false,
+    //   status_code: 34,
+    //   status_message: 'The resource you requested could not be found.',
+    // });
   }),
 ];

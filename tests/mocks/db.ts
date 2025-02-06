@@ -8,6 +8,7 @@ export const db = factory({
     title: String,
     poster_path: String,
     media_type: String,
+    popularity: Number,
   },
   tv: {
     id: primaryKey(Number),
@@ -63,6 +64,7 @@ export function initDb() {
       poster_path: movie.poster_path,
       release_date: movie.release_date,
       media_type: 'movie',
+      popularity: movie.popularity,
     });
     db.cast.create({
       id: movie.id,
@@ -84,4 +86,24 @@ export function initDb() {
       actors: db.actor.getAll().slice(3, 5),
     });
   }
+}
+
+export function mswPersonMovies(id: number) {
+  const cast = db.cast.findMany({
+    where: {
+      actors: {
+        id: {
+          equals: Number(id),
+        },
+      },
+    },
+  });
+  const movies = db.movie.findMany({
+    where: {
+      id: {
+        in: cast.map(cast => cast.id),
+      },
+    },
+  });
+  return movies;
 }

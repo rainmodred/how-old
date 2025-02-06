@@ -1,4 +1,4 @@
-import { Card, CardSection, Image, Text } from '@mantine/core';
+import { Card, CardSection, Image, Text, Title } from '@mantine/core';
 import { Link } from '@remix-run/react';
 import { Movie } from '~/utils/api.server';
 import { formatDate } from '~/utils/dates';
@@ -34,9 +34,9 @@ export function MovieCard({ movie, text }: Props) {
         </Link>
       </CardSection>
       <CardSection w="185" p="sm">
-        <Text fw={700} size="md">
+        <Title order={3} fw={700} size="md">
           {movie.title}
-        </Text>
+        </Title>
         <Text size="sm">{formatDate(movie.release_date)}</Text>
         <Text size="sm">
           <strong>{text}</strong>
