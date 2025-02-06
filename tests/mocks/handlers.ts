@@ -152,4 +152,35 @@ export const handlers = [
       status_message: 'The resource you requested could not be found.',
     });
   }),
+
+  http.get(`${API_URL}/person/:id/movie_credits`, async ({ params }) => {
+    await delay();
+    const { id } = params;
+    const cast = db.cast.findMany({
+      where: {
+        actors: {
+          id: {
+            equals: Number(id),
+          },
+        },
+      },
+    });
+    const movies = db.movie.findMany({
+      where: {
+        id: {
+          in: cast.map(cast => cast.id),
+        },
+      },
+    });
+
+    if (typeof id === 'string') {
+      return HttpResponse.json({ cast: movies });
+    }
+
+    return HttpResponse.json({
+      success: false,
+      status_code: 34,
+      status_message: 'The resource you requested could not be found.',
+    });
+  }),
 ];
