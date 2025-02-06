@@ -8,7 +8,7 @@
     "build": "remix vite:build",
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc",
-    "test": "playwright test --ui",
+    "test": "vitest",
     "test:e2e": "playwright test"
   },
   "dependencies": {
@@ -31,6 +31,10 @@
     "@playwright/test": "^1.40.1",
     "@remix-run/dev": "^2.10.2",
     "@remix-run/eslint-config": "^2.10.2",
+    "@remix-run/testing": "^2.15.3",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
@@ -41,6 +45,7 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "jsdom": "^26.0.0",
     "msw": "^2.3.1",
     "postcss": "^8.4.39",
     "postcss-preset-mantine": "^1.16.0",
@@ -48,7 +53,8 @@
     "prettier": "^3.1.1",
     "typescript": "^5.1.6",
     "vite": "^5.3.4",
-    "vite-tsconfig-paths": "^4.3.2"
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^3.0.5"
   },
   "engines": {
     "node": ">=18.0.0"

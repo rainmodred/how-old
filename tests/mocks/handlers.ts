@@ -4,7 +4,7 @@ import { db } from './db';
 
 export const handlers = [
   http.get(`${API_URL}/search/multi`, async ({ request }) => {
-    await delay();
+    await delay(100);
     const url = new URL(request.url);
     const query = url.searchParams.get('query');
     if (!query) {
@@ -22,6 +22,9 @@ export const handlers = [
         where: { title: { contains: query } },
       }),
       ...db.tv.findMany({
+        where: { name: { contains: query } },
+      }),
+      ...db.person.findMany({
         where: { name: { contains: query } },
       }),
     ];

@@ -31,6 +31,7 @@ export const db = factory({
     birthday: String,
     deathday: nullable(String),
     profile_path: String,
+    popularity: Number,
   },
 });
 
@@ -43,6 +44,7 @@ export function initDb() {
       birthday: person.birthday,
       deathday: person.deathday,
       profile_path: person.profile_path,
+      popularity: person.popularity,
     });
   }
 

@@ -104,7 +104,11 @@ export function Autocomplete({
           }}
           onBlur={() => combobox.closeDropdown()}
           leftSection={
-            isLoading ? <Loader size={16} /> : <IconSearch size={16} />
+            isLoading ? (
+              <Loader data-testid="loading" size={16} />
+            ) : (
+              <IconSearch size={16} />
+            )
           }
         />
       </Combobox.Target>

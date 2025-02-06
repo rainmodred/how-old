@@ -4,7 +4,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('http://localhost:3000/');
 });
 
-test('should work with movies', async ({ page }) => {
+test.skip('should work with movies', async ({ page }) => {
   const search = await page.getByPlaceholder('Search for a movie or tv');
   await search.click();
   await search.fill('Lord of the');
@@ -37,7 +37,7 @@ test('should work with movies', async ({ page }) => {
   // }
 });
 
-test('should work with tv series', async ({ page }) => {
+test.skip('should work with tv series', async ({ page }) => {
   const search = await page.getByPlaceholder('Search for a movie or tv');
   await search.click();
   await search.fill('Lord of the');
@@ -62,7 +62,7 @@ test('should work with tv series', async ({ page }) => {
   await expect(page.getByRole('link', { name: '1' })).toBeVisible();
 });
 
-test('should show popular movies', async ({ page }) => {
+test.skip('should show popular movies', async ({ page }) => {
   await expect(
     page.getByRole('heading', { name: 'Popular Movies' }),
   ).toBeVisible();

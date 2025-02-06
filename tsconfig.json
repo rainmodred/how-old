@@ -15,7 +15,7 @@
     "paths": {
       "~/*": ["./app/*"]
     },
-    "types": ["@remix-run/node", "vite/client"],
+    "types": ["@remix-run/node", "vite/client", "@testing-library/jest-dom"],
     "skipLibCheck": true,
     "module": "ESNext",
 
