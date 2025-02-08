@@ -1,6 +1,6 @@
 import { Card, CardSection, Image, Text, Title } from '@mantine/core';
 import { Link } from '@remix-run/react';
-import { Movie } from '~/utils/api.server';
+import { Movie } from '~/utils/types';
 import { formatDate } from '~/utils/dates';
 
 interface Props {

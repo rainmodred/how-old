@@ -7,7 +7,8 @@ import {
   HeadersFunction,
 } from '@vercel/remix';
 import { Await, useLoaderData } from '@remix-run/react';
-import { getPerson, getPersonMovies, Movie } from '~/utils/api.server';
+import { getPerson, getPersonMovies } from '~/utils/api.server';
+import { Movie } from '~/utils/types';
 import { Suspense } from 'react';
 import PersonCard from '~/components/PersonCard/PersonCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';

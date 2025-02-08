@@ -1,7 +1,7 @@
 import { ComboboxItem, Grid, Group, Title, Select } from '@mantine/core';
 import { formatDistanceStrict } from 'date-fns';
 import { useState } from 'react';
-import { Movie, Person } from '~/utils/api.server';
+import { Movie, Person } from '~/utils/types';
 import { MovieCard } from './MovieCard';
 
 interface Props {

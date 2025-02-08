@@ -2,6 +2,17 @@ import { differenceInYears, isBefore, sub } from 'date-fns';
 import { formatDate } from './dates';
 import { API_URL, LIMIT } from './constants';
 import { cache } from './cache.server';
+import {
+  Actor,
+  SeasonDetails,
+  Person,
+  Movie,
+  TvDetails,
+  MovieRes,
+  PersonRes,
+  SearchRes,
+  TvRes,
+} from './types';
 
 const token = process.env.API_TOKEN;
 if (!token) {
@@ -82,27 +93,7 @@ export async function multiSearch(query: string, language: string = 'en') {
   };
 }
 
-export type SearchRes = MovieRes | TvRes | PersonRes;
-
-export interface MovieRes {
-  id: number;
-  title: string;
-  media_type: 'movie';
-  release_date: string;
-}
-export interface TvRes {
-  id: number;
-  name: string;
-  media_type: 'tv';
-  first_air_date: string;
-}
-export interface PersonRes {
-  id: number;
-  name: string;
-  media_type: 'person';
-  popularity: number;
-}
-
+export type CastWithAges = Awaited<ReturnType<typeof getCastWithAges>>;
 export async function getCastWithAges(
   cast: Actor[],
   releaseDate: string,
@@ -141,8 +132,6 @@ export async function getCastWithAges(
 
   return castWithAges;
 }
-
-export type CastWithAges = Awaited<ReturnType<typeof getCastWithAges>>;
 
 export async function getCast(id: string) {
   const path = `/movie/${id}/credits`;
@@ -253,58 +242,4 @@ export async function getMovie(id: string) {
   const movie = await fetcher<Movie>(path);
   cache.set(path, movie);
   return movie;
-}
-
-export interface Movie {
-  id: number;
-  release_date: string;
-  title: string;
-  poster_path: string;
-  video: boolean;
-  popularity: number;
-}
-
-export interface Tv {
-  id: number;
-  first_air_date: string;
-  seasons: {
-    id: number;
-    air_date: string;
-    season_number: string;
-    name: string;
-  };
-}
-
-export interface Person {
-  id: number;
-  birthday: string;
-  deathday?: string;
-  name: string;
-  profile_path: string;
-  place_of_birth: string;
-}
-
-export interface Actor {
-  id: number;
-  name: string;
-  profile_path: string;
-  character: string;
-  known_for_department: string;
-}
-
-interface TvDetails {
-  id: number;
-  name: string;
-  first_air_date: string;
-  seasons: {
-    id: number;
-    air_date: string | null;
-    season_number: number;
-    poster_path: string;
-    name: string;
-  }[];
-}
-
-interface SeasonDetails {
-  air_date: string;
 }
