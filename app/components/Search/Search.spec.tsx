@@ -10,21 +10,29 @@ import { Search } from './Search';
 import { loader } from '../../routes/action.search';
 import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
+import { Outlet } from '@remix-run/react';
 
 it('should search', async () => {
   const user = userEvent.setup();
   const RemixStub = createRemixStub([
     {
       path: '/',
-      Component: Search,
-    },
-    {
-      path: 'movie/:id',
-      Component: () => <p>Movie page</p>,
-    },
-    {
-      path: 'action/search',
-      loader,
+      Component: () => (
+        <>
+          <Search />
+          <Outlet />
+        </>
+      ),
+      children: [
+        {
+          path: 'movie/:id',
+          Component: () => <p>Movie page</p>,
+        },
+        {
+          path: 'action/search',
+          loader,
+        },
+      ],
     },
   ]);
 
@@ -48,4 +56,5 @@ it('should search', async () => {
   expect(movie).toBeInTheDocument();
   await user.click(movie);
   expect(await screen.findByText('Movie page')).toBeInTheDocument();
+  expect(searchbox).toHaveValue('');
 });

@@ -44,6 +44,7 @@ export function Search() {
         value={query}
         onChange={value => setQuery(value)}
         onOptionSubmit={item => {
+          setQuery('');
           navigate(getLink(item));
         }}
       />
