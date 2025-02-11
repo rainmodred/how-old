@@ -1,4 +1,4 @@
-import { differenceInYears, isBefore, sub } from 'date-fns';
+import { isBefore, sub } from 'date-fns';
 import { customFormatDate } from './dates';
 import { API_URL, LIMIT } from './constants';
 import { cache } from './cache.server';
@@ -93,10 +93,9 @@ export async function multiSearch(query: string, language: string = 'en') {
   };
 }
 
-export type CastWithAges = Awaited<ReturnType<typeof getCastWithAges>>;
-export async function getCastWithAges(
+export type CastWithDates = Awaited<ReturnType<typeof getCastWithDates>>;
+export async function getCastWithDates(
   cast: Actor[],
-  releaseDate: string,
   { offset, limit = LIMIT }: { offset: number; limit?: number },
 ) {
   const promises = cast.slice(offset, offset + limit).map(async actor => {
@@ -112,7 +111,7 @@ export async function getCastWithAges(
   const castWithAges = result
     // .filter(person => person.birthday)
     .map(person => {
-      const end = person.deathday ? new Date(person.deathday) : new Date();
+      // const end = person.deathday ? new Date(person.deathday) : new Date();
 
       return {
         id: person.id,
@@ -121,12 +120,12 @@ export async function getCastWithAges(
         birthday: person.birthday ? customFormatDate(person.birthday) : null,
         deathday: person.deathday && customFormatDate(person.deathday),
         profile_path: person.profile_path,
-        ageNow: person.birthday
-          ? differenceInYears(end, person.birthday)
-          : null,
-        ageThen: person.birthday
-          ? differenceInYears(new Date(releaseDate), person.birthday)
-          : null,
+        // ageNow: person.birthday
+        //   ? differenceInYears(end, person.birthday)
+        //   : null,
+        // ageThen: person.birthday
+        //   ? differenceInYears(new Date(releaseDate), person.birthday)
+        //   : null,
       };
     });
 

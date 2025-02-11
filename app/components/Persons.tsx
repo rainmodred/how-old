@@ -1,9 +1,11 @@
 import { Box, Image, Group, Table, Text, Button } from '@mantine/core';
 import { Link, useFetcher, useSearchParams } from '@remix-run/react';
 import { useEffect, useState } from 'react';
-import { CastWithAges } from '~/utils/api.server';
+import { CastWithDates } from '~/utils/api.server';
 import { baseImageUrl, LIMIT } from '~/utils/constants';
 import { loader } from '~/routes/movie.$id.cast';
+import { differenceInYears } from 'date-fns';
+import { calculateAges } from '~/utils/dates';
 
 interface ProfileImageProps {
   id: number;
@@ -25,7 +27,7 @@ function ProfileImage({ id, src, alt }: ProfileImageProps) {
 }
 
 interface PersonsProps {
-  initialCast: CastWithAges;
+  initialCast: CastWithDates;
   releaseDate: string;
   done: boolean;
 }
@@ -88,16 +90,12 @@ export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
         </Table.Thead>
         <Table.Tbody>
           {persons.map(
-            ({
-              id,
-              name,
-              character,
-              birthday,
-              deathday,
-              ageNow,
-              ageThen,
-              profile_path,
-            }) => {
+            ({ id, name, character, birthday, deathday, profile_path }) => {
+              const { ageThen, ageNow } = calculateAges(releaseDate, {
+                birthday,
+                deathday,
+              });
+
               return (
                 <Table.Tr key={id}>
                   <Table.Td>

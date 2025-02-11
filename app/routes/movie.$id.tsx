@@ -13,9 +13,9 @@ import {
 } from '@remix-run/react';
 import { Persons } from '~/components/Persons';
 import {
-  CastWithAges,
+  CastWithDates,
   getCast,
-  getCastWithAges,
+  getCastWithDates,
   getMovie,
 } from '~/utils/api.server';
 import { SkeletonTable } from '~/components/SkeletonTable';
@@ -56,7 +56,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     getCast(params.id),
   ]);
 
-  const castWithAges = getCastWithAges(cast, movie.release_date, {
+  const castWithDates = getCastWithDates(cast, {
     offset: 0,
     limit: offset + LIMIT,
   });
@@ -64,7 +64,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   return defer(
     {
       movie,
-      cast: castWithAges,
+      cast: castWithDates,
       done: offset + LIMIT >= cast.length,
     },
     {
@@ -94,7 +94,7 @@ export default function MoviePage() {
             }
             return (
               <Persons
-                initialCast={cast as CastWithAges}
+                initialCast={cast as CastWithDates}
                 releaseDate={movie.release_date}
                 done={done}
               />

@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs, redirect } from '@remix-run/node';
-import { getCast, getCastWithAges } from '~/utils/api.server';
+import { getCast, getCastWithDates } from '~/utils/api.server';
 import { LIMIT } from '~/utils/constants';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -12,7 +12,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const releaseDate = url.searchParams.get('releaseDate')!;
 
   const cast = await getCast(params.id);
-  const castWithAges = await getCastWithAges(cast, releaseDate, { offset });
+  const castWithAges = await getCastWithDates(cast, releaseDate, { offset });
 
   return { offset, cast: castWithAges, done: offset + LIMIT >= cast.length };
 }
