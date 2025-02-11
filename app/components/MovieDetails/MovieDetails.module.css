@@ -1,0 +1,29 @@
+.grid {
+  --card-padding: 0;
+
+  display: grid;
+  gap: var(--mantine-spacing-md);
+  grid-template-columns: 185px auto;
+  grid-template-rows: auto;
+
+  grid-template-areas:
+    'img title'
+    'img overview';
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    grid-template-areas:
+      'img title'
+      'overview overview';
+  }
+}
+
+.img {
+  grid-area: img;
+}
+
+.title {
+  grid-area: title;
+}
+.overview {
+  grid-area: overview;
+}

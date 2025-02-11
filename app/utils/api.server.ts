@@ -1,5 +1,5 @@
 import { differenceInYears, isBefore, sub } from 'date-fns';
-import { formatDate } from './dates';
+import { customFormatDate } from './dates';
 import { API_URL, LIMIT } from './constants';
 import { cache } from './cache.server';
 import {
@@ -118,8 +118,8 @@ export async function getCastWithAges(
         id: person.id,
         name: person.name,
         character: person.character,
-        birthday: person.birthday ? formatDate(person.birthday) : null,
-        deathday: person.deathday && formatDate(person.deathday),
+        birthday: person.birthday ? customFormatDate(person.birthday) : null,
+        deathday: person.deathday && customFormatDate(person.deathday),
         profile_path: person.profile_path,
         ageNow: person.birthday
           ? differenceInYears(end, person.birthday)
@@ -233,7 +233,7 @@ export async function discover() {
   return data.results;
 }
 
-export async function getMovie(id: string) {
+export async function getMovie(id: string): Promise<Movie> {
   const path = `/movie/${id}`;
   if (cache.has(path)) {
     return cache.get(path) as Movie;
@@ -241,5 +241,16 @@ export async function getMovie(id: string) {
 
   const movie = await fetcher<Movie>(path);
   cache.set(path, movie);
-  return movie;
+  return {
+    id: movie.id,
+    title: movie.title,
+    release_date: movie.release_date,
+    video: movie.video,
+    genres: movie.genres,
+    runtime: movie.runtime,
+    overview: movie.overview,
+    popularity: movie.popularity,
+    poster_path: movie.poster_path,
+    backdrop_path: movie.backdrop_path,
+  };
 }

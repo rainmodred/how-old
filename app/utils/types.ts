@@ -8,9 +8,12 @@ export type Movie = {
   release_date: string;
   title: string;
   poster_path: string;
+  backdrop_path: string;
   video: boolean;
   popularity: number;
   genres: Genre[];
+  runtime: number;
+  overview: string;
 };
 
 export type Tv = {
