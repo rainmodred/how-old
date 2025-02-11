@@ -2,7 +2,7 @@
   --card-padding: 0;
 
   display: grid;
-  gap: var(--mantine-spacing-md);
+  /*gap: var(--mantine-spacing-);*/
   grid-template-columns: 185px auto;
   grid-template-rows: auto;
 

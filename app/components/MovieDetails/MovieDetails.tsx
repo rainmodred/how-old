@@ -22,7 +22,7 @@ export default function MovieDetails({ movie }: Props) {
         />
       </Card.Section>
 
-      <Box className={classes.title}>
+      <Box className={classes.title} p="sm">
         <Title size="h2" mt="xs">
           {movie.title}
         </Title>
@@ -39,7 +39,7 @@ export default function MovieDetails({ movie }: Props) {
         </Text>
       </Box>
 
-      <Box className={classes.overview}>
+      <Box className={classes.overview} p="sm">
         <Title mt="xs" order={4}>
           Overview
         </Title>
