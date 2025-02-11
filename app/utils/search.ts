@@ -1,6 +1,6 @@
 import { getYear } from 'date-fns';
 import { GroupItem, IGroup } from '~/components/Search/Autocomplete';
-import { SearchRes, TvRes, MovieRes, PersonRes } from './api.server';
+import { SearchRes, TvRes, MovieRes, PersonRes } from './types';
 
 export function getLink(item: GroupItem) {
   if (item.media_type === 'movie') {
@@ -36,11 +36,6 @@ export function transformData(data: undefined | SearchRes[]): IGroup[] | null {
           label: 'Movies',
           options: group
             .filter(m => m.release_date && m.title)
-            .sort(
-              (a, b) =>
-                new Date(a.release_date).getTime() -
-                new Date(b.release_date).getTime(),
-            )
             .map(m => {
               const label = `${m.title} (${getYear(m.release_date)})`;
               return {
@@ -58,11 +53,6 @@ export function transformData(data: undefined | SearchRes[]): IGroup[] | null {
           label: 'TV Series',
           options: group
             .filter(tv => tv.first_air_date && tv.name)
-            .sort(
-              (a, b) =>
-                new Date(a.first_air_date).getTime() -
-                new Date(b.first_air_date).getTime(),
-            )
             .map(tv => {
               const label = `${tv.name} (${getYear(tv.first_air_date)})`;
               return {

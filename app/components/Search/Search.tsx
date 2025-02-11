@@ -2,7 +2,7 @@ import { useFetcher, useNavigate } from '@remix-run/react';
 import { useState, useRef, useEffect } from 'react';
 import { useDebounce } from '~/utils/misc';
 import { Box } from '@mantine/core';
-import { SearchRes } from '~/utils/api.server';
+import { SearchRes } from '~/utils/types';
 import { Autocomplete } from './Autocomplete';
 import { getLink, transformData } from '~/utils/search';
 
@@ -44,6 +44,7 @@ export function Search() {
         value={query}
         onChange={value => setQuery(value)}
         onOptionSubmit={item => {
+          setQuery('');
           navigate(getLink(item));
         }}
       />

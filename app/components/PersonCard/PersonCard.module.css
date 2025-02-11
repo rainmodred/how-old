@@ -1,9 +1,10 @@
 .card {
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
+  /*align-items: flex-start;*/
+  /*justify-content: flex-start;*/
   gap: var(--mantine-spacing-xl);
+  padding-bottom: 0;
 
-  @media (max-width: $mantine-breakpoint-md) {
-  }
+  /*@media (max-width: $mantine-breakpoint-md) {*/
+  /*}*/
 }

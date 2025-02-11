@@ -1,29 +1,14 @@
 import { Flex, Text, Title } from '@mantine/core';
+import { type LoaderFunctionArgs, defer, HeadersFunction } from '@vercel/remix';
 import {
-  redirect,
-  type LoaderFunctionArgs,
-  defer,
-  HeadersFunction,
-} from '@vercel/remix';
-import {
-  Await,
   NavLink,
+  Outlet,
   ShouldRevalidateFunctionArgs,
   useLoaderData,
   useLocation,
   useSearchParams,
 } from '@remix-run/react';
-import {
-  CastWithAges,
-  getCastWithAges,
-  getSeasonDetails,
-  getTvCast,
-  getTvDetails,
-} from '~/utils/api.server';
-import { SkeletonTable } from '~/components/SkeletonTable';
-import { Persons } from '~/components/Persons';
-import { Suspense } from 'react';
-import { LIMIT } from '~/utils/constants';
+import { getTvDetails } from '~/utils/api.server';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
@@ -41,30 +26,16 @@ export function shouldRevalidate({
   return defaultShouldRevalidate;
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const tvId = url.pathname.split('/')[2];
-  const seasonNumber = params.id as string;
-  if (!seasonNumber || !tvId) {
-    throw redirect('/');
-  }
+export async function loader({ params }: LoaderFunctionArgs) {
+  console.log('tv laoder', params);
+  const { id } = params;
 
-  const offset = Number(url.searchParams.get('offset')) || 0;
-
-  const [{ air_date: releaseDate }, { name, seasons }, cast] =
-    await Promise.all([
-      getSeasonDetails(tvId, seasonNumber),
-      getTvDetails(tvId),
-      getTvCast(tvId, seasonNumber),
-    ]);
-  const castWithAges = getCastWithAges(cast, releaseDate, {
-    offset: 0,
-    limit: offset + LIMIT,
-  });
+  const { name, seasons, first_air_date } = await getTvDetails(Number(id));
 
   return defer(
     {
       title: name,
+      firstAirDate: first_air_date,
       seasons: seasons
         .filter(season => season.air_date && season.season_number > 0)
         .map(season => {
@@ -76,9 +47,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             seasonNumber: season.season_number,
           };
         }),
-      cast: castWithAges,
-      releaseDate,
-      done: offset + LIMIT >= cast.length,
     },
     {
       headers: {
@@ -89,8 +57,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function TvPage() {
-  const { seasons, title, cast, releaseDate, done } =
-    useLoaderData<typeof loader>();
+  const { seasons, title, firstAirDate } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
 
   const location = useLocation();
@@ -119,22 +86,10 @@ export default function TvPage() {
         })}
       </Flex>
       <div>
-        <Title size="h1" order={3}>
-          {title} ({releaseDate?.slice(0, 4)})
+        <Title size="h1" order={1}>
+          {title} ({firstAirDate?.slice(0, 4)})
         </Title>
-        <Suspense fallback={<SkeletonTable rows={5} />}>
-          <Await resolve={cast}>
-            {cast => {
-              return (
-                <Persons
-                  initialCast={cast as CastWithAges}
-                  releaseDate={releaseDate}
-                  done={done}
-                />
-              );
-            }}
-          </Await>
-        </Suspense>
+        <Outlet />
       </div>
     </div>
   );

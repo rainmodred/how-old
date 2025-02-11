@@ -1,7 +1,18 @@
-import { differenceInYears, isBefore, sub } from 'date-fns';
-import { formatDate } from './dates';
+import { isBefore, sub } from 'date-fns';
+import { customFormatDate } from './dates';
 import { API_URL, LIMIT } from './constants';
 import { cache } from './cache.server';
+import {
+  Actor,
+  SeasonDetails,
+  Person,
+  Movie,
+  TvDetails,
+  MovieRes,
+  PersonRes,
+  SearchRes,
+  TvRes,
+} from './types';
 
 const token = process.env.API_TOKEN;
 if (!token) {
@@ -82,30 +93,9 @@ export async function multiSearch(query: string, language: string = 'en') {
   };
 }
 
-export type SearchRes = MovieRes | TvRes | PersonRes;
-
-export interface MovieRes {
-  id: number;
-  title: string;
-  media_type: 'movie';
-  release_date: string;
-}
-export interface TvRes {
-  id: number;
-  name: string;
-  media_type: 'tv';
-  first_air_date: string;
-}
-export interface PersonRes {
-  id: number;
-  name: string;
-  media_type: 'person';
-  popularity: number;
-}
-
-export async function getCastWithAges(
+export type CastWithDates = Awaited<ReturnType<typeof getCastWithDates>>;
+export async function getCastWithDates(
   cast: Actor[],
-  releaseDate: string,
   { offset, limit = LIMIT }: { offset: number; limit?: number },
 ) {
   const promises = cast.slice(offset, offset + limit).map(async actor => {
@@ -121,28 +111,26 @@ export async function getCastWithAges(
   const castWithAges = result
     // .filter(person => person.birthday)
     .map(person => {
-      const end = person.deathday ? new Date(person.deathday) : new Date();
+      // const end = person.deathday ? new Date(person.deathday) : new Date();
 
       return {
         id: person.id,
         name: person.name,
         character: person.character,
-        birthday: person.birthday ? formatDate(person.birthday) : null,
-        deathday: person.deathday && formatDate(person.deathday),
+        birthday: person.birthday ? customFormatDate(person.birthday) : null,
+        deathday: person.deathday && customFormatDate(person.deathday),
         profile_path: person.profile_path,
-        ageNow: person.birthday
-          ? differenceInYears(end, person.birthday)
-          : null,
-        ageThen: person.birthday
-          ? differenceInYears(new Date(releaseDate), person.birthday)
-          : null,
+        // ageNow: person.birthday
+        //   ? differenceInYears(end, person.birthday)
+        //   : null,
+        // ageThen: person.birthday
+        //   ? differenceInYears(new Date(releaseDate), person.birthday)
+        //   : null,
       };
     });
 
   return castWithAges;
 }
-
-export type CastWithAges = Awaited<ReturnType<typeof getCastWithAges>>;
 
 export async function getCast(id: string) {
   const path = `/movie/${id}/credits`;
@@ -176,6 +164,7 @@ export async function getTvCast(id: string, season: string) {
   return cast;
 }
 
+//TODO: useless?
 export async function getSeasonDetails(id: string, season: string) {
   const path = `/tv/${id}/season/${season}`;
   if (cache.has(path)) {
@@ -244,7 +233,7 @@ export async function discover() {
   return data.results;
 }
 
-export async function getMovie(id: string) {
+export async function getMovie(id: string): Promise<Movie> {
   const path = `/movie/${id}`;
   if (cache.has(path)) {
     return cache.get(path) as Movie;
@@ -252,59 +241,16 @@ export async function getMovie(id: string) {
 
   const movie = await fetcher<Movie>(path);
   cache.set(path, movie);
-  return movie;
-}
-
-export interface Movie {
-  id: number;
-  release_date: string;
-  title: string;
-  poster_path: string;
-  video: boolean;
-  popularity: number;
-}
-
-export interface Tv {
-  id: number;
-  first_air_date: string;
-  seasons: {
-    id: number;
-    air_date: string;
-    season_number: string;
-    name: string;
+  return {
+    id: movie.id,
+    title: movie.title,
+    release_date: movie.release_date,
+    video: movie.video,
+    genres: movie.genres,
+    runtime: movie.runtime,
+    overview: movie.overview,
+    popularity: movie.popularity,
+    poster_path: movie.poster_path,
+    backdrop_path: movie.backdrop_path,
   };
-}
-
-export interface Person {
-  id: number;
-  birthday: string;
-  deathday?: string;
-  name: string;
-  profile_path: string;
-  place_of_birth: string;
-}
-
-export interface Actor {
-  id: number;
-  name: string;
-  profile_path: string;
-  character: string;
-  known_for_department: string;
-}
-
-interface TvDetails {
-  id: number;
-  name: string;
-  first_air_date: string;
-  seasons: {
-    id: number;
-    air_date: string | null;
-    season_number: number;
-    poster_path: string;
-    name: string;
-  }[];
-}
-
-interface SeasonDetails {
-  air_date: string;
 }

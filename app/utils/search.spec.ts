@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { transformData } from './search';
-import { SearchRes } from './api.server';
+import { SearchRes } from './types';
 
 it('transformdata', () => {
   const input: SearchRes[] = [

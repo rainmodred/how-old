@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 import { API_URL } from '~/utils/constants';
-import { db, mswPersonMovies } from './db';
+import { db, mswGetPersonMovies } from './db';
 
 export const handlers = [
   http.get(`${API_URL}/search/multi`, async ({ request }) => {
@@ -18,15 +18,21 @@ export const handlers = [
 
     //Case insensitive search is not supported
     const results = [
-      ...db.movie.findMany({
-        where: { title: { contains: query } },
-      }),
-      ...db.tv.findMany({
-        where: { name: { contains: query } },
-      }),
-      ...db.person.findMany({
-        where: { name: { contains: query } },
-      }),
+      ...db.movie
+        .findMany({
+          where: { title: { contains: query } },
+        })
+        .map(movie => ({ ...movie, media_type: 'movie' })),
+      ...db.tv
+        .findMany({
+          where: { name: { contains: query } },
+        })
+        .map(tv => ({ ...tv, media_type: 'tv' })),
+      ...db.person
+        .findMany({
+          where: { name: { contains: query } },
+        })
+        .map(person => ({ ...person, media_type: 'person' })),
     ];
 
     return HttpResponse.json({
@@ -46,74 +52,75 @@ export const handlers = [
     await delay();
 
     const { id } = params;
-    if (typeof id === 'string') {
-      return HttpResponse.json(
-        db.movie.findFirst({ where: { id: { equals: Number(id) } } }),
-      );
+
+    const movie = db.movie.findFirst({ where: { id: { equals: Number(id) } } });
+    if (!movie) {
+      return HttpResponse.json({
+        success: false,
+        status_code: 34,
+        status_message: 'The resource you requested could not be found.',
+      });
     }
+    // return HttpResponse.json(movie);
 
     return HttpResponse.json({
-      success: false,
-      status_code: 34,
-      status_message: 'The resource you requested could not be found.',
+      id: movie.id,
+      title: movie.title,
+      release_date: movie.release_date,
+      poster_path: movie.poster_path,
+      media_type: 'movie',
+      popularity: movie.popularity,
+      genres: movie.genres,
+      runtime: movie.runtime,
+      overview: movie.overview,
     });
   }),
 
   http.get(`${API_URL}/movie/:id/credits`, async ({ params }) => {
     await delay();
     const { id } = params;
-    if (id) {
-      const res = db.cast.findFirst({
-        where: { id: { equals: Number(id) } },
-      });
 
-      if (!res) {
-        return HttpResponse.json({
-          success: false,
-          status_code: 34,
-          status_message: 'The resource you requested could not be found.',
-        });
-      }
+    const movie = db.movie.findFirst({ where: { id: { equals: Number(id) } } });
+    if (!movie) {
       return HttpResponse.json({
-        id,
-        cast: res.actors,
+        success: false,
+        status_code: 34,
+        status_message: 'The resource you requested could not be found.',
       });
     }
 
     return HttpResponse.json({
-      success: false,
-      status_code: 34,
-      status_message: 'The resource you requested could not be found.',
+      id,
+      cast: movie.actors.map(actor => ({
+        id: actor.person?.id,
+        character: actor.character,
+        known_for_department: actor.known_for_department,
+      })),
     });
   }),
-  http.get(`${API_URL}/tv/:id`, async () => {
+
+  http.get(`${API_URL}/tv/:id`, async ({ params }) => {
     await delay();
+
+    const { id } = params;
+    const tv = db.tv.findFirst({ where: { id: { equals: Number(id) } } });
+    if (!tv) {
+      return HttpResponse.json({
+        success: false,
+        status_code: 34,
+        status_message: 'The resource you requested could not be found.',
+      });
+    }
+
     return HttpResponse.json({
-      id: 84773,
-      name: 'The Lord of the Rings: The Rings of Power',
-      first_air_date: '2022-09-01',
-      seasons: [
-        {
-          air_date: '2022-09-03',
-          episode_count: 26,
-          id: 311036,
-          name: 'Specials',
-          overview: '',
-          poster_path: '/tRaU2w0S8aRSfNmkSxesaO4DAhe.jpg',
-          season_number: 0,
-          vote_average: 0,
-        },
-        {
-          air_date: '2022-09-01',
-          episode_count: 8,
-          id: 114041,
-          name: 'Season 1',
-          overview: '',
-          poster_path: '/umRaUV2ku9MMtEunMQt3uCO1OgE.jpg',
-          season_number: 1,
-          vote_average: 6.4,
-        },
-      ],
+      id: tv.id,
+      name: tv.name,
+      first_air_date: tv.first_air_date,
+      seasons: tv.seasons.map(season => ({
+        id: season.id,
+        air_date: season.air_date,
+        season_number: season.season_number,
+      })),
     });
   }),
 
@@ -121,18 +128,28 @@ export const handlers = [
     `${API_URL}/tv/:id/season/:seasonNumber/credits`,
     async ({ params }) => {
       await delay();
-      const { id } = params;
-      if (id) {
-        const tv = db.cast.findFirst({
-          where: { id: { equals: Number(id) } },
+      const { id, seasonNumber } = params;
+
+      const tv = db.tv.findFirst({ where: { id: { equals: Number(id) } } });
+      if (!tv) {
+        return HttpResponse.json({
+          success: false,
+          status_code: 34,
+          status_message: 'The resource you requested could not be found.',
         });
-        return HttpResponse.json({ id, cast: tv?.actors });
       }
 
+      const season = tv.seasons.filter(
+        season => season.season_number === Number(seasonNumber),
+      )[0];
+
       return HttpResponse.json({
-        success: false,
-        status_code: 34,
-        status_message: 'The resource you requested could not be found.',
+        id: season.id,
+        cast: season.actors.map(actor => ({
+          id: actor.person!.id,
+          character: actor.character,
+          known_for_department: actor.known_for_department,
+        })),
       });
     },
   ),
@@ -140,30 +157,35 @@ export const handlers = [
   http.get(`${API_URL}/person/:id`, async ({ params }) => {
     await delay();
     const { id } = params;
-    if (typeof id === 'string') {
-      return HttpResponse.json(
-        db.person.findFirst({ where: { id: { equals: Number(id) } } }),
-      );
+    const person = db.person.findFirst({
+      where: { id: { equals: Number(id) } },
+    });
+
+    if (!person) {
+      return HttpResponse.json({
+        success: false,
+        status_code: 34,
+        status_message: 'The resource you requested could not be found.',
+      });
     }
 
-    return HttpResponse.json({
-      success: false,
-      status_code: 34,
-      status_message: 'The resource you requested could not be found.',
-    });
+    return HttpResponse.json(person);
   }),
 
   http.get(`${API_URL}/person/:id/movie_credits`, async ({ params }) => {
     await delay(100);
-    const id = Number(params.id);
-    const movies = mswPersonMovies(id);
+    const { id } = params;
 
-    return HttpResponse.json({ cast: movies });
+    try {
+      const movies = mswGetPersonMovies(Number(id));
 
-    // return HttpResponse.json({
-    //   success: false,
-    //   status_code: 34,
-    //   status_message: 'The resource you requested could not be found.',
-    // });
+      return HttpResponse.json({ cast: movies });
+    } catch (err) {
+      return HttpResponse.json({
+        success: false,
+        status_code: 34,
+        status_message: 'The resource you requested could not be found.',
+      });
+    }
   }),
 ];

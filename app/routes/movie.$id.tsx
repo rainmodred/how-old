@@ -8,20 +8,20 @@ import {
 } from '@vercel/remix';
 import {
   Await,
-  Outlet,
   ShouldRevalidateFunctionArgs,
   useLoaderData,
 } from '@remix-run/react';
 import { Persons } from '~/components/Persons';
 import {
-  CastWithAges,
+  CastWithDates,
   getCast,
-  getCastWithAges,
+  getCastWithDates,
   getMovie,
 } from '~/utils/api.server';
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Suspense } from 'react';
 import { LIMIT } from '~/utils/constants';
+import MovieDetails from '~/components/MovieDetails/MovieDetails';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.title ?? 'Movie' }];
@@ -51,21 +51,20 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const offset = Number(url.searchParams.get('offset')) || 0;
 
-  const [{ release_date: releaseDate, title }, cast] = await Promise.all([
+  const [movie, cast] = await Promise.all([
     getMovie(params.id),
     getCast(params.id),
   ]);
 
-  const castWithAges = getCastWithAges(cast, releaseDate, {
+  const castWithDates = getCastWithDates(cast, {
     offset: 0,
     limit: offset + LIMIT,
   });
 
   return defer(
     {
-      title,
-      releaseDate,
-      cast: castWithAges,
+      movie,
+      cast: castWithDates,
       done: offset + LIMIT >= cast.length,
     },
     {
@@ -77,14 +76,11 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 }
 
 export default function MoviePage() {
-  const { title, releaseDate, cast, done } = useLoaderData<typeof loader>();
+  const { movie, cast, done } = useLoaderData<typeof loader>();
 
   return (
     <>
-      <Title size="h1" mb="xl">
-        {title} ({releaseDate?.slice(0, 4)})
-      </Title>
-      <Outlet context={cast} />
+      <MovieDetails movie={movie} />
       <Suspense fallback={<SkeletonTable rows={5} />}>
         <Await resolve={cast}>
           {cast => {
@@ -98,8 +94,8 @@ export default function MoviePage() {
             }
             return (
               <Persons
-                initialCast={cast as CastWithAges}
-                releaseDate={releaseDate}
+                initialCast={cast as CastWithDates}
+                releaseDate={movie.release_date}
                 done={done}
               />
             );
