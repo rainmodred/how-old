@@ -74,12 +74,16 @@ export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
 
   return (
     <>
-      <Table className="table-sm" id="persons">
+      <Table className="table-sm" stickyHeader id="persons">
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Actor</Table.Th>
-            <Table.Th>Age then</Table.Th>
-            <Table.Th>Age now</Table.Th>
+            <Table.Th ta="center" style={{ whiteSpace: 'nowrap' }}>
+              Age then
+            </Table.Th>
+            <Table.Th ta="center" style={{ whiteSpace: 'nowrap' }}>
+              Age now
+            </Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -106,8 +110,8 @@ export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
                       </Box>
                     </Group>
                   </Table.Td>
-                  <Table.Td>{ageThen ? ageThen : '-'}</Table.Td>
-                  <Table.Td>
+                  <Table.Td ta="center">{ageThen ? ageThen : '-'}</Table.Td>
+                  <Table.Td ta="center">
                     {deathday
                       ? ` ${deathday} (${ageNow})`
                       : ageNow
