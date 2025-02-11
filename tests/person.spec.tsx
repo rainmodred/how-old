@@ -10,7 +10,7 @@ import { MantineProvider } from '@mantine/core';
 import PersonPage, { loader } from '../app/routes/person.$id';
 import { db, mswGetPersonMovies } from './mocks/db';
 
-it('should search', async () => {
+it('should render', async () => {
   const user = userEvent.setup();
 
   const person = db.person.getAll()[0];
