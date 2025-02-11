@@ -1,8 +1,8 @@
 import { Card, Image, Title, Text, Box } from '@mantine/core';
-import { Person } from '~/utils/api.server';
-import { formatDate } from '~/utils/dates';
-import classes from './PersonCard.module.css';
+import { customFormatDate } from '~/utils/dates';
 import { formatDistanceStrict } from 'date-fns';
+import { Person } from '~/utils/types';
+import classes from './PersonCard.module.css';
 
 interface Props {
   person: Person;
@@ -14,7 +14,7 @@ export default function PersonCard({ person }: Props) {
   }
 
   return (
-    <Card p="md" className={classes.card}>
+    <Card className={classes.card}>
       <Card.Section>
         <Image
           loading="lazy"
@@ -57,7 +57,7 @@ function formatBirthday(person: Person) {
     return 'unknown';
   }
 
-  const formattedDate = formatDate(person.birthday);
+  const formattedDate = customFormatDate(person.birthday);
   const years = !person.deathday
     ? `(${formatDistanceStrict(new Date(), person.birthday)} old)`
     : '';
@@ -70,7 +70,7 @@ function formatDeathday(person: Person) {
     return 'unknown';
   }
 
-  const formattedDate = formatDate(person.deathday);
+  const formattedDate = customFormatDate(person.deathday);
   const years = `(${formatDistanceStrict(person.deathday, person.birthday)} old)`;
 
   return `${formattedDate} ${years}`;
