@@ -2,7 +2,7 @@ import { expect, afterEach, vi, beforeAll, afterAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 import { server } from './mocks/node';
-import { db, initDb } from './mocks/db';
+import { db, seed } from './mocks/db';
 import { drop } from '@mswjs/data';
 
 beforeAll(() => {
@@ -13,7 +13,7 @@ beforeAll(() => {
   };
 
   drop(db);
-  initDb();
+  seed();
   server.listen();
 });
 afterEach(() => {

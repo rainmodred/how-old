@@ -8,13 +8,14 @@ import {
 import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
 import PersonPage, { loader } from '../app/routes/person.$id';
-import { mswPersonMovies } from './mocks/db';
+import { db, mswGetPersonMovies } from './mocks/db';
 
 it('should search', async () => {
   const user = userEvent.setup();
 
-  const personId = 109;
-  const movies = mswPersonMovies(personId);
+  const person = db.person.getAll()[0];
+  const movies = mswGetPersonMovies(person.id);
+
   const RemixStub = createRemixStub([
     {
       path: '/person/:id',
@@ -25,19 +26,19 @@ it('should search', async () => {
 
   render(
     <MantineProvider>
-      <RemixStub initialEntries={[`/person/${personId}`]} />
+      <RemixStub initialEntries={[`/person/${person.id}`]} />
     </MantineProvider>,
   );
 
   expect(
     await screen.findByRole('heading', {
-      name: /elijah wood/i,
+      name: person.name,
     }),
   ).toBeInTheDocument();
 
   await waitForElementToBeRemoved(screen.queryByTestId('skeleton'));
 
-  expect(screen.getAllByTestId('movie-card')).toHaveLength(3);
+  expect(screen.getAllByTestId('movie-card')).toHaveLength(movies.length);
 
   let titleElements = screen
     .getAllByRole('heading', { level: 3 })
