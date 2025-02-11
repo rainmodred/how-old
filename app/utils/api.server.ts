@@ -165,6 +165,7 @@ export async function getTvCast(id: string, season: string) {
   return cast;
 }
 
+//TODO: useless?
 export async function getSeasonDetails(id: string, season: string) {
   const path = `/tv/${id}/season/${season}`;
   if (cache.has(path)) {

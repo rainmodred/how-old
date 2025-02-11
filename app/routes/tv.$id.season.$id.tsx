@@ -16,7 +16,6 @@ import {
 import {
   CastWithAges,
   getCastWithAges,
-  getSeasonDetails,
   getTvCast,
   getTvDetails,
 } from '~/utils/api.server';
@@ -51,12 +50,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const offset = Number(url.searchParams.get('offset')) || 0;
 
-  const [{ air_date: releaseDate }, { name, seasons }, cast] =
-    await Promise.all([
-      getSeasonDetails(tvId, seasonNumber),
-      getTvDetails(tvId),
-      getTvCast(tvId, seasonNumber),
-    ]);
+  const [{ name, seasons }, cast] = await Promise.all([
+    getTvDetails(tvId),
+    getTvCast(tvId, seasonNumber),
+  ]);
+
+  const releaseDate = seasons.find(
+    season => season.season_number === Number(seasonNumber),
+  )?.air_date;
+
+  //TODO: What if air_date is undefined?
+  if (!releaseDate) {
+    throw new Error('meow');
+  }
   const castWithAges = getCastWithAges(cast, releaseDate, {
     offset: 0,
     limit: offset + LIMIT,
