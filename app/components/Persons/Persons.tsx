@@ -1,11 +1,9 @@
 import { Box, Image, Group, Table, Text, Button } from '@mantine/core';
-import { Link, useFetcher, useSearchParams } from '@remix-run/react';
-import { useEffect, useState } from 'react';
+import { Link } from '@remix-run/react';
 import { CastWithDates } from '~/utils/api.server';
-import { baseImageUrl, LIMIT } from '~/utils/constants';
-import { loader } from '~/routes/movie.$id.cast';
-import { differenceInYears } from 'date-fns';
+import { baseImageUrl } from '~/utils/constants';
 import { calculateAges } from '~/utils/dates';
+import useLoadMore from './useLoadMore';
 
 interface ProfileImageProps {
   id: number;
@@ -33,46 +31,10 @@ interface PersonsProps {
 }
 
 export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
-  const [persons, setPersons] = useState(initialCast);
-  const fetcher = useFetcher<typeof loader>();
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  useEffect(() => {
-    setPersons(initialCast);
-  }, [initialCast]);
-
-  useEffect(() => {
-    if (!fetcher.data || fetcher.state === 'loading') {
-      return;
-    }
-
-    if (fetcher.data) {
-      const newItems = fetcher.data.cast;
-      //TODO: FIX TS
-      setPersons(prevAssets => [...prevAssets, ...newItems]);
-    }
-  }, [fetcher.data, fetcher.state]);
-
-  function loadMore() {
-    const offset = searchParams.has('offset')
-      ? Number(searchParams.get('offset')!) + LIMIT
-      : LIMIT;
-
-    const newParams = new URLSearchParams();
-    newParams.set('offset', offset.toString());
-    newParams.set('releaseDate', releaseDate);
-
-    setSearchParams(newParams, { replace: true, preventScrollReset: true });
-    fetcher.load(`cast?${newParams.toString()}`);
-  }
-
-  //Hide button if loaded all cast
-  let isDone = false;
-  if (done) {
-    isDone = true;
-  } else {
-    isDone = fetcher?.data?.done ? fetcher?.data.done : false;
-  }
+  const { persons, isDone, isLoading, loadMore } = useLoadMore(
+    initialCast,
+    done,
+  );
 
   return (
     <>
@@ -125,7 +87,8 @@ export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
 
       {!isDone && (
         <Button
-          loading={fetcher.state === 'loading'}
+          loading={isLoading}
+          disabled={isLoading}
           variant="default"
           m={'sm'}
           size="sm"

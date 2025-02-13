@@ -11,7 +11,7 @@ import {
   ShouldRevalidateFunctionArgs,
   useLoaderData,
 } from '@remix-run/react';
-import { Persons } from '~/components/Persons';
+import { Persons } from '~/components/Persons/Persons';
 import {
   CastWithDates,
   getCast,

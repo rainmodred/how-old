@@ -108,28 +108,18 @@ export async function getCastWithDates(
 
   const result = await Promise.all(promises);
 
-  const castWithAges = result
-    // .filter(person => person.birthday)
-    .map(person => {
-      // const end = person.deathday ? new Date(person.deathday) : new Date();
+  const castWithDates = result.map(person => {
+    return {
+      id: person.id,
+      name: person.name,
+      character: person.character,
+      birthday: person.birthday ? customFormatDate(person.birthday) : null,
+      deathday: person.deathday && customFormatDate(person.deathday),
+      profile_path: person.profile_path,
+    };
+  });
 
-      return {
-        id: person.id,
-        name: person.name,
-        character: person.character,
-        birthday: person.birthday ? customFormatDate(person.birthday) : null,
-        deathday: person.deathday && customFormatDate(person.deathday),
-        profile_path: person.profile_path,
-        // ageNow: person.birthday
-        //   ? differenceInYears(end, person.birthday)
-        //   : null,
-        // ageThen: person.birthday
-        //   ? differenceInYears(new Date(releaseDate), person.birthday)
-        //   : null,
-      };
-    });
-
-  return castWithAges;
+  return castWithDates;
 }
 
 export async function getCast(id: string) {

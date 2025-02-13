@@ -27,8 +27,6 @@ export function calculateAges(
     deathday: string | undefined | null;
   },
 ) {
-  console.log('new Daet', new Date().toISOString().split('T')[0]);
-  console.log({ birthday, deathday });
   const end = deathday ? new Date(deathday) : new Date();
   const ageNow = birthday ? differenceInYears(end, birthday) : null;
   const ageThen = birthday

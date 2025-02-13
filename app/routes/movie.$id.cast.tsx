@@ -9,10 +9,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const url = new URL(request.url);
   const offset = Number(url.searchParams.get('offset')) || 0;
-  const releaseDate = url.searchParams.get('releaseDate')!;
 
   const cast = await getCast(params.id);
-  const castWithAges = await getCastWithDates(cast, releaseDate, { offset });
+  const castWithDates = await getCastWithDates(cast, { offset });
 
-  return { offset, cast: castWithAges, done: offset + LIMIT >= cast.length };
+  return { offset, cast: castWithDates, done: offset + LIMIT >= cast.length };
 }
