@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { IconSearch } from '@tabler/icons-react';
 import { Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
 
@@ -31,6 +31,7 @@ export function Autocomplete({
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
+  const ref = useRef<HTMLInputElement>(null);
 
   const [searched, setSearched] = useState(false);
 
@@ -77,12 +78,14 @@ export function Autocomplete({
           return;
         }
         onOptionSubmit(map[optionValue]);
+        ref.current?.blur();
       }}
       withinPortal={false}
       store={combobox}
     >
       <Combobox.Target>
         <TextInput
+          ref={ref}
           type="search"
           name="search"
           placeholder="Search for a movie or tv series"
