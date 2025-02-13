@@ -7,7 +7,7 @@ import {
 } from '@remix-run/react';
 import { CastWithDates, getCastWithDates, getTvCast } from '~/utils/api.server';
 import { SkeletonTable } from '~/components/SkeletonTable';
-import { Persons } from '~/components/Persons';
+import { Persons } from '~/components/Persons/Persons';
 import { Suspense } from 'react';
 import { LIMIT } from '~/utils/constants';
 import { loader as tvLoader } from './tv.$id';
