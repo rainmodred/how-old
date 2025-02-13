@@ -11,7 +11,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const offset = Number(url.searchParams.get('offset')) || 0;
 
   const cast = await getCast(params.id);
-  const castWithAges = await getCastWithDates(cast, { offset });
+  const castWithDates = await getCastWithDates(cast, { offset });
 
-  return { offset, cast: castWithAges, done: offset + LIMIT >= cast.length };
+  return { offset, cast: castWithDates, done: offset + LIMIT >= cast.length };
 }
