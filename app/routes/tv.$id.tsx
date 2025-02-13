@@ -27,7 +27,6 @@ export function shouldRevalidate({
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  console.log('tv laoder', params);
   const { id } = params;
 
   const { name, seasons, first_air_date } = await getTvDetails(Number(id));

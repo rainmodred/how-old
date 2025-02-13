@@ -29,7 +29,6 @@ export function shouldRevalidate({
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  console.log('tv season loader');
   const url = new URL(request.url);
 
   const { id, sNumber: seasonNumber } = params;
