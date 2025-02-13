@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { CastWithDates } from '~/utils/api.server';
 import { baseImageUrl, LIMIT } from '~/utils/constants';
 import { loader } from '~/routes/movie.$id.cast';
-import { differenceInYears } from 'date-fns';
 import { calculateAges } from '~/utils/dates';
 
 interface ProfileImageProps {
@@ -49,7 +48,7 @@ export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
     if (fetcher.data) {
       const newItems = fetcher.data.cast;
       //TODO: FIX TS
-      setPersons(prevAssets => [...prevAssets, ...newItems]);
+      setPersons(prev => [...prev, ...newItems]);
     }
   }, [fetcher.data, fetcher.state]);
 
@@ -126,6 +125,7 @@ export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
       {!isDone && (
         <Button
           loading={fetcher.state === 'loading'}
+          disabled={fetcher.state === 'loading'}
           variant="default"
           m={'sm'}
           size="sm"
