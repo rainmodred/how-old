@@ -59,7 +59,6 @@ export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
 
     const newParams = new URLSearchParams();
     newParams.set('offset', offset.toString());
-    newParams.set('releaseDate', releaseDate);
 
     setSearchParams(newParams, { replace: true, preventScrollReset: true });
     fetcher.load(`cast?${newParams.toString()}`);
