@@ -21,9 +21,9 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-server.events.on('request:start', ({ request }) => {
-  console.log('MSW intercepted:', request.method, request.url);
-});
+// server.events.on('request:start', ({ request }) => {
+//   console.log('MSW intercepted:', request.method, request.url);
+// });
 
 expect.extend(matchers);
 

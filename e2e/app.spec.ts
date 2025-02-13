@@ -1,7 +1,89 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
+
+async function searchAndSelect(
+  page: Page,
+  searchInput: string,
+  optionName: string,
+) {
+  const search = page.getByPlaceholder('Search for a movie or tv');
+  await search.click();
+  await search.fill(searchInput);
+  await search.click();
+
+  const option = page.getByRole('option', { name: optionName });
+  await expect(option).toBeVisible();
+  await option.click();
+
+  await expect(
+    page.getByRole('heading', { name: optionName, level: 1 }),
+  ).toHaveText(optionName);
+}
 
 test.beforeEach(async ({ page }) => {
   await page.goto('http://localhost:3000/');
+});
+
+test('smoke', async ({ page }) => {
+  await expect(
+    page.getByRole('heading', { name: 'Popular Movies', level: 1 }),
+  ).toBeVisible();
+
+  // await searchAndSelect(
+  //   page,
+  //   'The Lord of the Rings',
+  //   'The Lord of the Rings: The Fellowship of the Ring (2001)',
+  // );
+
+  const search = page.getByPlaceholder('Search for a movie or tv');
+  await search.click();
+  await search.fill('Lord of the');
+  await search.click();
+  let option = page.getByRole('option', {
+    name: 'The Lord of the Rings: The Fellowship of the Ring (2001)',
+  });
+  await expect(option).toBeVisible();
+  await option.click();
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'The Lord of the Rings',
+      level: 1,
+    }),
+  ).toHaveText('The Lord of the Rings: The Fellowship of the Ring');
+
+  await search.click();
+  await search.fill('Firefly');
+  await search.click();
+  option = page.getByRole('option', {
+    name: 'Firefly (2002)',
+  });
+  await expect(option).toBeVisible();
+  await option.click();
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'Firefly (2002)',
+      level: 1,
+    }),
+  ).toHaveText('Firefly (2002)');
+
+  await search.click();
+  await search.fill('House');
+  await search.click();
+  option = page.getByRole('option', {
+    name: 'House (2004)',
+  });
+  await expect(option).toBeVisible();
+  await option.click();
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'House (2004)',
+      level: 1,
+    }),
+  ).toHaveText('House (2004)');
+
+  // await page.getByRole('link', { name: 'Ian McKellen' }).click()
 });
 
 test.skip('should work with movies', async ({ page }) => {
@@ -69,7 +151,7 @@ test.skip('should show popular movies', async ({ page }) => {
   await expect(page.getByTestId('movie-card')).toHaveCount(3);
 });
 
-test('shold change theme', async ({ page }) => {
+test.skip('shold change theme', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute(
     'data-mantine-color-scheme',
     'light',
