@@ -6,7 +6,11 @@ import {
   defer,
   HeadersFunction,
 } from '@vercel/remix';
-import { Await, useLoaderData } from '@remix-run/react';
+import {
+  Await,
+  ShouldRevalidateFunctionArgs,
+  useLoaderData,
+} from '@remix-run/react';
 import { getPerson, getPersonMovies } from '~/utils/api.server';
 import { Movie } from '~/utils/types';
 import { Suspense } from 'react';
@@ -21,6 +25,18 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
 });
+
+export function shouldRevalidate({
+  currentParams,
+  nextParams,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) {
+  if (currentParams.id === nextParams.id) {
+    return false;
+  }
+
+  return defaultShouldRevalidate;
+}
 
 export async function loader({ params }: LoaderFunctionArgs) {
   if (!params.id) {

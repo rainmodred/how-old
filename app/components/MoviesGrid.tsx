@@ -1,8 +1,8 @@
-import { ComboboxItem, Grid, Group, Title, Select } from '@mantine/core';
+import { Grid, Group, Title, Select } from '@mantine/core';
 import { formatDistanceStrict } from 'date-fns';
-import { useState } from 'react';
 import { Movie, Person } from '~/utils/types';
 import { MovieCard } from './MovieCard';
+import { useSearchParams } from '@remix-run/react';
 
 interface Props {
   movies: Movie[];
@@ -10,12 +10,13 @@ interface Props {
 }
 
 const items = [
-  { value: 'Popularity', label: 'Popularity' },
-  { value: 'Release Date', label: 'Release Date' },
+  { value: 'popularity', label: 'Popularity' },
+  { value: 'release_date', label: 'Release Date' },
 ] as const;
 
 export function MoviesGrid({ movies, person }: Props) {
-  const [sort, setSort] = useState<ComboboxItem | null>(items[0]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const sort = searchParams.get('sort') ?? items[0].value;
 
   return (
     <>
@@ -23,9 +24,11 @@ export function MoviesGrid({ movies, person }: Props) {
         <Group justify="space-between">
           <Title order={2}>Filmography</Title>
           <Select
-            value={sort ? sort.value : null}
+            value={sort}
             onChange={(_value, option) => {
-              option && setSort(option);
+              const newParams = new URLSearchParams();
+              newParams.set('sort', option.value);
+              setSearchParams(newParams, { replace: true });
             }}
             placeholder="sort by..."
             data={items}
@@ -35,9 +38,9 @@ export function MoviesGrid({ movies, person }: Props) {
 
       {movies
         .sort((a, b) => {
-          if (sort?.value === 'Popularity') {
+          if (sort === 'popularity') {
             return b.popularity - a.popularity;
-          } else if (sort?.value === 'Release Date') {
+          } else if (sort === 'release_date') {
             return (
               new Date(a.release_date).getTime() -
               new Date(b.release_date).getTime()
