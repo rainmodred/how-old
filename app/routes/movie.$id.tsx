@@ -21,7 +21,7 @@ import {
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Suspense } from 'react';
 import { LIMIT } from '~/utils/constants';
-import MovieDetails from '~/components/MovieDetails/MovieDetails';
+import ItemDetails from '~/components/ItemDetails/ItemDetails';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.title ?? 'Movie' }];
@@ -80,7 +80,14 @@ export default function MoviePage() {
 
   return (
     <>
-      <MovieDetails movie={movie} />
+      <ItemDetails
+        title={movie.title}
+        genres={movie.genres}
+        overview={movie.overview}
+        poster_path={movie.poster_path}
+        release_date={movie.release_date}
+        runtime={movie.runtime}
+      />
       <Suspense fallback={<SkeletonTable rows={5} />}>
         <Await resolve={cast}>
           {cast => {

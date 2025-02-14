@@ -196,7 +196,7 @@ export async function getPersonMovies(id: number) {
   return filteredMovies;
 }
 
-export async function getTvDetails(id: number | string) {
+export async function getTvDetails(id: number | string): Promise<TvDetails> {
   const path = `/tv/${id}`;
   if (cache.has(path)) {
     return cache.get(path) as TvDetails;
@@ -205,7 +205,19 @@ export async function getTvDetails(id: number | string) {
   const data = await fetcher<TvDetails>(path);
   cache.set(path, data);
 
-  return data;
+  return {
+    id: data.id,
+    name: data.name,
+    first_air_date: data.first_air_date,
+    last_air_date: data.last_air_date,
+    overview: data.overview,
+    poster_path: data.poster_path,
+    seasons: data.seasons,
+    genres: data.genres,
+    popularity: data.popularity,
+    number_of_seasons: data.number_of_seasons,
+    number_of_episodes: data.number_of_episodes,
+  };
 }
 
 export async function discover() {

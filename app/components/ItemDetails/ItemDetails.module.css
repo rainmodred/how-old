@@ -2,7 +2,6 @@
   --card-padding: 0;
 
   display: grid;
-  /*gap: var(--mantine-spacing-);*/
   grid-template-columns: 185px auto;
   grid-template-rows: auto;
 
@@ -20,8 +19,7 @@
 .img {
   grid-area: img;
 }
-
-.title {
+.meta {
   grid-area: title;
 }
 .overview {

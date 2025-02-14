@@ -48,6 +48,13 @@ export type TvDetails = {
   id: number;
   name: string;
   first_air_date: string;
+  last_air_date: string;
+  number_of_seasons: number;
+  number_of_episodes: number;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  genres: Genre[];
   seasons: {
     id: number;
     air_date: string | null;

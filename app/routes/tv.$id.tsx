@@ -1,4 +1,4 @@
-import { Flex, Text, Title } from '@mantine/core';
+import { Flex, Text } from '@mantine/core';
 import { type LoaderFunctionArgs, defer, HeadersFunction } from '@vercel/remix';
 import {
   NavLink,
@@ -9,6 +9,7 @@ import {
   useSearchParams,
 } from '@remix-run/react';
 import { getTvDetails } from '~/utils/api.server';
+import ItemDetails from '~/components/ItemDetails/ItemDetails';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
@@ -29,20 +30,19 @@ export function shouldRevalidate({
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
 
-  const { name, seasons, first_air_date } = await getTvDetails(Number(id));
+  const details = await getTvDetails(Number(id));
 
   return defer(
     {
-      title: name,
-      firstAirDate: first_air_date,
-      seasons: seasons
+      ...details,
+      seasons: details.seasons
         .filter(season => season.air_date && season.season_number > 0)
         .map(season => {
           return {
             airDate: season.air_date,
             id: season.id,
             name: season.name,
-            posterPath: season.poster_path,
+            // posterPath: season.poster_path,
             seasonNumber: season.season_number,
           };
         }),
@@ -56,16 +56,23 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export default function TvPage() {
-  const { seasons, title, firstAirDate } = useLoaderData<typeof loader>();
+  const tv = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
 
   const location = useLocation();
 
   return (
     <div>
+      <ItemDetails
+        title={tv.name}
+        release_date={tv.first_air_date}
+        poster_path={tv.poster_path}
+        genres={tv.genres}
+        overview={tv.overview}
+      />
       <Flex gap="xs" wrap="wrap">
         <Text>Seasons:</Text>
-        {seasons.map(season => {
+        {tv.seasons.map(season => {
           return (
             <NavLink
               style={({ isActive, isPending }) => {
@@ -75,6 +82,7 @@ export default function TvPage() {
                   color: isPending ? 'red' : 'inherit',
                 };
               }}
+              preventScrollReset
               key={season.id}
               relative="path"
               to={`/tv/${location.pathname.split('/')[2]}/season/${season.seasonNumber}?${searchParams.toString()}`}
@@ -84,12 +92,8 @@ export default function TvPage() {
           );
         })}
       </Flex>
-      <div>
-        <Title size="h1" order={1}>
-          {title} ({firstAirDate?.slice(0, 4)})
-        </Title>
-        <Outlet />
-      </div>
+
+      <Outlet />
     </div>
   );
 }
