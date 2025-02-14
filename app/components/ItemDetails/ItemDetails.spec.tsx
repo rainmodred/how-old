@@ -1,17 +1,24 @@
 import { expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
-import MovieDetails from './MovieDetails';
 import { db } from 'tests/mocks/db';
 import { formatDistanceStrict } from 'date-fns';
 import { customFormatDate, formatMinutes } from '~/utils/dates';
+import ItemDetails from './ItemDetails';
 
 it('should render', async () => {
   const movie = db.movie.getAll()[0];
 
   render(
     <MantineProvider>
-      <MovieDetails movie={movie} />
+      <ItemDetails
+        title={movie.title}
+        genres={movie.genres}
+        overview={movie.overview}
+        poster_path={movie.poster_path}
+        release_date={movie.release_date}
+        runtime={movie.runtime}
+      />
     </MantineProvider>,
   );
 
