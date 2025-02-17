@@ -22,7 +22,10 @@ export function shouldRevalidate({
   nextParams,
   defaultShouldRevalidate,
 }: ShouldRevalidateFunctionArgs) {
-  if (currentParams.sNumber === nextParams.sNumber) {
+  if (
+    currentParams.sNumber === nextParams.sNumber &&
+    currentParams.id === nextParams.id
+  ) {
     return false;
   }
 
@@ -44,7 +47,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return data(
     {
       cast: castWithDates,
-      seasonNumber,
+      seasonNumber: Number(seasonNumber),
       done: offset + LIMIT >= cast.length,
     },
     {
@@ -59,7 +62,9 @@ export default function TvPage({ loaderData }: Route.ComponentProps) {
   const data = useTvLoaderData();
   const { cast, done, seasonNumber } = loaderData;
 
-  const releaseDate = data?.seasons.at(Number(seasonNumber))?.airDate;
+  const releaseDate = data?.seasons.find(
+    season => season.seasonNumber === seasonNumber,
+  )?.airDate;
   if (!releaseDate) {
     throw new Error('releaseDate is missing');
   }
