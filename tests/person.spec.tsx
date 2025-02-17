@@ -1,8 +1,9 @@
-import { createRemixStub } from '@remix-run/testing';
+import { createRoutesStub } from 'react-router';
 import { expect, it } from 'vitest';
 import {
   render,
   screen,
+  waitFor,
   waitForElementToBeRemoved,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -10,13 +11,13 @@ import { MantineProvider } from '@mantine/core';
 import PersonPage, { loader } from '../app/routes/person.$id';
 import { db, mswGetPersonMovies } from './mocks/db';
 
-it('should render', async () => {
+it('should render and sort', async () => {
   const user = userEvent.setup();
 
   const person = db.person.getAll()[0];
   const movies = mswGetPersonMovies(person.id);
 
-  const RemixStub = createRemixStub([
+  const Stub = createRoutesStub([
     {
       path: '/person/:id',
       Component: PersonPage,
@@ -26,7 +27,7 @@ it('should render', async () => {
 
   render(
     <MantineProvider>
-      <RemixStub initialEntries={[`/person/${person.id}`]} />
+      <Stub initialEntries={[`/person/${person.id}`]} />
     </MantineProvider>,
   );
 
@@ -50,11 +51,15 @@ it('should render', async () => {
   expect(titleElements).toEqual(expectedTitles);
 
   await user.click(screen.getByRole('textbox'));
-  await user.click(screen.getByRole('option', { name: 'Release Date' }));
+  await user.click(screen.getByRole('option', { name: /release Date/i }));
+  await waitFor(() =>
+    expect(screen.getByRole('textbox')).toHaveValue('Release Date'),
+  );
 
   titleElements = screen
     .getAllByRole('heading', { level: 3 })
     .map(el => el.textContent);
+
   expectedTitles = movies
     .sort(
       (a, b) =>

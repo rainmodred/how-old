@@ -67,7 +67,7 @@ export function createFakeMovie() {
     poster_path: faker.image.urlLoremFlickr(),
     release_date: faker.date.past({ years: 9 }).toISOString().split('T')[0],
     video: false,
-    popularity: faker.number.int({ min: 1, max: 100 }),
+    popularity: faker.number.float({ min: 1, max: 100 }),
     runtime: faker.number.int({ min: 30, max: 300 }),
     overview: faker.lorem.words(10),
   };

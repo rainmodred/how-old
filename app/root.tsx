@@ -1,14 +1,6 @@
 import '@mantine/core/styles.css';
 import '@mantine/nprogress/styles.css';
-import {
-  Meta,
-  Links,
-  Link,
-  Outlet,
-  ScrollRestoration,
-  Scripts,
-  useNavigation,
-} from '@remix-run/react';
+import { Meta, Links, Link, Outlet, ScrollRestoration, Scripts, useNavigation } from 'react-router';
 import {
   Text,
   Stack,

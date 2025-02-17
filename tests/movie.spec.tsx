@@ -1,4 +1,4 @@
-import { createRemixStub } from '@remix-run/testing';
+import { createRoutesStub } from 'react-router';
 import { expect, it } from 'vitest';
 import {
   render,
@@ -17,7 +17,7 @@ it('should load more persons', async () => {
   const actorsLength = testMovie.actors.length;
   const user = userEvent.setup();
 
-  const RemixStub = createRemixStub([
+  const Stub = createRoutesStub([
     {
       path: '/movie/:id',
       Component: MoviePage,
@@ -29,7 +29,7 @@ it('should load more persons', async () => {
 
   render(
     <MantineProvider>
-      <RemixStub initialEntries={[`/movie/${testMovie.id}`]} />
+      <Stub initialEntries={[`/movie/${testMovie.id}`]} />
     </MantineProvider>,
   );
 

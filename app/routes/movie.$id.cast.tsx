@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs, redirect } from '@remix-run/node';
+import { LoaderFunctionArgs, redirect } from 'react-router';
 import { getCast, getCastWithDates } from '~/utils/api.server';
 import { LIMIT } from '~/utils/constants';
 

@@ -57,12 +57,13 @@ test('shold change theme', async ({ page }) => {
     'data-mantine-color-scheme',
     'light',
   );
-  await page.getByRole('button').click();
+  const button = page.getByRole('button', { name: 'theme switch' });
+  await button.click();
   await expect(page.locator('html')).toHaveAttribute(
     'data-mantine-color-scheme',
     'dark',
   );
-  await page.getByRole('button').click();
+  await button.click();
 
   await expect(page.locator('html')).toHaveAttribute(
     'data-mantine-color-scheme',

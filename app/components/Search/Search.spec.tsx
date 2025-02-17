@@ -1,23 +1,22 @@
-import { createRemixStub } from '@remix-run/testing';
+import { createRoutesStub } from 'react-router';
 import { expect, it } from 'vitest';
 import {
   render,
   screen,
-  waitFor,
   waitForElementToBeRemoved,
 } from '@testing-library/react';
 import { Search } from './Search';
 import { loader } from '../../routes/action.search';
 import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
-import { Outlet } from '@remix-run/react';
+import { Outlet } from 'react-router';
 import { db } from 'tests/mocks/db';
 import { getYear } from 'date-fns';
 
 it('should search', async () => {
   const testMovie = db.movie.getAll()[0];
   const user = userEvent.setup();
-  const RemixStub = createRemixStub([
+  const Stub = createRoutesStub([
     {
       path: '/',
       Component: () => (
@@ -41,11 +40,11 @@ it('should search', async () => {
 
   render(
     <MantineProvider>
-      <RemixStub initialEntries={['/']} />
+      <Stub initialEntries={['/']} />
     </MantineProvider>,
   );
 
-  await waitFor(() => screen.getByRole('searchbox'));
+  expect(await screen.findByRole('searchbox')).toBeInTheDocument();
   const searchbox = screen.getByRole('searchbox');
   await user.type(searchbox, testMovie.title.slice(0, 4));
 

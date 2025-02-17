@@ -1,6 +1,6 @@
 import { Button, Container, Group, Title } from '@mantine/core';
 import classes from './ServerError.module.css';
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 
 export function ServerError() {
   return (

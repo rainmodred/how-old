@@ -1,5 +1,5 @@
 import { Button, Group, Image } from '@mantine/core';
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 import { Search } from './Search/Search';
 import { ThemeSwitch } from './ThemeSwitch/ThemeSwitch';
 import classes from './ThemeSwitch/ThemeSwitch.module.css';

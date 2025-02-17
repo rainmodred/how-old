@@ -166,13 +166,24 @@ export async function getSeasonDetails(id: string, season: string) {
   return details;
 }
 
+function formatPerson(person: Person) {
+  return {
+    id: person.id,
+    name: person.name,
+    profile_path: person.profile_path,
+    birthday: person.birthday,
+    deathday: person.deathday,
+    place_of_birth: person.place_of_birth,
+  };
+}
 export async function getPerson(id: number) {
   const path = `/person/${id}`;
   if (cache.has(path)) {
     return cache.get(path) as Person;
   }
 
-  const person = await fetcher<Person>(path);
+  const personData = await fetcher<Person>(path);
+  const person = formatPerson(personData);
   cache.set(path, person);
 
   return person;
@@ -196,15 +207,7 @@ export async function getPersonMovies(id: number) {
   return filteredMovies;
 }
 
-export async function getTvDetails(id: number | string): Promise<TvDetails> {
-  const path = `/tv/${id}`;
-  if (cache.has(path)) {
-    return cache.get(path) as TvDetails;
-  }
-
-  const data = await fetcher<TvDetails>(path);
-  cache.set(path, data);
-
+function formatTvDetails(data: TvDetails) {
   return {
     id: data.id,
     name: data.name,
@@ -220,6 +223,19 @@ export async function getTvDetails(id: number | string): Promise<TvDetails> {
   };
 }
 
+export async function getTvDetails(id: number | string): Promise<TvDetails> {
+  const path = `/tv/${id}`;
+  if (cache.has(path)) {
+    return cache.get(path) as TvDetails;
+  }
+
+  const data = await fetcher<TvDetails>(path);
+  const details = formatTvDetails(data);
+  cache.set(path, details);
+
+  return details;
+}
+
 export async function discover() {
   const vote_count = 1000;
   const prevYear = sub(new Date(), { years: 1 });
@@ -232,17 +248,15 @@ export async function discover() {
     `/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&primary_release_date.lte=${prevYear}&sort_by=vote_count.desc&without_genres=16&vote_count.gte=${vote_count}`,
   );
 
-  return data.results;
+  return data.results.map(movie => ({
+    id: movie.id,
+    title: movie.title,
+    release_date: movie.release_date,
+    poster_path: movie.poster_path,
+  }));
 }
 
-export async function getMovie(id: string): Promise<Movie> {
-  const path = `/movie/${id}`;
-  if (cache.has(path)) {
-    return cache.get(path) as Movie;
-  }
-
-  const movie = await fetcher<Movie>(path);
-  cache.set(path, movie);
+function formatMovie(movie: Movie) {
   return {
     id: movie.id,
     title: movie.title,
@@ -255,4 +269,16 @@ export async function getMovie(id: string): Promise<Movie> {
     poster_path: movie.poster_path,
     backdrop_path: movie.backdrop_path,
   };
+}
+
+export async function getMovie(id: string): Promise<Movie> {
+  const path = `/movie/${id}`;
+  if (cache.has(path)) {
+    return cache.get(path) as Movie;
+  }
+
+  const movieData = await fetcher<Movie>(path);
+  const movie = formatMovie(movieData);
+  cache.set(path, movie);
+  return movie;
 }

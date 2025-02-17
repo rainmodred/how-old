@@ -1,16 +1,14 @@
 import { Grid, Group, Skeleton } from '@mantine/core';
 import {
-  redirect,
-  type LoaderFunctionArgs,
-  MetaFunction,
+  Await,
   data,
   HeadersFunction,
-} from '@vercel/remix';
-import {
-  Await,
+  LoaderFunctionArgs,
+  MetaFunction,
+  redirect,
   ShouldRevalidateFunctionArgs,
   useLoaderData,
-} from '@remix-run/react';
+} from 'react-router';
 import { getPerson, getPersonMovies } from '~/utils/api.server';
 import { Movie } from '~/utils/types';
 import { Suspense } from 'react';
@@ -19,7 +17,7 @@ import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
 import { MoviesGrid } from '~/components/MoviesGrid';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: data?.title ?? 'Movie' }];
+  return [{ title: data?.person.name ?? 'Person' }];
 };
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({

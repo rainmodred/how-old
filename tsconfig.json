@@ -1,5 +1,5 @@
 {
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [".react-router/types/**/*", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "isolatedModules": true,
@@ -15,9 +15,10 @@
     "paths": {
       "~/*": ["./app/*"]
     },
-    "types": ["@remix-run/node", "vite/client", "@testing-library/jest-dom"],
+    "types": ["@react-router/node", "vite/client", "@testing-library/jest-dom"],
     "skipLibCheck": true,
     "module": "ESNext",
+    "rootDirs": [".", "./.react-router/types"],
 
     // Remix takes care of building everything in `remix build`.
     "noEmit": true

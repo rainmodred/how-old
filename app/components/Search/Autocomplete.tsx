@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IconSearch } from '@tabler/icons-react';
+import { TbSearch as IconSearch } from 'react-icons/tb';
 import { Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
 
 export interface IGroup {
