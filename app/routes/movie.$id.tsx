@@ -1,16 +1,15 @@
 import { Title } from '@mantine/core';
 import {
-  redirect,
-  type LoaderFunctionArgs,
-  MetaFunction,
-  defer,
-  HeadersFunction,
-} from '@vercel/remix';
-import {
   Await,
+  data,
+  HeadersFunction,
+  LoaderFunctionArgs,
+  redirect,
   ShouldRevalidateFunctionArgs,
   useLoaderData,
-} from '@remix-run/react';
+  MetaFunction,
+} from 'react-router';
+
 import { Persons } from '~/components/Persons/Persons';
 import {
   CastWithDates,
@@ -24,7 +23,7 @@ import { LIMIT } from '~/utils/constants';
 import ItemDetails from '~/components/ItemDetails/ItemDetails';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: data?.title ?? 'Movie' }];
+  return [{ title: data?.movie.title ?? 'Movie' }];
 };
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
@@ -61,7 +60,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     limit: offset + LIMIT,
   });
 
-  return defer(
+  return data(
     {
       movie,
       cast: castWithDates,

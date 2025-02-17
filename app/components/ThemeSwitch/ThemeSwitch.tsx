@@ -3,7 +3,7 @@ import {
   useComputedColorScheme,
   useMantineColorScheme,
 } from '@mantine/core';
-import { IconMoonStars, IconSun } from '@tabler/icons-react';
+import { TbMoonStars as IconMoonStars, TbSun as IconSun } from 'react-icons/tb';
 import classes from './ThemeSwitch.module.css';
 
 export function ThemeSwitch() {

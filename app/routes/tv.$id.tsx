@@ -1,15 +1,18 @@
 import { Flex, Text } from '@mantine/core';
-import { type LoaderFunctionArgs, defer, HeadersFunction } from '@vercel/remix';
 import {
+  data,
+  HeadersFunction,
+  LoaderFunctionArgs,
   NavLink,
   Outlet,
   ShouldRevalidateFunctionArgs,
-  useLoaderData,
   useLocation,
+  useRouteLoaderData,
   useSearchParams,
-} from '@remix-run/react';
+} from 'react-router';
 import { getTvDetails } from '~/utils/api.server';
 import ItemDetails from '~/components/ItemDetails/ItemDetails';
+import { Route } from './+types/tv.$id';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
@@ -32,7 +35,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   const details = await getTvDetails(Number(id));
 
-  return defer(
+  return data(
     {
       ...details,
       seasons: details.seasons
@@ -55,8 +58,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
   );
 }
 
-export default function TvPage() {
-  const tv = useLoaderData<typeof loader>();
+export default function TvPage({ loaderData }: Route.ComponentProps) {
+  const tv = loaderData;
   const [searchParams] = useSearchParams();
 
   const location = useLocation();
@@ -96,4 +99,12 @@ export default function TvPage() {
       <Outlet />
     </div>
   );
+}
+
+export function useTvLoaderData() {
+  const data = useRouteLoaderData<typeof loader>('routes/tv.$id');
+  if (!data) {
+    throw new Error('useTvLoaderData must be used inside tv.$id route');
+  }
+  return data;
 }

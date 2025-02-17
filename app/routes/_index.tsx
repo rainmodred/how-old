@@ -1,11 +1,11 @@
 import { Title, Box, Grid } from '@mantine/core';
-import { Await, useLoaderData } from '@remix-run/react';
-import { defer, HeadersFunction, type MetaFunction } from '@vercel/remix';
+import { Await, data, HeadersFunction, MetaFunction } from 'react-router';
 import { formatDistanceStrict } from 'date-fns';
 import { Suspense } from 'react';
 import { MovieCard } from '~/components/MovieCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
 import { discover } from '~/utils/api.server';
+import { Route } from './+types/_index';
 
 export const meta: MetaFunction = () => {
   return [
@@ -20,7 +20,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => ({
 
 export async function loader() {
   const popularMovies = discover();
-  return defer(
+  return data(
     { popularMovies },
     {
       headers: {
@@ -30,8 +30,8 @@ export async function loader() {
   );
 }
 
-export default function Index() {
-  const { popularMovies } = useLoaderData<typeof loader>();
+export default function Index({ loaderData }: Route.ComponentProps) {
+  const { popularMovies } = loaderData;
 
   return (
     <Box>
@@ -50,7 +50,14 @@ export default function Index() {
 
                     return (
                       <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
-                        <MovieCard movie={movie} text={text} key={movie.id} />
+                        <MovieCard
+                          id={movie.id}
+                          title={movie.title}
+                          poster_path={movie.poster_path}
+                          release_date={movie.release_date}
+                          text={text}
+                          key={movie.id}
+                        />
                       </Grid.Col>
                     );
                   })}

@@ -1,17 +1,16 @@
-import { vitePlugin as remix } from '@remix-run/dev';
+import { reactRouter } from '@react-router/dev/vite';
 import { defineConfig, loadEnv } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { configDefaults } from 'vitest/config';
+import { reactRouterDevTools } from 'react-router-devtools';
 
 export default defineConfig({
   server: {
     port: 3000,
   },
   plugins: [
-    !process.env.VITEST &&
-      remix({
-        ignoredRouteFiles: ['**/*.css'],
-      }),
+    reactRouterDevTools(),
+    !process.env.VITEST && reactRouter(),
     tsconfigPaths(),
   ],
   test: {

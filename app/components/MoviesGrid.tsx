@@ -2,7 +2,7 @@ import { Grid, Group, Title, Select } from '@mantine/core';
 import { formatDistanceStrict } from 'date-fns';
 import { Movie, Person } from '~/utils/types';
 import { MovieCard } from './MovieCard';
-import { useSearchParams } from '@remix-run/react';
+import { useSearchParams } from 'react-router';
 
 interface Props {
   movies: Movie[];
@@ -52,7 +52,10 @@ export function MoviesGrid({ movies, person }: Props) {
           return (
             <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
               <MovieCard
-                movie={movie}
+                id={movie.id}
+                title={movie.title}
+                poster_path={movie.poster_path}
+                release_date={movie.release_date}
                 text={formatText(person.birthday, movie.release_date)}
                 key={movie.id}
               />
@@ -68,6 +71,7 @@ function formatText(birthday: string, releaseDate: string): string {
   try {
     text = `${formatDistanceStrict(birthday, releaseDate)} old`;
   } catch (err) {
+    console.error(err);
     text = 'unknown age';
   }
   return text;

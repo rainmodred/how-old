@@ -1,16 +1,17 @@
-import { type LoaderFunctionArgs, defer, HeadersFunction } from '@vercel/remix';
 import {
   Await,
+  data,
+  HeadersFunction,
+  LoaderFunctionArgs,
   ShouldRevalidateFunctionArgs,
-  useLoaderData,
-  useRouteLoaderData,
-} from '@remix-run/react';
+} from 'react-router';
 import { CastWithDates, getCastWithDates, getTvCast } from '~/utils/api.server';
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Persons } from '~/components/Persons/Persons';
 import { Suspense } from 'react';
 import { LIMIT } from '~/utils/constants';
-import { loader as tvLoader } from './tv.$id';
+import { useTvLoaderData } from './tv.$id';
+import { Route } from './+types/tv.$id.season.$sNumber';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
@@ -40,7 +41,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     limit: offset + LIMIT,
   });
 
-  return defer(
+  return data(
     {
       cast: castWithDates,
       seasonNumber,
@@ -54,13 +55,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   );
 }
 
-export default function TvPage() {
-  const data = useRouteLoaderData<typeof tvLoader>('routes/tv.$id');
-
-  const { cast, done, seasonNumber } = useLoaderData<typeof loader>();
+export default function TvPage({ loaderData }: Route.ComponentProps) {
+  const data = useTvLoaderData();
+  const { cast, done, seasonNumber } = loaderData;
 
   const releaseDate = data?.seasons.at(Number(seasonNumber))?.airDate;
-  //TODO: do something if releaseDate is unknown
+  if (!releaseDate) {
+    throw new Error('releaseDate is missing');
+  }
 
   return (
     <Suspense fallback={<SkeletonTable rows={5} />}>

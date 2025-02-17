@@ -1,5 +1,5 @@
 import { Box, Image, Group, Table, Text, Button } from '@mantine/core';
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 import { CastWithDates } from '~/utils/api.server';
 import { baseImageUrl } from '~/utils/constants';
 import { calculateAges } from '~/utils/dates';

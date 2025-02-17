@@ -1,4 +1,4 @@
-import { useFetcher, useNavigate } from '@remix-run/react';
+import { useFetcher, useNavigate } from 'react-router';
 import { useState, useRef, useEffect } from 'react';
 import { useDebounce } from '~/utils/misc';
 import { Box } from '@mantine/core';
