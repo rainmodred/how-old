@@ -3,7 +3,7 @@ import {
   redirect,
   type LoaderFunctionArgs,
   MetaFunction,
-  defer,
+  data,
   HeadersFunction,
 } from '@vercel/remix';
 import {
@@ -48,7 +48,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const movies = getPersonMovies(id);
   const person = await getPerson(id);
 
-  return defer(
+  return data(
     { person, movies },
     {
       headers: {

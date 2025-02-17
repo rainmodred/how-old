@@ -1,5 +1,5 @@
 import { Flex, Text } from '@mantine/core';
-import { type LoaderFunctionArgs, defer, HeadersFunction } from '@vercel/remix';
+import { type LoaderFunctionArgs, data, HeadersFunction } from '@vercel/remix';
 import {
   NavLink,
   Outlet,
@@ -32,7 +32,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   const details = await getTvDetails(Number(id));
 
-  return defer(
+  return data(
     {
       ...details,
       seasons: details.seasons

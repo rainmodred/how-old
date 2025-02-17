@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, defer, HeadersFunction } from '@vercel/remix';
+import { type LoaderFunctionArgs, data, HeadersFunction } from '@vercel/remix';
 import {
   Await,
   ShouldRevalidateFunctionArgs,
@@ -40,7 +40,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     limit: offset + LIMIT,
   });
 
-  return defer(
+  return data(
     {
       cast: castWithDates,
       seasonNumber,

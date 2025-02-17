@@ -1,6 +1,6 @@
 import { Title, Box, Grid } from '@mantine/core';
 import { Await, useLoaderData } from '@remix-run/react';
-import { defer, HeadersFunction, type MetaFunction } from '@vercel/remix';
+import { data, HeadersFunction, type MetaFunction } from '@vercel/remix';
 import { formatDistanceStrict } from 'date-fns';
 import { Suspense } from 'react';
 import { MovieCard } from '~/components/MovieCard';
@@ -20,7 +20,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => ({
 
 export async function loader() {
   const popularMovies = discover();
-  return defer(
+  return data(
     { popularMovies },
     {
       headers: {
