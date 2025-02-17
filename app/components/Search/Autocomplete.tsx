@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { TbSearch as IconSearch } from 'react-icons/tb';
 import { Combobox, Loader, TextInput, useCombobox } from '@mantine/core';
 
