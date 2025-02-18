@@ -27,13 +27,13 @@ function ProfileImage({ id, src, alt }: ProfileImageProps) {
 interface PersonsProps {
   initialCast: CastWithDates;
   releaseDate: string;
-  done: boolean;
+  hasMore: boolean;
 }
 
-export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
-  const { persons, isDone, isLoading, loadMore } = useLoadMore(
+export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
+  const { persons, isLoaded, isLoading, loadMore } = useLoadMore(
     initialCast,
-    done,
+    hasMore,
   );
 
   return (
@@ -85,7 +85,7 @@ export function Persons({ initialCast, releaseDate, done }: PersonsProps) {
         </Table.Tbody>
       </Table>
 
-      {!isDone && (
+      {!isLoaded && (
         <Button
           loading={isLoading}
           disabled={isLoading}

@@ -3,6 +3,7 @@ import {
   data,
   HeadersFunction,
   LoaderFunctionArgs,
+  redirect,
   ShouldRevalidateFunctionArgs,
 } from 'react-router';
 import { CastWithDates, getCastWithDates, getTvCast } from '~/utils/api.server';
@@ -33,22 +34,26 @@ export function shouldRevalidate({
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
+  if (!params.id || !params.sNumber) {
+    throw redirect('/');
+  }
 
   const { id, sNumber: seasonNumber } = params;
-  const offset = Number(url.searchParams.get('offset')) || 0;
 
-  const cast = await getTvCast(id!, seasonNumber!);
+  const url = new URL(request.url);
+  const limit = Number(url.searchParams.get('limit')) || LIMIT;
+
+  const cast = await getTvCast(id, seasonNumber);
   const castWithDates = getCastWithDates(cast, {
     offset: 0,
-    limit: offset + LIMIT,
+    limit,
   });
 
   return data(
     {
       cast: castWithDates,
       seasonNumber: Number(seasonNumber),
-      done: offset + LIMIT >= cast.length,
+      hasMore: limit < cast.length,
     },
     {
       headers: {
@@ -60,7 +65,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function TvPage({ loaderData }: Route.ComponentProps) {
   const data = useTvLoaderData();
-  const { cast, done, seasonNumber } = loaderData;
+  const { cast, seasonNumber, hasMore } = loaderData;
 
   const releaseDate = data?.seasons.find(
     season => season.seasonNumber === seasonNumber,
@@ -76,8 +81,8 @@ export default function TvPage({ loaderData }: Route.ComponentProps) {
           return (
             <Persons
               initialCast={cast as CastWithDates}
+              hasMore={hasMore}
               releaseDate={releaseDate}
-              done={done}
             />
           );
         }}

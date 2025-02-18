@@ -98,7 +98,7 @@ export async function getCastWithDates(
   cast: Actor[],
   { offset, limit = LIMIT }: { offset: number; limit?: number },
 ) {
-  const promises = cast.slice(offset, offset + limit).map(async actor => {
+  const promises = cast.slice(offset, limit).map(async actor => {
     const person = await getPerson(actor.id);
     return {
       ...person,

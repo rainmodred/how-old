@@ -48,7 +48,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   }
 
   const url = new URL(request.url);
-  const offset = Number(url.searchParams.get('offset')) || 0;
+  const limit = Number(url.searchParams.get('limit')) || LIMIT;
 
   const [movie, cast] = await Promise.all([
     getMovie(params.id),
@@ -57,14 +57,14 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
   const castWithDates = getCastWithDates(cast, {
     offset: 0,
-    limit: offset + LIMIT,
+    limit,
   });
 
   return data(
     {
       movie,
       cast: castWithDates,
-      done: offset + LIMIT >= cast.length,
+      hasMore: limit < cast.length,
     },
     {
       headers: {
@@ -75,7 +75,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 }
 
 export default function MoviePage() {
-  const { movie, cast, done } = useLoaderData<typeof loader>();
+  const { movie, cast, hasMore } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -102,7 +102,7 @@ export default function MoviePage() {
               <Persons
                 initialCast={cast as CastWithDates}
                 releaseDate={movie.release_date}
-                done={done}
+                hasMore={hasMore}
               />
             );
           }}
