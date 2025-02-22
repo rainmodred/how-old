@@ -12,12 +12,17 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
-  reactHooks.configs['recommended'],
-  pluginTestingLibrary.configs['flat/react'],
+  pluginReact.configs.flat['jsx-runtime'],
   {
     rules: {
-      'react/react-in-jsx-scope': 'off',
       '@typescript-eslint/no-unused-vars': ['warn'],
     },
   },
+  {
+    plugins: {
+      'react-hooks': reactHooks,
+    },
+    rules: reactHooks.configs.recommended.rules,
+  },
+  pluginTestingLibrary.configs['flat/react'],
 ];
