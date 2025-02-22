@@ -1,4 +1,9 @@
-import { differenceInYears, format, formatDistanceStrict } from 'date-fns';
+import {
+  differenceInYears,
+  format,
+  formatDistanceStrict,
+  formatDuration,
+} from 'date-fns';
 
 export function customFormatDate(date: string) {
   return format(new Date(date), 'MMMM d, y');
@@ -9,10 +14,12 @@ export function customFormatDistance(
   date2: Parameters<typeof formatDistanceStrict>[1],
   options?: Parameters<typeof formatDistanceStrict>[2],
 ) {
-  return formatDistanceStrict(date1, date2, {
-    ...options,
-    roundingMethod: 'floor',
-  });
+  const years = Math.abs(differenceInYears(date1, date2));
+  if (years > 0) {
+    return formatDuration({ years });
+  }
+
+  return formatDistanceStrict(date1, date2, options);
 }
 
 export function formatMinutes(minutes: number) {
