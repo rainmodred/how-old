@@ -48,6 +48,7 @@ it('should render and sort', async () => {
   let expectedTitles = movies
     .sort((a, b) => b.popularity - a.popularity)
     .map(item => item.title);
+
   expect(titleElements).toEqual(expectedTitles);
 
   await user.click(screen.getByRole('textbox'));

@@ -13,6 +13,7 @@ export const db = factory({
     runtime: Number,
     genres: manyOf('genre'),
     actors: manyOf('actor'),
+    video: Boolean,
   },
   genre: {
     id: primaryKey(Number),
@@ -31,6 +32,7 @@ export const db = factory({
     deathday: nullable(String),
     profile_path: String,
     popularity: Number,
+    place_of_birth: String,
   },
   tv: {
     id: primaryKey(Number),
@@ -57,6 +59,7 @@ export function createFakePerson() {
     name: faker.person.fullName(),
     birthday: faker.date.birthdate().toISOString().split('T')[0],
     deathday: null,
+    place_of_birth: faker.location.city(),
   };
 }
 

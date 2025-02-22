@@ -1,5 +1,6 @@
 import { Card, CardSection, Image, Text, Title } from '@mantine/core';
 import { Link } from 'react-router';
+import { baseImageUrl } from '~/utils/constants';
 import { customFormatDate } from '~/utils/dates';
 
 interface Props {
@@ -34,7 +35,7 @@ export function MovieCard({
             }}
             loading="lazy"
             alt={title}
-            src={`https://image.tmdb.org/t/p/w342/${poster_path}`}
+            src={`${baseImageUrl}/w342/${poster_path}`}
             width={342}
             height={513}
             h="auto"

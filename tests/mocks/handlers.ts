@@ -3,7 +3,7 @@ import { API_URL } from '~/utils/constants';
 import { db, mswGetPersonMovies } from './db';
 
 export const handlers = [
-  http.get(`${API_URL}/search/multi`, async ({ request }) => {
+  http.get(`${API_URL}/3/search/multi`, async ({ request }) => {
     await delay(100);
     const url = new URL(request.url);
     const query = url.searchParams.get('query');
@@ -43,12 +43,12 @@ export const handlers = [
     });
   }),
 
-  http.get(`${API_URL}/discover/movie`, async () => {
+  http.get(`${API_URL}/3/discover/movie`, async () => {
     await delay();
     return HttpResponse.json({ page: 1, results: db.movie.getAll() });
   }),
 
-  http.get(`${API_URL}/movie/:id`, async ({ params }) => {
+  http.get(`${API_URL}/3/movie/:id`, async ({ params }) => {
     await delay();
 
     const { id } = params;
@@ -76,7 +76,7 @@ export const handlers = [
     });
   }),
 
-  http.get(`${API_URL}/movie/:id/credits`, async ({ params }) => {
+  http.get(`${API_URL}/3/movie/:id/credits`, async ({ params }) => {
     await delay();
     const { id } = params;
 
@@ -99,7 +99,7 @@ export const handlers = [
     });
   }),
 
-  http.get(`${API_URL}/tv/:id`, async ({ params }) => {
+  http.get(`${API_URL}/3/tv/:id`, async ({ params }) => {
     await delay();
 
     const { id } = params;
@@ -125,7 +125,7 @@ export const handlers = [
   }),
 
   http.get(
-    `${API_URL}/tv/:id/season/:seasonNumber/credits`,
+    `${API_URL}/3/tv/:id/season/:seasonNumber/credits`,
     async ({ params }) => {
       await delay();
       const { id, seasonNumber } = params;
@@ -154,7 +154,7 @@ export const handlers = [
     },
   ),
 
-  http.get(`${API_URL}/person/:id`, async ({ params }) => {
+  http.get(`${API_URL}/3/person/:id`, async ({ params }) => {
     await delay();
     const { id } = params;
     const person = db.person.findFirst({
@@ -172,14 +172,14 @@ export const handlers = [
     return HttpResponse.json(person);
   }),
 
-  http.get(`${API_URL}/person/:id/movie_credits`, async ({ params }) => {
+  http.get(`${API_URL}/3/person/:id/movie_credits`, async ({ params }) => {
     await delay(100);
     const { id } = params;
 
     try {
       const movies = mswGetPersonMovies(Number(id));
 
-      return HttpResponse.json({ cast: movies });
+      return HttpResponse.json({ id: Number(id), cast: movies });
     } catch (err) {
       return HttpResponse.json({
         success: false,

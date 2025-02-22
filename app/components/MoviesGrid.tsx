@@ -1,12 +1,13 @@
 import { Grid, Group, Title, Select } from '@mantine/core';
-import { formatDistanceStrict } from 'date-fns';
-import { Movie, Person } from '~/utils/types';
 import { MovieCard } from './MovieCard';
 import { useSearchParams } from 'react-router';
+import { FormattedPersonDetails } from '~/api/getPerson.server';
+import { FormattedMovieDetails } from '~/api/getMovie.server';
+import { customFormatDistance } from '~/utils/dates';
 
 interface Props {
-  movies: Movie[];
-  person: Person;
+  movies: FormattedMovieDetails[];
+  person: FormattedPersonDetails;
 }
 
 const items = [
@@ -66,10 +67,18 @@ export function MoviesGrid({ movies, person }: Props) {
   );
 }
 
-function formatText(birthday: string, releaseDate: string): string {
+function formatText(
+  birthday: string | undefined | null,
+  releaseDate: string,
+): string {
   let text = '';
+  if (!birthday) {
+    text = 'unknown age';
+    return text;
+  }
+
   try {
-    text = `${formatDistanceStrict(birthday, releaseDate)} old`;
+    text = `${customFormatDistance(birthday, releaseDate)} old`;
   } catch (err) {
     console.error(err);
     text = 'unknown age';

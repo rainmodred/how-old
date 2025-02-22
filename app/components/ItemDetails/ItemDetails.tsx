@@ -1,8 +1,11 @@
 import { Card, Box, Title, Group, Image, Text } from '@mantine/core';
-import { formatDistanceStrict } from 'date-fns';
-import { customFormatDate, formatMinutes } from '~/utils/dates';
-import { Genre } from '~/utils/types';
+import {
+  customFormatDate,
+  customFormatDistance,
+  formatMinutes,
+} from '~/utils/dates';
 import classes from './ItemDetails.module.css';
+import { Genre } from '~/api/getMovie.server';
 
 interface Props {
   title: string;
@@ -45,7 +48,7 @@ export default function ItemDetails({
 
         <Text size="sm">
           {customFormatDate(release_date)} (
-          {formatDistanceStrict(release_date, new Date())} ago)
+          {customFormatDistance(release_date, new Date())} ago)
         </Text>
       </Box>
 

@@ -10,9 +10,9 @@ import {
   useRouteLoaderData,
   useSearchParams,
 } from 'react-router';
-import { getTvDetails } from '~/utils/api.server';
 import ItemDetails from '~/components/ItemDetails/ItemDetails';
 import { Route } from './+types/tv.$id';
+import { getTvDetails } from '~/api/getTvDetails.server';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
@@ -35,27 +35,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   const details = await getTvDetails(Number(id));
 
-  return data(
-    {
-      ...details,
-      seasons: details.seasons
-        .filter(season => season.air_date && season.season_number > 0)
-        .map(season => {
-          return {
-            airDate: season.air_date,
-            id: season.id,
-            name: season.name,
-            // posterPath: season.poster_path,
-            seasonNumber: season.season_number,
-          };
-        }),
+  return data(details, {
+    headers: {
+      'Cache-Control': 'max-age=86400, public',
     },
-    {
-      headers: {
-        'Cache-Control': 'max-age=86400, public',
-      },
-    },
-  );
+  });
 }
 
 export default function TvPage({ loaderData }: Route.ComponentProps) {
@@ -88,9 +72,9 @@ export default function TvPage({ loaderData }: Route.ComponentProps) {
               preventScrollReset
               key={season.id}
               relative="path"
-              to={`/tv/${location.pathname.split('/')[2]}/season/${season.seasonNumber}?${searchParams.toString()}`}
+              to={`/tv/${location.pathname.split('/')[2]}/season/${season.season_number}?${searchParams.toString()}`}
             >
-              {season.seasonNumber}
+              {season.season_number}
             </NavLink>
           );
         })}

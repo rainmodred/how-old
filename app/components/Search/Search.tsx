@@ -2,12 +2,12 @@ import { useFetcher, useNavigate } from 'react-router';
 import { useState, useRef, useEffect } from 'react';
 import { useDebounce } from '~/utils/misc';
 import { Box } from '@mantine/core';
-import { SearchRes } from '~/utils/types';
 import { Autocomplete } from './Autocomplete';
 import { getLink, transformData } from '~/utils/search';
+import { SearchRes } from '~/api/multiSearch.server';
 
 export function Search() {
-  const fetcher = useFetcher<{ results: SearchRes[] }>();
+  const fetcher = useFetcher<{ results: SearchRes }>();
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
 

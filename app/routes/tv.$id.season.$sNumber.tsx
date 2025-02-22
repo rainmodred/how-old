@@ -6,13 +6,15 @@ import {
   redirect,
   ShouldRevalidateFunctionArgs,
 } from 'react-router';
-import { CastWithDates, getCastWithDates, getTvCast } from '~/utils/api.server';
+
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Persons } from '~/components/Persons/Persons';
 import { Suspense } from 'react';
 import { LIMIT } from '~/utils/constants';
 import { useTvLoaderData } from './tv.$id';
 import { Route } from './+types/tv.$id.season.$sNumber';
+import { getTvCredits } from '~/api/getTvCredits.server';
+import { getCastWithDates } from '~/api/getCastWithDates.server';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
@@ -43,8 +45,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const limit = Number(url.searchParams.get('limit')) || LIMIT;
 
-  const cast = await getTvCast(id, seasonNumber);
-  const castWithDates = getCastWithDates(cast, {
+  const credits = await getTvCredits(Number(id), Number(seasonNumber));
+  const castWithDates = getCastWithDates(credits.cast, {
     offset: 0,
     limit,
   });
@@ -53,7 +55,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     {
       cast: castWithDates,
       seasonNumber: Number(seasonNumber),
-      hasMore: limit < cast.length,
+      hasMore: limit < credits.cast.length,
     },
     {
       headers: {
@@ -68,8 +70,8 @@ export default function TvPage({ loaderData }: Route.ComponentProps) {
   const { cast, seasonNumber, hasMore } = loaderData;
 
   const releaseDate = data?.seasons.find(
-    season => season.seasonNumber === seasonNumber,
-  )?.airDate;
+    season => season.season_number === seasonNumber,
+  )?.air_date;
   if (!releaseDate) {
     throw new Error('releaseDate is missing');
   }
@@ -80,7 +82,7 @@ export default function TvPage({ loaderData }: Route.ComponentProps) {
         {cast => {
           return (
             <Persons
-              initialCast={cast as CastWithDates}
+              initialCast={cast}
               hasMore={hasMore}
               releaseDate={releaseDate}
             />

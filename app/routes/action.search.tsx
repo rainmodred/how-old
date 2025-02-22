@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from 'react-router';
-import { multiSearch } from '~/utils/api.server';
+import { multiSearch } from '~/api/multiSearch.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);

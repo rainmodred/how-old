@@ -9,12 +9,12 @@ import {
   ShouldRevalidateFunctionArgs,
   useLoaderData,
 } from 'react-router';
-import { getPerson, getPersonMovies } from '~/utils/api.server';
-import { Movie } from '~/utils/types';
 import { Suspense } from 'react';
 import PersonCard from '~/components/PersonCard/PersonCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
 import { MoviesGrid } from '~/components/MoviesGrid';
+import { getPerson } from '~/api/getPerson.server';
+import { getPersonCast } from '~/api/getPersonMovies.server';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.person.name ?? 'Person' }];
@@ -43,7 +43,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   const id = Number(params.id);
 
-  const movies = getPersonMovies(id);
+  const movies = getPersonCast(id);
   const person = await getPerson(id);
 
   return data(
@@ -80,19 +80,7 @@ export default function PersonPage() {
       >
         <Await resolve={movies}>
           {movies => {
-            const unique = new Set();
-            const uniqueMovies = movies.reduce((accum, current) => {
-              if (unique.has(current.id)) {
-                return accum;
-              }
-
-              unique.add(current.id);
-              accum.push(current);
-
-              return accum;
-            }, [] as Movie[]);
-
-            return <MoviesGrid movies={uniqueMovies} person={person} />;
+            return <MoviesGrid movies={movies.cast} person={person} />;
           }}
         </Await>
       </Suspense>
