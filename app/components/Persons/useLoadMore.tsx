@@ -29,7 +29,7 @@ export default function useLoadMore(
       });
       setSearchParams(newParams, { replace: true, preventScrollReset: true });
     }
-  }, [fetcher.data, fetcher.state]);
+  }, [fetcher.data, fetcher.state, setSearchParams]);
 
   function loadMore() {
     const newParams = new URLSearchParams({

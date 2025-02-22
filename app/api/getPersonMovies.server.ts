@@ -22,16 +22,7 @@ type Cast = z.infer<typeof castSchema>;
 const schema = z
   .object({
     id: z.number(),
-    cast: z.array(
-      z.object({
-        id: z.number(),
-        title: z.string(),
-        release_date: z.string(),
-        poster_path: z.string().nullable(),
-        popularity: z.number(),
-        video: z.boolean(),
-      }),
-    ),
+    cast: z.array(castSchema),
   })
   .transform(data => {
     const unique = new Set();
