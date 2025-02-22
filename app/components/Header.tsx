@@ -1,5 +1,5 @@
-import { Button, Group, Image } from '@mantine/core';
-import { Link } from 'react-router';
+import { Button, Group, Image, NavLink } from '@mantine/core';
+import { Link, NavLink as RouterNavLink } from 'react-router';
 import { Search } from './Search/Search';
 import { ThemeSwitch } from './ThemeSwitch/ThemeSwitch';
 import classes from './ThemeSwitch/ThemeSwitch.module.css';
@@ -13,6 +13,7 @@ export default function Header() {
       justify="center"
       gap="xs"
     >
+      <NavLink component={RouterNavLink} label="Home" to={'/'} w={'auto'} />
       <Search />
       <ThemeSwitch />
       {/* TODO: Support switch lang */}
