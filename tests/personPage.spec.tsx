@@ -14,7 +14,7 @@ import { db, mswGetPersonMovies } from './mocks/db';
 it('should render and sort', async () => {
   const user = userEvent.setup();
 
-  const person = db.person.getAll()[0];
+  const person = db.person.getAll()[0]!;
   const movies = mswGetPersonMovies(person.id);
 
   const Stub = createRoutesStub([
