@@ -7,7 +7,9 @@ import { movieSearchSchema, tvSearchSchema } from './multiSearch';
 // export type PersonCredits =
 //   paths['/3/person/{person_id}/combined_credits']['get']['responses'][200]['content']['application/json']['cast'];
 
-export type PersonCredits = z.infer<typeof schema>;
+// export type PersonCredits = z.infer<typeof schema>;
+export type MediaItems = z.infer<typeof schema>['cast'];
+export type NormalizedCast = z.infer<typeof schema>['cast'][number];
 
 const castSchema = z.union([
   movieSearchSchema.extend({
@@ -20,11 +22,15 @@ const castSchema = z.union([
 type Cast = z.infer<typeof castSchema>;
 type Movie = Extract<Cast, { media_type: 'movie' }>;
 
-//Documentary, Talk
-const excludedGenres = new Set([99, 10767]);
+//Documentary, Talk, News, Reality
+const excludedGenres = new Set([99, 10767, 10763, 10764]);
+const excludedTitles = new Set(['Honest Trailers']);
 
-function hasInvalidGenre(item: Cast) {
-  return !item.genre_ids.some(id => excludedGenres.has(id));
+function isAlloved(item: Cast) {
+  return (
+    !item.genre_ids.some(id => excludedGenres.has(id)) &&
+    !excludedTitles.has(item.media_type === 'movie' ? item.title : item.name)
+  );
 }
 
 function isValidDate(releaseDate: string) {
@@ -33,10 +39,10 @@ function isValidDate(releaseDate: string) {
 
 function isValidItem(item: Cast) {
   if (item.media_type === 'movie') {
-    return isValidDate(item.release_date) && !item.video;
+    return isValidDate(item.release_date) && !item.video && isAlloved(item);
   }
   if (item.media_type === 'tv') {
-    return isValidDate(item.first_air_date) && hasInvalidGenre(item);
+    return isValidDate(item.first_air_date) && isAlloved(item);
   }
   return false;
 }
@@ -86,8 +92,6 @@ const schema = z
       ),
     };
   });
-
-export type MediaItems = z.infer<typeof schema>['cast'];
 
 export async function getPersonCredits(id: number) {
   const { data, error } = await client.GET(

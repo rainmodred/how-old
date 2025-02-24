@@ -46,19 +46,9 @@ export default function Index({ loaderData }: Route.ComponentProps) {
               return (
                 <>
                   {popularMovies.map(movie => {
-                    const text = `${customFormatDistance(movie.release_date, new Date())} old`;
-
                     return (
                       <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
-                        <MediaCard
-                          id={movie.id}
-                          title={movie.title}
-                          posterPath={movie.poster_path}
-                          releaseDate={movie.release_date}
-                          mediaType={'movie'}
-                          text={text}
-                          key={movie.id}
-                        />
+                        <MediaCard item={movie} key={movie.id} />
                       </Grid.Col>
                     );
                   })}

@@ -23,7 +23,7 @@ const tvDetailsSchema = tvBaseSchema
       z.object({
         id: z.number(),
         name: z.string(),
-        air_date: z.string(),
+        air_date: z.string().nullable(),
         season_number: z.number(),
       }),
     ),

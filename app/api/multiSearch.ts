@@ -4,7 +4,6 @@ import { movieBaseSchema } from './getMovieDetails';
 import { tvBaseSchema } from './getTvDetails';
 import { personBaseSchema } from './getPerson';
 
-//TODO: Fixme
 // export type SearchMovie =
 //   paths['/3/search/movie']['get']['responses'][200]['content']['application/json']['results'];
 // export type SearchTv =

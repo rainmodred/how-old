@@ -2,7 +2,6 @@ import { Grid, Group, Title, Select } from '@mantine/core';
 import { MediaCard } from './MediaCard';
 import { useSearchParams } from 'react-router';
 import { PersonDetails } from '~/api/getPerson';
-import { customFormatDistance } from '~/utils/dates';
 import { MediaItems } from '~/api/getPersonCredits';
 
 interface Props {
@@ -52,37 +51,10 @@ export function MediaGrid({ mediaItems, person }: Props) {
         .map(item => {
           return (
             <Grid.Col key={item.id} span={{ base: 6, md: 4, lg: 3 }}>
-              <MediaCard
-                id={item.id}
-                title={item.title}
-                posterPath={item.poster_path}
-                releaseDate={item.release_date}
-                mediaType={item.media_type}
-                text={formatText(person.birthday, item.release_date)}
-                key={item.id}
-              />
+              <MediaCard item={item} key={item.id} birthday={person.birthday} />
             </Grid.Col>
           );
         })}
     </>
   );
-}
-
-function formatText(
-  birthday: string | undefined | null,
-  releaseDate: string,
-): string {
-  let text = '';
-  if (!birthday) {
-    text = 'unknown age';
-    return text;
-  }
-
-  try {
-    text = `${customFormatDistance(birthday, releaseDate)} old`;
-  } catch (err) {
-    console.error(err);
-    text = 'unknown age';
-  }
-  return text;
 }
