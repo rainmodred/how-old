@@ -5,13 +5,13 @@ import {
   formatMinutes,
 } from '~/utils/dates';
 import classes from './ItemDetails.module.css';
-import { Genre } from '~/api/getMovie.server';
+import { Genre } from '~/api/getMovieDetails';
 
 interface Props {
   title: string;
   release_date: string;
   overview: string;
-  poster_path: string;
+  poster_path: string | null;
   genres: Genre[];
   runtime?: number;
 }

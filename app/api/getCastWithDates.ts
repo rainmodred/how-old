@@ -1,6 +1,6 @@
 import { LIMIT } from '../utils/constants';
 import { customFormatDate } from '../utils/dates';
-import { getPerson } from './getPerson.server';
+import { getPerson } from './getPerson';
 
 export type CastWithDates = Awaited<ReturnType<typeof getCastWithDates>>;
 export async function getCastWithDates(

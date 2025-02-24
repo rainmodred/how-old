@@ -4,7 +4,7 @@ import { useDebounce } from '~/utils/misc';
 import { Box } from '@mantine/core';
 import { Autocomplete } from './Autocomplete';
 import { getLink, transformData } from '~/utils/search';
-import { SearchRes } from '~/api/multiSearch.server';
+import { SearchRes } from '~/api/multiSearch';
 
 export function Search() {
   const fetcher = useFetcher<{ results: SearchRes }>();

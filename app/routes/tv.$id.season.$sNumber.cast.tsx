@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs, redirect } from 'react-router';
-import { getCastWithDates } from '~/api/getCastWithDates.server';
-import { getTvCredits } from '~/api/getTvCredits.server';
+import { getCastWithDates } from '~/api/getCastWithDates';
+import { getTvCredits } from '~/api/getTvCredits';
 import { LIMIT } from '~/utils/constants';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -13,10 +13,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const offset = Number(url.searchParams.get('offset')) || 0;
 
-  const credits = await getTvCredits(Number(id), Number(seasonNumber));
+  const { cast } = await getTvCredits(Number(id), Number(seasonNumber));
 
   const end = offset + LIMIT;
-  const castWithDates = await getCastWithDates(credits.cast, {
+  const castWithDates = await getCastWithDates(cast, {
     offset,
     limit: end,
   });
@@ -24,6 +24,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return {
     cast: castWithDates,
     offset: end,
-    hasMore: end < credits.cast.length,
+    hasMore: end < cast.length,
   };
 }

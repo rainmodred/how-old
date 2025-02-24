@@ -1,6 +1,6 @@
 import { Box, Image, Group, Table, Text, Button } from '@mantine/core';
 import { Link } from 'react-router';
-import { CastWithDates } from '~/api/getCastWithDates.server';
+import { CastWithDates } from '~/api/getCastWithDates';
 import { baseImageUrl } from '~/utils/constants';
 import { calculateAges } from '~/utils/dates';
 import useLoadMore from './useLoadMore';

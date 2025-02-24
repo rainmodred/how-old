@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw';
 import { API_URL } from '~/utils/constants';
-import { db, mswGetPersonMovies } from './db';
+import { db, genresToGenreIds, mswGetPersonCast } from './db';
 
 export const handlers = [
   http.get(`${API_URL}/3/search/multi`, async ({ request }) => {
@@ -22,12 +22,20 @@ export const handlers = [
         .findMany({
           where: { title: { contains: query } },
         })
-        .map(movie => ({ ...movie, media_type: 'movie' })),
+        .map(movie => ({
+          ...movie,
+          media_type: 'movie',
+          genre_ids: genresToGenreIds(movie.genres),
+        })),
       ...db.tv
         .findMany({
           where: { name: { contains: query } },
         })
-        .map(tv => ({ ...tv, media_type: 'tv' })),
+        .map(tv => ({
+          ...tv,
+          media_type: 'tv',
+          genre_ids: genresToGenreIds(tv.genres),
+        })),
       ...db.person
         .findMany({
           where: { name: { contains: query } },
@@ -63,17 +71,9 @@ export const handlers = [
     }
     // return HttpResponse.json(movie);
 
-    return HttpResponse.json({
-      id: movie.id,
-      title: movie.title,
-      release_date: movie.release_date,
-      poster_path: movie.poster_path,
-      media_type: 'movie',
-      popularity: movie.popularity,
-      genres: movie.genres,
-      runtime: movie.runtime,
-      overview: movie.overview,
-    });
+    const { _actors, ...result } = movie;
+
+    return HttpResponse.json(result);
   }),
 
   http.get(`${API_URL}/3/movie/:id/credits`, async ({ params }) => {
@@ -94,7 +94,9 @@ export const handlers = [
       cast: movie.actors.map(actor => ({
         id: actor.person?.id,
         character: actor.character,
-        known_for_department: actor.known_for_department,
+        profile_path: actor.person?.profile_path,
+        name: actor.person?.name,
+        popularity: actor.person?.popularity,
       })),
     });
   }),
@@ -172,14 +174,17 @@ export const handlers = [
     return HttpResponse.json(person);
   }),
 
-  http.get(`${API_URL}/3/person/:id/movie_credits`, async ({ params }) => {
+  http.get(`${API_URL}/3/person/:id/combined_credits`, async ({ params }) => {
     await delay(100);
     const { id } = params;
 
     try {
-      const movies = mswGetPersonMovies(Number(id));
+      const cast = mswGetPersonCast(Number(id));
 
-      return HttpResponse.json({ id: Number(id), cast: movies });
+      return HttpResponse.json({
+        id: Number(id),
+        cast,
+      });
     } catch (err) {
       return HttpResponse.json({
         success: false,

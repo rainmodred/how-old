@@ -13,8 +13,8 @@ import { Suspense } from 'react';
 import { LIMIT } from '~/utils/constants';
 import { useTvLoaderData } from './tv.$id';
 import { Route } from './+types/tv.$id.season.$sNumber';
-import { getTvCredits } from '~/api/getTvCredits.server';
-import { getCastWithDates } from '~/api/getCastWithDates.server';
+import { getTvCredits } from '~/api/getTvCredits';
+import { getCastWithDates } from '~/api/getCastWithDates';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
@@ -45,8 +45,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const limit = Number(url.searchParams.get('limit')) || LIMIT;
 
-  const credits = await getTvCredits(Number(id), Number(seasonNumber));
-  const castWithDates = getCastWithDates(credits.cast, {
+  const { cast } = await getTvCredits(Number(id), Number(seasonNumber));
+  const castWithDates = getCastWithDates(cast, {
     offset: 0,
     limit,
   });
@@ -55,7 +55,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     {
       cast: castWithDates,
       seasonNumber: Number(seasonNumber),
-      hasMore: limit < credits.cast.length,
+      hasMore: limit < cast.length,
     },
     {
       headers: {

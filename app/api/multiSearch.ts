@@ -1,5 +1,8 @@
-import { client } from './api.server';
+import { client } from './api';
 import { z } from 'zod';
+import { movieBaseSchema } from './getMovieDetails';
+import { tvBaseSchema } from './getTvDetails';
+import { personBaseSchema } from './getPerson';
 
 //TODO: Fixme
 // export type SearchMovie =
@@ -11,34 +14,29 @@ import { z } from 'zod';
 
 // export type SearchRes = SearchMovie | SearchTv | SearchPerson;
 
-const movieResSchema = z.object({
-  id: z.number(),
-  title: z.string(),
+export const movieSearchSchema = movieBaseSchema.extend({
   media_type: z.literal('movie'),
-  release_date: z.string(),
+  genre_ids: z.array(z.number()),
 });
 
-const tvResSchema = z.object({
-  id: z.number(),
-  name: z.string(),
+export const tvSearchSchema = tvBaseSchema.extend({
   media_type: z.literal('tv'),
-  first_air_date: z.string(),
+  genre_ids: z.array(z.number()),
 });
 
-const personResSchema = z.object({
-  id: z.number(),
-  name: z.string(),
+const personSearchSchema = personBaseSchema.extend({
   media_type: z.literal('person'),
-  popularity: z.number(),
+  profile_path: z.string().nullable(),
+  known_for_department: z.string(),
 });
 
 const searchResSchema = z.array(
-  z.union([movieResSchema, tvResSchema, personResSchema]),
+  z.union([movieSearchSchema, tvSearchSchema, personSearchSchema]),
 );
 
-export type SearchMovie = z.infer<typeof movieResSchema>;
-export type SearchTv = z.infer<typeof tvResSchema>;
-export type SearchPerson = z.infer<typeof personResSchema>;
+export type SearchMovie = z.infer<typeof movieSearchSchema>;
+export type SearchTv = z.infer<typeof tvSearchSchema>;
+export type SearchPerson = z.infer<typeof personSearchSchema>;
 
 export type SearchRes = z.infer<typeof searchResSchema>;
 

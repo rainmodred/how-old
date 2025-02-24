@@ -5,7 +5,7 @@ import {
   SearchPerson,
   SearchRes,
   SearchTv,
-} from '../api/multiSearch.server';
+} from '../api/multiSearch';
 
 export function getLink(item: GroupItem) {
   if (item.media_type === 'movie') {

@@ -12,7 +12,7 @@ import {
 } from 'react-router';
 import ItemDetails from '~/components/ItemDetails/ItemDetails';
 import { Route } from './+types/tv.$id';
-import { getTvDetails } from '~/api/getTvDetails.server';
+import { getTvDetails } from '~/api/getTvDetails';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,

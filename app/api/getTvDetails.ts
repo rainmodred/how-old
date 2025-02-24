@@ -1,20 +1,24 @@
-import { paths } from 'schema';
 import { tvCache } from '../utils/cache.server';
-import { client } from './api.server';
+import { client } from './api';
 import { z } from 'zod';
+import { genreSchema } from './getMovieDetails';
 
-export type TvDetails =
-  paths['/3/tv/{series_id}']['get']['responses'][200]['content']['application/json'];
+// export type TvDetails =
+//   paths['/3/tv/{series_id}']['get']['responses'][200]['content']['application/json'];
 
-export type FormattedTvDetails = z.infer<typeof schema>;
+export type TvDetails = z.infer<typeof tvDetailsSchema>;
 
-const schema = z
-  .object({
-    id: z.number(),
-    name: z.string(),
-    first_air_date: z.string(),
-    overview: z.string(),
-    poster_path: z.string(),
+export const tvBaseSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  first_air_date: z.string(),
+  overview: z.string(),
+  poster_path: z.string().nullable(),
+  popularity: z.number(),
+});
+
+const tvDetailsSchema = tvBaseSchema
+  .extend({
     seasons: z.array(
       z.object({
         id: z.number(),
@@ -23,8 +27,8 @@ const schema = z
         season_number: z.number(),
       }),
     ),
-    genres: z.array(z.object({ id: z.number(), name: z.string() })),
-    // popularity: z.number(),
+    genres: z.array(genreSchema),
+    popularity: z.number(),
     number_of_seasons: z.number(),
   })
   .transform(data => {
@@ -52,7 +56,7 @@ export async function getTvDetails(id: number) {
     throw error;
   }
 
-  const result = schema.parse(data);
+  const result = tvDetailsSchema.parse(data);
   tvCache.set(id, result);
   return result;
 }

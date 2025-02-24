@@ -1,9 +1,9 @@
 import { Title, Box, Grid } from '@mantine/core';
 import { Await, data, HeadersFunction, MetaFunction } from 'react-router';
 import { Suspense } from 'react';
-import { MovieCard } from '~/components/MovieCard';
+import { MediaCard } from '~/components/MediaGrid/MediaCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
-import { discover } from '~/api/discover.server';
+import { discoverMovie } from '~/api/discover';
 import { Route } from './+types/_index';
 import { customFormatDistance } from '~/utils/dates';
 
@@ -19,7 +19,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => ({
 });
 
 export async function loader() {
-  const popularMovies = discover();
+  const popularMovies = discoverMovie();
   return data(
     { popularMovies },
     {
@@ -50,11 +50,12 @@ export default function Index({ loaderData }: Route.ComponentProps) {
 
                     return (
                       <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
-                        <MovieCard
+                        <MediaCard
                           id={movie.id}
                           title={movie.title}
-                          poster_path={movie.poster_path}
-                          release_date={movie.release_date}
+                          posterPath={movie.poster_path}
+                          releaseDate={movie.release_date}
+                          mediaType={'movie'}
                           text={text}
                           key={movie.id}
                         />

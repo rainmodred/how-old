@@ -1,13 +1,13 @@
 import { Grid, Group, Title, Select } from '@mantine/core';
-import { MovieCard } from './MovieCard';
+import { MediaCard } from './MediaCard';
 import { useSearchParams } from 'react-router';
-import { FormattedPersonDetails } from '~/api/getPerson.server';
-import { FormattedMovieDetails } from '~/api/getMovie.server';
+import { PersonDetails } from '~/api/getPerson';
 import { customFormatDistance } from '~/utils/dates';
+import { MediaItems } from '~/api/getPersonCredits';
 
 interface Props {
-  movies: FormattedMovieDetails[];
-  person: FormattedPersonDetails;
+  mediaItems: MediaItems;
+  person: PersonDetails;
 }
 
 const items = [
@@ -15,7 +15,7 @@ const items = [
   { value: 'release_date', label: 'Release Date' },
 ] as const;
 
-export function MoviesGrid({ movies, person }: Props) {
+export function MediaGrid({ mediaItems, person }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const sort = searchParams.get('sort') ?? items[0].value;
 
@@ -37,7 +37,7 @@ export function MoviesGrid({ movies, person }: Props) {
         </Group>
       </Grid.Col>
 
-      {movies
+      {mediaItems
         .sort((a, b) => {
           if (sort === 'popularity') {
             return b.popularity - a.popularity;
@@ -49,16 +49,17 @@ export function MoviesGrid({ movies, person }: Props) {
           }
           throw new Error('invalid sort');
         })
-        .map(movie => {
+        .map(item => {
           return (
-            <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
-              <MovieCard
-                id={movie.id}
-                title={movie.title}
-                poster_path={movie.poster_path}
-                release_date={movie.release_date}
-                text={formatText(person.birthday, movie.release_date)}
-                key={movie.id}
+            <Grid.Col key={item.id} span={{ base: 6, md: 4, lg: 3 }}>
+              <MediaCard
+                id={item.id}
+                title={item.title}
+                posterPath={item.poster_path}
+                releaseDate={item.release_date}
+                mediaType={item.media_type}
+                text={formatText(person.birthday, item.release_date)}
+                key={item.id}
               />
             </Grid.Col>
           );

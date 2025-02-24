@@ -1,14 +1,13 @@
-import { paths } from 'schema';
 import { tvCreditsCache } from '../utils/cache.server';
-import { client } from './api.server';
+import { client } from './api';
 import { z } from 'zod';
 
-export type TvSeriesCredits =
-  paths['/3/tv/{series_id}/season/{season_number}/credits']['get']['responses'][200]['content']['application/json'];
+// export type TvSeriesCredits =
+//   paths['/3/tv/{series_id}/season/{season_number}/credits']['get']['responses'][200]['content']['application/json'];
 
-export type FormattedTvCredits = z.infer<typeof schema>;
+export type TvCredits = z.infer<typeof tvCreditsSchema>;
 
-const schema = z.object({
+const tvCreditsSchema = z.object({
   id: z.number(),
   cast: z.array(
     z.object({
@@ -37,8 +36,8 @@ export async function getTvCredits(id: number, seasonNumber: number) {
     throw error;
   }
 
-  const result = schema.parse(data);
-
+  const result = tvCreditsSchema.parse(data);
   tvCreditsCache.set(id, result);
+
   return result;
 }

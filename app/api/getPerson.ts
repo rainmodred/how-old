@@ -1,20 +1,24 @@
-import { paths } from 'schema';
 import { personCache } from '../utils/cache.server';
-import { client } from './api.server';
+import { client } from './api';
 import { z } from 'zod';
 
-export type PersonDetails =
-  paths['/3/person/{person_id}']['get']['responses'][200]['content']['application/json'];
+// export type PersonDetails =
+//   paths['/3/person/{person_id}']['get']['responses'][200]['content']['application/json'];
 
-export type FormattedPersonDetails = z.infer<typeof schema>;
+export type PersonDetails = z.infer<typeof personDetailsSchema>;
 
-const schema = z.object({
+export const personBaseSchema = z.object({
   id: z.number(),
   name: z.string(),
-  profile_path: z.string().nullable(),
+  popularity: z.number(),
+});
+
+export const personDetailsSchema = personBaseSchema.extend({
   birthday: z.string().nullable(),
   deathday: z.string().nullable(),
   place_of_birth: z.string().nullable(),
+  profile_path: z.string().nullable(),
+  known_for_department: z.string(),
 });
 
 export async function getPerson(id: number) {
@@ -33,7 +37,7 @@ export async function getPerson(id: number) {
     throw error;
   }
 
-  const result = schema.parse(data);
+  const result = personDetailsSchema.parse(data);
   personCache.set(id, result);
 
   return result;
