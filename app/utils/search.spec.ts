@@ -1,9 +1,9 @@
 import { expect, it } from 'vitest';
 import { transformData } from './search';
-import { SearchRes } from './types';
+import { SearchRes } from '~/api/multiSearch';
 
 it('transformdata', () => {
-  const input: SearchRes[] = [
+  const input: SearchRes = [
     {
       id: 120,
       title: 'The Lord of the Rings: The Fellowship of the Ring',
@@ -54,13 +54,13 @@ it('transformdata', () => {
       label: 'Persons',
       options: [
         {
-          id: 1327,
-          label: 'Ian McKellen',
+          id: 1328,
+          label: 'Sean Astin',
           media_type: 'person',
         },
         {
-          id: 1328,
-          label: 'Sean Astin',
+          id: 1327,
+          label: 'Ian McKellen',
           media_type: 'person',
         },
       ],

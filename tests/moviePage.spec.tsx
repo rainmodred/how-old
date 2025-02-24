@@ -13,7 +13,7 @@ import { loader as castLoader } from '~/routes/movie.$id.cast';
 import { LIMIT } from '~/utils/constants';
 
 it('should load more persons', async () => {
-  const testMovie = db.movie.getAll()[0];
+  const testMovie = db.movie.getAll()[0]!;
   const actorsLength = testMovie.actors.length;
   const user = userEvent.setup();
 

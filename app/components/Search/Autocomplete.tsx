@@ -74,7 +74,7 @@ export function Autocomplete({
     <Combobox
       onOptionSubmit={optionValue => {
         combobox.closeDropdown();
-        if (!map) {
+        if (!map || !map[optionValue]) {
           return;
         }
         onOptionSubmit(map[optionValue]);

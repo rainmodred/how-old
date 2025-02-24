@@ -9,13 +9,13 @@ import {
 import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
 import PersonPage, { loader } from '../app/routes/person.$id';
-import { db, mswGetPersonMovies } from './mocks/db';
+import { db, mswGetPersonCast } from './mocks/db';
 
 it('should render and sort', async () => {
   const user = userEvent.setup();
 
-  const person = db.person.getAll()[0];
-  const movies = mswGetPersonMovies(person.id);
+  const person = db.person.getAll()[0]!;
+  const movies = mswGetPersonCast(person.id);
 
   const Stub = createRoutesStub([
     {
@@ -39,7 +39,7 @@ it('should render and sort', async () => {
 
   await waitForElementToBeRemoved(screen.queryByTestId('skeleton'));
 
-  expect(screen.getAllByTestId('movie-card')).toHaveLength(movies.length);
+  expect(screen.getAllByTestId('media-card')).toHaveLength(movies.length);
 
   let titleElements = screen
     .getAllByRole('heading', { level: 3 })
@@ -48,6 +48,7 @@ it('should render and sort', async () => {
   let expectedTitles = movies
     .sort((a, b) => b.popularity - a.popularity)
     .map(item => item.title);
+
   expect(titleElements).toEqual(expectedTitles);
 
   await user.click(screen.getByRole('textbox'));

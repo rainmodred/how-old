@@ -1,6 +1,11 @@
 import { getYear } from 'date-fns';
 import { GroupItem, IGroup } from '~/components/Search/Autocomplete';
-import { SearchRes, TvRes, MovieRes, PersonRes } from './types';
+import {
+  SearchMovie,
+  SearchPerson,
+  SearchRes,
+  SearchTv,
+} from '../api/multiSearch';
 
 export function getLink(item: GroupItem) {
   if (item.media_type === 'movie') {
@@ -12,17 +17,13 @@ export function getLink(item: GroupItem) {
   return `/person/${item.id}`;
 }
 
-export function transformData(data: undefined | SearchRes[]): IGroup[] | null {
+export function transformData(data: SearchRes): IGroup[] | null {
   if (!data) {
     return null;
   }
 
   const groups = Object.entries(
-    Object.groupBy(data, ({ media_type }) => media_type) as {
-      tv: TvRes[];
-      movie: MovieRes[];
-      person: PersonRes[];
-    },
+    Object.groupBy(data, ({ media_type }) => media_type),
   )
     .filter(
       ([groupName]) =>
@@ -31,7 +32,7 @@ export function transformData(data: undefined | SearchRes[]): IGroup[] | null {
     .map(([groupName, g]) => {
       if (groupName === 'movie') {
         //ts hates me
-        const group = g as MovieRes[];
+        const group = g as SearchMovie[];
         return {
           label: 'Movies',
           options: group
@@ -48,7 +49,7 @@ export function transformData(data: undefined | SearchRes[]): IGroup[] | null {
       }
 
       if (groupName === 'tv') {
-        const group = g as TvRes[];
+        const group = g as SearchTv[];
         return {
           label: 'TV Series',
           options: group
@@ -65,11 +66,11 @@ export function transformData(data: undefined | SearchRes[]): IGroup[] | null {
       }
 
       if (groupName === 'person') {
-        const group = g as PersonRes[];
+        const group = g as SearchPerson[];
         return {
           label: 'Persons',
           options: group
-            .sort((a, b) => a.popularity - b.popularity)
+            .sort((a, b) => b.popularity - a.popularity)
             .slice(0, 5)
             .map(p => {
               const label = `${p.name}`;

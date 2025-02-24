@@ -2,8 +2,11 @@ import { expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { db } from 'tests/mocks/db';
-import { formatDistanceStrict } from 'date-fns';
-import { customFormatDate, formatMinutes } from '~/utils/dates';
+import {
+  customFormatDate,
+  customFormatDistance,
+  formatMinutes,
+} from '~/utils/dates';
 import ItemDetails from './ItemDetails';
 
 it('should render', async () => {
@@ -30,7 +33,7 @@ it('should render', async () => {
     screen.getByText(movie.genres.map(g => g.name).join(', ')),
   ).toBeInTheDocument();
 
-  const releaseDateText = `${customFormatDate(movie.release_date)} (${formatDistanceStrict(movie.release_date, new Date())} ago)`;
+  const releaseDateText = `${customFormatDate(movie.release_date)} (${customFormatDistance(movie.release_date, new Date())} ago)`;
   expect(screen.getByText(releaseDateText)).toBeInTheDocument();
   expect(screen.getByText(formatMinutes(movie.runtime))).toBeInTheDocument();
 

@@ -1,11 +1,11 @@
 import { Title, Box, Grid } from '@mantine/core';
 import { Await, data, HeadersFunction, MetaFunction } from 'react-router';
-import { formatDistanceStrict } from 'date-fns';
 import { Suspense } from 'react';
-import { MovieCard } from '~/components/MovieCard';
+import { MediaCard } from '~/components/MediaGrid/MediaCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
-import { discover } from '~/utils/api.server';
+import { discoverMovie } from '~/api/discover';
 import { Route } from './+types/_index';
+import { customFormatDistance } from '~/utils/dates';
 
 export const meta: MetaFunction = () => {
   return [
@@ -19,7 +19,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => ({
 });
 
 export async function loader() {
-  const popularMovies = discover();
+  const popularMovies = discoverMovie();
   return data(
     { popularMovies },
     {
@@ -46,18 +46,9 @@ export default function Index({ loaderData }: Route.ComponentProps) {
               return (
                 <>
                   {popularMovies.map(movie => {
-                    const text = `${formatDistanceStrict(movie.release_date, new Date())} old`;
-
                     return (
                       <Grid.Col key={movie.id} span={{ base: 6, md: 4, lg: 3 }}>
-                        <MovieCard
-                          id={movie.id}
-                          title={movie.title}
-                          poster_path={movie.poster_path}
-                          release_date={movie.release_date}
-                          text={text}
-                          key={movie.id}
-                        />
+                        <MediaCard item={movie} key={movie.id} />
                       </Grid.Col>
                     );
                   })}

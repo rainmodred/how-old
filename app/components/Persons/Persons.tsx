@@ -1,13 +1,13 @@
 import { Box, Image, Group, Table, Text, Button } from '@mantine/core';
 import { Link } from 'react-router';
-import { CastWithDates } from '~/utils/api.server';
+import { CastWithDates } from '~/api/getCastWithDates';
 import { baseImageUrl } from '~/utils/constants';
 import { calculateAges } from '~/utils/dates';
 import useLoadMore from './useLoadMore';
 
 interface ProfileImageProps {
   id: number;
-  src: string;
+  src: string | undefined | null;
   alt: string;
 }
 
@@ -15,8 +15,12 @@ function ProfileImage({ id, src, alt }: ProfileImageProps) {
   return (
     <Box component={Link} to={`/person/${id}`} style={{ width: '85px' }}>
       <Image
+        fallbackSrc="/movieFallback.svg"
+        onError={e => {
+          e.currentTarget.src = '/movieFallback.svg';
+        }}
         loading="lazy"
-        src={src ? `${baseImageUrl}/${src}` : '/profileFallback.svg'}
+        src={`${baseImageUrl}/w185/${src}`}
         radius={4}
         alt={alt}
       />
@@ -65,7 +69,7 @@ export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
                       <ProfileImage id={id} src={profile_path} alt={name} />
                       <Box>
                         <Text fw="700">{name}</Text>
-                        <Text>{character}</Text>
+                        <Text>{character ? character : '-'}</Text>
                         <Text>Birthday: {birthday ? birthday : '-'}</Text>
                       </Box>
                     </Group>

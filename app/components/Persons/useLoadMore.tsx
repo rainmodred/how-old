@@ -1,7 +1,7 @@
 import { useFetcher, useSearchParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import { loader } from '~/routes/movie.$id.cast';
-import { CastWithDates } from '~/utils/api.server';
+import { CastWithDates } from '~/api/getCastWithDates';
 
 export default function useLoadMore(
   initialCast: CastWithDates,
@@ -29,7 +29,7 @@ export default function useLoadMore(
       });
       setSearchParams(newParams, { replace: true, preventScrollReset: true });
     }
-  }, [fetcher.data, fetcher.state]);
+  }, [fetcher.data, fetcher.state, setSearchParams]);
 
   function loadMore() {
     const newParams = new URLSearchParams({

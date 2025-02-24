@@ -1,19 +1,28 @@
 import { expect, afterEach, vi, beforeAll, afterAll } from 'vitest';
-import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 import { server } from './mocks/node';
 import { db, seed } from './mocks/db';
 import { drop } from '@mswjs/data';
 
+// NOTE: server.listen must be called before `createClient` is used to ensure
+// the msw can inject its version of `fetch` to intercept the requests./
+//don't work inside beforeAll
+server.listen();
 beforeAll(() => {
   global.ResizeObserver = class ResizeObserver {
     observe() {}
     unobserve() {}
     disconnect() {}
   };
-
   drop(db);
   seed();
+});
+afterEach(() => {
+  server.resetHandlers();
+});
+afterAll(() => server.close());
+
+beforeAll(() => {
   server.listen();
 });
 afterEach(() => {
@@ -41,8 +50,4 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-});
-
-afterEach(() => {
-  cleanup();
 });

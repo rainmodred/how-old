@@ -2,6 +2,7 @@ import globals from 'globals';
 import pluginJs from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
 import pluginTestingLibrary from 'eslint-plugin-testing-library';
 
 /** @type {import('eslint').Linter.Config[]} */
@@ -11,11 +12,17 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
-  pluginTestingLibrary.configs['flat/react'],
+  pluginReact.configs.flat['jsx-runtime'],
   {
     rules: {
-      'react/react-in-jsx-scope': 'off',
       '@typescript-eslint/no-unused-vars': ['warn'],
     },
   },
+  {
+    plugins: {
+      'react-hooks': reactHooks,
+    },
+    rules: reactHooks.configs.recommended.rules,
+  },
+  pluginTestingLibrary.configs['flat/react'],
 ];

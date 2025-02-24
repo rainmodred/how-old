@@ -8,6 +8,8 @@ import {
   ScrollRestoration,
   Scripts,
   useNavigation,
+  useRouteError,
+  isRouteErrorResponse,
 } from 'react-router';
 import {
   Text,
@@ -95,6 +97,35 @@ export default function App() {
 }
 
 export function ErrorBoundary() {
+  const error = useRouteError();
+  if (process.env.NODE_ENV === 'development') {
+    if (isRouteErrorResponse(error)) {
+      return (
+        <Document>
+          <h1>
+            {error.status} {error.statusText}
+          </h1>
+          <p>{error.data}</p>
+        </Document>
+      );
+    } else if (error instanceof Error) {
+      return (
+        <Document>
+          <h1>Error</h1>
+          <p>{error.message}</p>
+          <p>The stack trace is:</p>
+          <pre>{error.stack}</pre>
+        </Document>
+      );
+    } else {
+      return (
+        <Document>
+          <h1>Unknown Error</h1>
+        </Document>
+      );
+    }
+  }
+
   return (
     <Document>
       <ServerError />

@@ -1,11 +1,10 @@
 import { Card, Image, Title, Text, Box } from '@mantine/core';
-import { customFormatDate } from '~/utils/dates';
-import { formatDistanceStrict } from 'date-fns';
-import { Person } from '~/utils/types';
+import { customFormatDate, customFormatDistance } from '~/utils/dates';
+import { PersonDetails } from '~/api/getPerson';
 import classes from './PersonCard.module.css';
 
 interface Props {
-  person: Person;
+  person: PersonDetails;
 }
 
 export default function PersonCard({ person }: Props) {
@@ -31,47 +30,46 @@ export default function PersonCard({ person }: Props) {
         </Title>
         <Text>
           <strong style={{ display: 'block' }}>Brithday</strong>
-          {formatBirthday(person)}
+          {formatBirthday(person.birthday, person.deathday)}
         </Text>
 
         {person.deathday && (
           <Text>
             <strong style={{ display: 'block' }}>Day of Death</strong>
-            {formatDeathday(person)}
+            {formatDeathday(person.birthday, person.deathday)}
           </Text>
         )}
 
-        {person.place_of_birth && (
-          <Text>
-            <strong style={{ display: 'block' }}>Place of Birth</strong>
-            {person.place_of_birth}
-          </Text>
-        )}
+        <Text>
+          <strong style={{ display: 'block' }}>Place of Birth</strong>
+          {person.place_of_birth ? person.place_of_birth : '-'}
+        </Text>
       </Box>
     </Card>
   );
 }
 
-function formatBirthday(person: Person) {
-  if (!person.birthday) {
-    return 'unknown';
+function formatBirthday(
+  birthday: string | undefined | null,
+  deathday: string | undefined | null,
+) {
+  if (!birthday) {
+    return '-';
   }
 
-  const formattedDate = customFormatDate(person.birthday);
-  const years = !person.deathday
-    ? `(${formatDistanceStrict(new Date(), person.birthday)} old)`
+  const date = customFormatDate(birthday);
+  const years = !deathday
+    ? `(${customFormatDistance(new Date(), birthday)} old)`
     : '';
 
-  return `${formattedDate} ${years}`;
+  return `${date} ${years}`;
 }
 
-function formatDeathday(person: Person) {
-  if (!person.deathday) {
-    return 'unknown';
-  }
+function formatDeathday(birthday: string | undefined | null, deathday: string) {
+  const date = customFormatDate(deathday);
+  const years = birthday
+    ? `(${customFormatDistance(deathday, birthday)} old)`
+    : '-';
 
-  const formattedDate = customFormatDate(person.deathday);
-  const years = `(${formatDistanceStrict(person.deathday, person.birthday)} old)`;
-
-  return `${formattedDate} ${years}`;
+  return `${date} ${years}`;
 }

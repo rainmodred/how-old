@@ -11,16 +11,13 @@ import {
 } from 'react-router';
 
 import { Persons } from '~/components/Persons/Persons';
-import {
-  CastWithDates,
-  getCast,
-  getCastWithDates,
-  getMovie,
-} from '~/utils/api.server';
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Suspense } from 'react';
 import { LIMIT } from '~/utils/constants';
 import ItemDetails from '~/components/ItemDetails/ItemDetails';
+import { getMovieCredits } from '~/api/getMovieCredits';
+import { getCastWithDates } from '~/api/getCastWithDates';
+import { getMovieDetails } from '~/api/getMovieDetails';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.movie.title ?? 'Movie' }];
@@ -50,9 +47,9 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const limit = Number(url.searchParams.get('limit')) || LIMIT;
 
-  const [movie, cast] = await Promise.all([
-    getMovie(params.id),
-    getCast(params.id),
+  const [movie, { cast }] = await Promise.all([
+    getMovieDetails(Number(params.id)),
+    getMovieCredits(Number(params.id)),
   ]);
 
   const castWithDates = getCastWithDates(cast, {
@@ -100,7 +97,7 @@ export default function MoviePage() {
             }
             return (
               <Persons
-                initialCast={cast as CastWithDates}
+                initialCast={cast}
                 releaseDate={movie.release_date}
                 hasMore={hasMore}
               />

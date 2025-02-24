@@ -1,6 +1,7 @@
 import { factory, primaryKey, manyOf, nullable, oneOf } from '@mswjs/data';
 import { genres } from './mocks';
 import { faker } from '@faker-js/faker';
+import { Genre } from '~/api/getMovieDetails';
 
 export const db = factory({
   movie: {
@@ -13,6 +14,7 @@ export const db = factory({
     runtime: Number,
     genres: manyOf('genre'),
     actors: manyOf('actor'),
+    video: Boolean,
   },
   genre: {
     id: primaryKey(Number),
@@ -21,7 +23,6 @@ export const db = factory({
   actor: {
     id: primaryKey(Number),
     character: String,
-    known_for_department: String,
     person: oneOf('person'),
   },
   person: {
@@ -31,12 +32,15 @@ export const db = factory({
     deathday: nullable(String),
     profile_path: String,
     popularity: Number,
+    place_of_birth: String,
+    known_for_department: String,
   },
   tv: {
     id: primaryKey(Number),
     first_air_date: String,
     name: String,
     poster_path: String,
+    overview: String,
     genres: manyOf('genre'),
     seasons: manyOf('season'),
   },
@@ -57,6 +61,9 @@ export function createFakePerson() {
     name: faker.person.fullName(),
     birthday: faker.date.birthdate().toISOString().split('T')[0],
     deathday: null,
+    place_of_birth: faker.location.city(),
+    popularity: faker.number.float({ min: 1, max: 100 }),
+    known_for_department: 'Acting',
   };
 }
 
@@ -116,7 +123,7 @@ export function getRandomItems<T>(items: T[], limit: number) {
   return shuffled.slice(0, limit);
 }
 
-export function mswGetPersonMovies(id: number) {
+export function mswGetPersonCast(id: number) {
   const roles = db.actor.findMany({
     where: { person: { id: { equals: Number(id) } } },
   });
@@ -126,7 +133,29 @@ export function mswGetPersonMovies(id: number) {
     where: { actors: { id: { in: rolesId } } },
   });
 
-  return movies;
+  //TODO:
+  // const tvs = db.tv.findMany({
+  //   where: { seasons: { actors: { id: { in: rolesId } } } },
+  // });
+
+  return [
+    ...movies.map(movie => ({
+      ...movie,
+      character: movie.actors.find(actor => actor.person?.id === id)?.character,
+      media_type: 'movie',
+      genre_ids: genresToGenreIds(movie.genres),
+    })),
+    // ...tvs.map(tv => ({
+    //   ...tv,
+    //   character: 'JOE',
+    //   media_type: 'tv',
+    //   genre_ids: genresToGenreIds(tv.genres),
+    // })),
+  ];
+}
+
+export function genresToGenreIds(genres: Genre[]) {
+  return genres.map(genre => genre.id);
 }
 
 const MOVIES_COUNT = 10;
@@ -148,9 +177,7 @@ export function seed() {
     const persons = getRandomItems(db.person.getAll(), 15);
     for (const person of persons) {
       const actor = createFakeActor();
-      actors.push(
-        db.actor.create({ ...actor, known_for_department: 'Acting', person }),
-      );
+      actors.push(db.actor.create({ ...actor, person }));
     }
 
     const genres = getRandomItems(db.genre.getAll(), 3);
@@ -164,9 +191,7 @@ export function seed() {
 
     for (const person of persons) {
       const actor = createFakeActor();
-      actors.push(
-        db.actor.create({ ...actor, known_for_department: 'Acting', person }),
-      );
+      actors.push(db.actor.create({ ...actor, person }));
     }
 
     const tv = createFakeTv();
