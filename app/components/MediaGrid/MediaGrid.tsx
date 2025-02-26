@@ -9,34 +9,71 @@ interface Props {
   person: PersonDetails;
 }
 
-const items = [
+const sortOptions = [
   { value: 'popularity', label: 'Popularity' },
   { value: 'release_date', label: 'Release Date' },
 ] as const;
 
+export const filterOptions = [
+  { value: 'movie', label: 'Movies' },
+  { value: 'tv', label: 'TV Shows' },
+];
+
 export function MediaGrid({ mediaItems, person }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const sort = searchParams.get('sort') ?? items[0].value;
+  const sort = searchParams.get('sort') ?? sortOptions[0].value;
+  const filter = searchParams.get('filter') ?? filterOptions[0]!.value;
+
+  const filteredItems = mediaItems.filter(item => {
+    if (filter === 'all') {
+      return true;
+    }
+    if (filter === 'movie') {
+      return item.media_type === 'movie';
+    }
+    if (filter === 'tv') {
+      return item.media_type === 'tv';
+    }
+
+    return false;
+  });
+
+  function updateParams(key: string, value: string) {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(key, value);
+    setSearchParams(newParams, {
+      replace: true,
+      preventScrollReset: true,
+    });
+  }
 
   return (
     <>
       <Grid.Col span={12}>
-        <Group justify="space-between">
-          <Title order={2}>Filmography</Title>
-          <Select
-            value={sort}
-            onChange={(_value, option) => {
-              const newParams = new URLSearchParams();
-              newParams.set('sort', option.value);
-              setSearchParams(newParams, { replace: true });
-            }}
-            placeholder="sort by..."
-            data={items}
-          />
+        <Group justify="space-between" wrap="nowrap">
+          <Title order={2}>Credits</Title>
+          <Group wrap="nowrap">
+            <Select
+              value={filter}
+              onChange={(_value, option) => {
+                updateParams('filter', option.value);
+              }}
+              placeholder="filter by"
+              data={filterOptions}
+            />
+            <Select
+              value={sort}
+              onChange={(_value, option) => {
+                updateParams('sort', option.value);
+              }}
+              placeholder="sort by"
+              data={sortOptions}
+            />
+          </Group>
         </Group>
       </Grid.Col>
 
-      {mediaItems
+      {filteredItems
         .sort((a, b) => {
           if (sort === 'popularity') {
             return b.popularity - a.popularity;

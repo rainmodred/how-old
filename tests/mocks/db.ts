@@ -59,11 +59,13 @@ export function createFakePerson() {
   return {
     id: id++,
     name: faker.person.fullName(),
-    birthday: faker.date.birthdate().toISOString().split('T')[0],
+    birthday: faker.date.birthdate().toISOString().split('T')[0] as string,
     deathday: null,
     place_of_birth: faker.location.city(),
     popularity: faker.number.float({ min: 1, max: 100 }),
     known_for_department: 'Acting',
+    profile_path: faker.image.urlLoremFlickr(),
+    media_type: 'person',
   };
 }
 
@@ -72,11 +74,15 @@ export function createFakeMovie() {
     id: id++,
     title: faker.book.title(),
     poster_path: faker.image.urlLoremFlickr(),
-    release_date: faker.date.past({ years: 9 }).toISOString().split('T')[0],
+    release_date: faker.date
+      .past({ years: 9 })
+      .toISOString()
+      .split('T')[0] as string,
     video: false,
     popularity: faker.number.float({ min: 1, max: 100 }),
     runtime: faker.number.int({ min: 30, max: 300 }),
     overview: faker.lorem.words(10),
+    media_type: 'movie',
   };
 }
 
@@ -91,6 +97,7 @@ export function createFakeTv() {
     poster_path: faker.image.urlLoremFlickr(),
     popularity: faker.number.int({ min: 1, max: 100 }),
     overview: faker.lorem.words(10),
+    media_type: 'tv',
   };
 }
 
