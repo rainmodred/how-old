@@ -7,7 +7,7 @@ import { movieSearchSchema, tvSearchSchema } from './multiSearch';
 // export type PersonCredits =
 //   paths['/3/person/{person_id}/combined_credits']['get']['responses'][200]['content']['application/json']['cast'];
 
-// export type PersonCredits = z.infer<typeof schema>;
+export type PersonCredits = z.infer<typeof schema>;
 export type MediaItems = z.infer<typeof schema>['cast'];
 export type NormalizedCast = z.infer<typeof schema>['cast'][number];
 
