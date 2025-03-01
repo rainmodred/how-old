@@ -71,7 +71,10 @@ export default function PersonPage() {
             <Grid.Col data-testid="skeleton" span={12}>
               <Group justify="space-between">
                 <Skeleton height={36} width={156} />
-                <Skeleton height={36} width={167} />
+                <Group>
+                  <Skeleton height={36} width={167} />
+                  <Skeleton height={36} width={167} />
+                </Group>
               </Group>
             </Grid.Col>
             <MoviesSkeleton />
