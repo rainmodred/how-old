@@ -1,4 +1,4 @@
-import { Box, Image, Group, Table, Text, Button } from '@mantine/core';
+import { Box, Image, Table, Text, Button } from '@mantine/core';
 import { Link } from 'react-router';
 import { CastWithDates } from '~/api/getCastWithDates';
 import { baseImageUrl } from '~/utils/constants';
@@ -23,6 +23,7 @@ function ProfileImage({ id, src, alt }: ProfileImageProps) {
         src={`${baseImageUrl}/w185/${src}`}
         radius={4}
         alt={alt}
+        w={100}
       />
     </Box>
   );
@@ -45,6 +46,7 @@ export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
       <Table className="table-sm" stickyHeader id="persons">
         <Table.Thead>
           <Table.Tr>
+            <Table.Th></Table.Th>
             <Table.Th>Actor</Table.Th>
             <Table.Th ta="center" style={{ whiteSpace: 'nowrap' }}>
               Age then
@@ -64,15 +66,15 @@ export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
 
               return (
                 <Table.Tr key={id}>
+                  <Table.Td w={'1%'}>
+                    <ProfileImage id={id} src={profile_path} alt={name} />
+                  </Table.Td>
                   <Table.Td>
-                    <Group wrap="nowrap">
-                      <ProfileImage id={id} src={profile_path} alt={name} />
-                      <Box>
-                        <Text fw="700">{name}</Text>
-                        <Text>{character ? character : '-'}</Text>
-                        <Text>Birthday: {birthday ? birthday : '-'}</Text>
-                      </Box>
-                    </Group>
+                    <Box>
+                      <Text fw="700">{name}</Text>
+                      <Text>{character ? character : '-'}</Text>
+                      <Text>Birthday: {birthday ? birthday : '-'}</Text>
+                    </Box>
                   </Table.Td>
                   <Table.Td ta="center">{ageThen ? ageThen : '-'}</Table.Td>
                   <Table.Td ta="center">
