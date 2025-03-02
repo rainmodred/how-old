@@ -1,7 +1,7 @@
 import { factory, primaryKey, manyOf, nullable, oneOf } from '@mswjs/data';
 import { genres } from './mocks';
 import { faker } from '@faker-js/faker';
-import { Genre } from '~/api/getMovieDetails';
+import { Genre } from '~/api/schemas';
 
 export const db = factory({
   movie: {

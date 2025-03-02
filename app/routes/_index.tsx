@@ -3,9 +3,8 @@ import { Await, data, HeadersFunction, MetaFunction } from 'react-router';
 import { Suspense } from 'react';
 import { MediaCard } from '~/components/MediaGrid/MediaCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
-import { discoverMovie } from '~/api/discover';
 import { Route } from './+types/_index';
-import { customFormatDistance } from '~/utils/dates';
+import { tmdbApi } from '~/api/tmdbApi';
 
 export const meta: MetaFunction = () => {
   return [
@@ -19,7 +18,7 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => ({
 });
 
 export async function loader() {
-  const popularMovies = discoverMovie();
+  const popularMovies = tmdbApi.discover.movie();
   return data(
     { popularMovies },
     {

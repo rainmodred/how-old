@@ -16,4 +16,5 @@ const myMiddleware: Middleware = {
 };
 
 export const client = createClient<paths>({ baseUrl: API_URL });
+export type Client = typeof client;
 client.use(myMiddleware);

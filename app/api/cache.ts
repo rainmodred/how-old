@@ -1,10 +1,8 @@
 import { LRUCache } from 'lru-cache';
-import { PersonDetails } from '../api/getPerson';
-import { MovieDetails } from '../api/getMovieDetails';
-import { MovieCast } from '../api/getMovieCredits';
-import { TvCredits } from '../api/getTvCredits';
-import { TvDetails } from '../api/getTvDetails';
-import { PersonCredits } from '../api/getPersonCredits';
+import { MovieDetails } from './schemas';
+import { MovieCast } from './schemas';
+import { PersonCredits, PersonDetails } from './schemas';
+import { TvDetails, TvCredits } from './schemas';
 
 export const personCache = new LRUCache<number, PersonDetails>({
   max: 50,

@@ -13,8 +13,7 @@ import { Suspense } from 'react';
 import PersonCard from '~/components/PersonCard/PersonCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
 import { MediaGrid } from '~/components/MediaGrid/MediaGrid';
-import { getPerson } from '~/api/getPerson';
-import { getPersonCast } from '~/api/getPersonCredits';
+import { tmdbApi } from '~/api/tmdbApi';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.person.name ?? 'Person' }];
@@ -43,11 +42,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   const id = Number(params.id);
 
-  const items = getPersonCast(id);
-  const person = await getPerson(id);
+  const credits = tmdbApi.people.getCredits(id);
+  const person = await tmdbApi.people.getDetails(id);
 
   return data(
-    { person, items },
+    { person, credits },
     {
       headers: {
         'Cache-Control': 'max-age=86400, public',
@@ -57,7 +56,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export default function PersonPage() {
-  const { person, items } = useLoaderData<typeof loader>();
+  const { person, credits } = useLoaderData<typeof loader>();
 
   return (
     <Grid gutter={'md'}>
@@ -81,9 +80,9 @@ export default function PersonPage() {
           </>
         }
       >
-        <Await resolve={items}>
-          {items => {
-            return <MediaGrid mediaItems={items} person={person} />;
+        <Await resolve={credits}>
+          {credits => {
+            return <MediaGrid mediaItems={credits.cast} person={person} />;
           }}
         </Await>
       </Suspense>

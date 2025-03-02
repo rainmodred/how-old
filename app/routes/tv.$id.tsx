@@ -12,7 +12,7 @@ import {
 } from 'react-router';
 import ItemDetails from '~/components/ItemDetails/ItemDetails';
 import { Route } from './+types/tv.$id';
-import { getTvDetails } from '~/api/getTvDetails';
+import { tmdbApi } from '~/api/tmdbApi';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
@@ -33,7 +33,7 @@ export function shouldRevalidate({
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
 
-  const details = await getTvDetails(Number(id));
+  const details = await tmdbApi.tv.getDetails(Number(id));
 
   return data(details, {
     headers: {

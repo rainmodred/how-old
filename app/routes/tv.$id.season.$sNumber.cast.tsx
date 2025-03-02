@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs, redirect } from 'react-router';
+import { tmdbApi } from '~/api/tmdbApi';
 import { getCastWithDates } from '~/api/getCastWithDates';
-import { getTvCredits } from '~/api/getTvCredits';
 import { LIMIT } from '~/utils/constants';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -13,7 +13,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const offset = Number(url.searchParams.get('offset')) || 0;
 
-  const { cast } = await getTvCredits(Number(id), Number(seasonNumber));
+  const { cast } = await tmdbApi.tv.getCredits(
+    Number(id),
+    Number(seasonNumber),
+  );
 
   const end = offset + LIMIT;
   const castWithDates = await getCastWithDates(cast, {

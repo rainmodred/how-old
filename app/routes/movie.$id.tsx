@@ -15,9 +15,8 @@ import { SkeletonTable } from '~/components/SkeletonTable';
 import { Suspense } from 'react';
 import { LIMIT } from '~/utils/constants';
 import ItemDetails from '~/components/ItemDetails/ItemDetails';
-import { getMovieCredits } from '~/api/getMovieCredits';
 import { getCastWithDates } from '~/api/getCastWithDates';
-import { getMovieDetails } from '~/api/getMovieDetails';
+import { tmdbApi } from '~/api/tmdbApi';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.movie.title ?? 'Movie' }];
@@ -48,8 +47,8 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const limit = Number(url.searchParams.get('limit')) || LIMIT;
 
   const [movie, { cast }] = await Promise.all([
-    getMovieDetails(Number(params.id)),
-    getMovieCredits(Number(params.id)),
+    tmdbApi.movie.getDetails(Number(params.id)),
+    tmdbApi.movie.getCredits(Number(params.id)),
   ]);
 
   const castWithDates = getCastWithDates(cast, {

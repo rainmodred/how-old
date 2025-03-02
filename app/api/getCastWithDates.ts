@@ -1,6 +1,6 @@
 import { LIMIT } from '../utils/constants';
 import { customFormatDate } from '../utils/dates';
-import { getPerson } from './getPerson';
+import { tmdbApi } from './tmdbApi';
 
 export type CastWithDates = Awaited<ReturnType<typeof getCastWithDates>>;
 export async function getCastWithDates(
@@ -8,7 +8,7 @@ export async function getCastWithDates(
   { offset, limit = LIMIT }: { offset: number; limit?: number },
 ) {
   const promises = cast.slice(offset, limit).map(async actor => {
-    const person = await getPerson(actor.id);
+    const person = await tmdbApi.people.getDetails(actor.id);
     return {
       ...person,
       character: actor.character,

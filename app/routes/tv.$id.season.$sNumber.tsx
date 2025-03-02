@@ -13,8 +13,8 @@ import { Suspense } from 'react';
 import { LIMIT } from '~/utils/constants';
 import { useTvLoaderData } from './tv.$id';
 import { Route } from './+types/tv.$id.season.$sNumber';
-import { getTvCredits } from '~/api/getTvCredits';
 import { getCastWithDates } from '~/api/getCastWithDates';
+import { tmdbApi } from '~/api/tmdbApi';
 
 export const headers: HeadersFunction = ({ loaderHeaders }) => ({
   'Cache-Control': loaderHeaders.get('Cache-Control')!,
@@ -45,7 +45,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const limit = Number(url.searchParams.get('limit')) || LIMIT;
 
-  const { cast } = await getTvCredits(Number(id), Number(seasonNumber));
+  const { cast } = await tmdbApi.tv.getCredits(
+    Number(id),
+    Number(seasonNumber),
+  );
   const castWithDates = getCastWithDates(cast, {
     offset: 0,
     limit,
