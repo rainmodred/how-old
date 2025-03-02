@@ -3,6 +3,7 @@ import { expect, it } from 'vitest';
 import {
   render,
   screen,
+  waitFor,
   waitForElementToBeRemoved,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -13,8 +14,10 @@ import { loader as castLoader } from '~/routes/movie.$id.cast';
 import { LIMIT } from '~/utils/constants';
 
 it('should load more persons', async () => {
-  const testMovie = db.movie.getAll()[0]!;
-  const actorsLength = testMovie.actors.length;
+  //TODO: refactor
+  const movies = db.movie.getAll();
+  const testMovie = movies.find(movie => movie.actors.length > 21)!;
+  const expectedActorsLength = testMovie.actors.length;
   const user = userEvent.setup();
 
   const Stub = createRoutesStub([
@@ -51,7 +54,18 @@ it('should load more persons', async () => {
   await user.click(loadMoreButton);
   expect(loadMoreButton).toHaveAttribute('data-loading', 'true');
 
-  await waitForElementToBeRemoved(loadMoreButton);
+  await waitFor(() => {
+    expect(loadMoreButton).not.toHaveAttribute('data-loading');
+  });
 
-  expect(await screen.findAllByRole('row')).toHaveLength(actorsLength + 1);
+  expect(await screen.findAllByRole('row')).toHaveLength(20 + 1);
+
+  await user.click(loadMoreButton);
+  expect(loadMoreButton).toHaveAttribute('data-loading', 'true');
+
+  await waitForElementToBeRemoved(loadMoreButton, { timeout: 5000 });
+
+  expect(await screen.findAllByRole('row')).toHaveLength(
+    expectedActorsLength + 1,
+  );
 });

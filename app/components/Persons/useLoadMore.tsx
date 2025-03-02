@@ -1,7 +1,8 @@
-import { useFetcher, useSearchParams } from 'react-router';
+import { useFetcher } from 'react-router';
 import { useEffect, useState } from 'react';
 import { loader } from '~/routes/movie.$id.cast';
 import { CastWithDates } from '~/api/getCastWithDates';
+import useSearchParams from '~/hooks/useSearchParams';
 
 export default function useLoadMore(
   initialCast: CastWithDates,

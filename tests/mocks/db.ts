@@ -181,7 +181,7 @@ export function seed() {
   for (let i = 0; i < MOVIES_COUNT; i++) {
     const actors = [];
 
-    const persons = getRandomItems(db.person.getAll(), 15);
+    const persons = getRandomItems(db.person.getAll(), 25);
     for (const person of persons) {
       const actor = createFakeActor();
       actors.push(db.actor.create({ ...actor, person }));
