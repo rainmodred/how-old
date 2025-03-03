@@ -1,12 +1,18 @@
 import { Card, CardSection, Image, Text, Title, Anchor } from '@mantine/core';
 import { Link } from 'react-router';
-import { NormalizedCast } from '~/api/getPersonCredits';
 import { baseImageUrl } from '~/utils/constants';
 import { customFormatDate, customFormatDistance } from '~/utils/dates';
 
 interface Props {
-  item: Partial<Pick<NormalizedCast, 'character' | 'media_type'>> &
-    Pick<NormalizedCast, 'id' | 'title' | 'release_date' | 'poster_path'>;
+  // item: Partial<Pick<NormalizedCast, 'character' | 'media_type'>> &
+  //   Pick<NormalizedCast, 'id' | 'title' | 'release_date' | 'poster_path'>;
+  item: {
+    id: number;
+    title: string;
+    release_date: string;
+    poster_path: string | undefined | null;
+    media_type: 'movie' | 'tv';
+  };
   birthday?: string | null;
 }
 

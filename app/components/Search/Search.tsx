@@ -4,12 +4,18 @@ import { useDebounce } from '~/utils/misc';
 import { Box } from '@mantine/core';
 import { Autocomplete } from './Autocomplete';
 import { getLink, transformData } from '~/utils/search';
-import { SearchRes } from '~/api/multiSearch';
+import { SearchRes } from '~/api/schemas';
+import { useLocalStorage } from '@mantine/hooks';
 
 export function Search() {
   const fetcher = useFetcher<{ results: SearchRes }>();
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
+
+  const [value] = useLocalStorage({
+    key: 'lang',
+    defaultValue: 'en',
+  });
 
   const navigate = useNavigate();
 
@@ -26,10 +32,11 @@ export function Search() {
       {
         intent: 'search',
         search: debouncedQuery,
+        lang: value,
       },
       { action: 'action/search', method: 'get' },
     );
-  }, [debouncedQuery]);
+  }, [debouncedQuery, value]);
 
   const data = transformData(fetcher?.data?.results);
 
