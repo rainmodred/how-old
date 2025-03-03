@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from 'react-router';
-import { multiSearch } from '~/api/multiSearch';
+import { tmdbApi } from '~/api/tmdbApi';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -11,6 +11,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     };
   }
 
-  const data = await multiSearch(query);
+  const data = await tmdbApi.search.multiSearch(query);
   return data;
 }

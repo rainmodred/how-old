@@ -1,11 +1,6 @@
 import { getYear } from 'date-fns';
 import { GroupItem, IGroup } from '~/components/Search/Autocomplete';
-import {
-  SearchMovie,
-  SearchPerson,
-  SearchRes,
-  SearchTv,
-} from '../api/multiSearch';
+import { SearchMovie, SearchPerson, SearchRes, SearchTv } from '~/api/schemas';
 
 export function getLink(item: GroupItem) {
   if (item.media_type === 'movie') {
