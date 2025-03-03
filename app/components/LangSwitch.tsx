@@ -11,7 +11,7 @@ export function LangSwitch() {
     <Select
       aria-label="lang switch"
       data={['en', 'ru']}
-      defaultValue={value}
+      value={value}
       withCheckIcon={false}
       allowDeselect={false}
       onChange={v => v && setValue(v)}

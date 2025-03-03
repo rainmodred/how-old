@@ -3,6 +3,7 @@ import { Link, NavLink as RouterNavLink } from 'react-router';
 import { Search } from './Search/Search';
 import { ThemeSwitch } from './ThemeSwitch/ThemeSwitch';
 import classes from './ThemeSwitch/ThemeSwitch.module.css';
+import { LangSwitch } from './LangSwitch';
 
 export default function Header() {
   return (
@@ -16,8 +17,7 @@ export default function Header() {
       <NavLink component={RouterNavLink} label="Home" to={'/'} w={'auto'} />
       <Search />
       <ThemeSwitch />
-      {/* TODO: Support switch lang */}
-      {/* <LangSwitch /> */}
+      <LangSwitch />
       <Button
         to="https://github.com/rainmodred/how-old"
         component={Link}
