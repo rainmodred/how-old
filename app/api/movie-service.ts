@@ -3,6 +3,11 @@ import { movieCache, movieCredisCache } from './cache';
 import { movieDetailsSchema, movieCreditsSchema } from './schemas';
 
 export class MoviesService extends Base {
+  private transformDetails(data: unknown) {
+    const result = movieDetailsSchema.parse(data);
+    return result;
+  }
+
   async getDetails(id: number) {
     const cached = movieCache.get(id);
     if (cached) {
@@ -47,5 +52,28 @@ export class MoviesService extends Base {
     movieCredisCache.set(id, result);
 
     return result;
+  }
+}
+
+class Cache {
+  constructor() {
+    this.api = new Api();
+    this.cache = new Cache();
+  }
+
+  getData() {
+    if (cache.has) {
+      return cache.get(id);
+    }
+    return api.getData();
+  }
+}
+
+class Api {
+  getData() {
+    //
+    return {
+      id: 1,
+    };
   }
 }

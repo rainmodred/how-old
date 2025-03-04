@@ -87,8 +87,16 @@ export type PersonDetails = z.infer<typeof personDetailsSchema>;
 const castItem = z.union([
   movieSearchSchema.extend({
     character: z.string().nullable(),
+    genre_ids: z.array(z.number()),
+    video: z.boolean(),
   }),
   tvSearchSchema.extend({
+    id: z.number(),
+    name: z.string(),
+    media_type: z.literal('tv'),
+    first_air_date: z.string(),
+    poster_path: z.string().nullable(),
+    popularity: z.number(),
     character: z.string().nullable(),
   }),
 ]);
@@ -147,7 +155,6 @@ export const creditsSchema = z
               popularity: current.popularity,
               poster_path: current.poster_path,
               character: current.character,
-              overview: current.overview,
               genre_ids: current.genre_ids,
             });
           }

@@ -46,6 +46,7 @@ export function MediaGrid({ mediaItems, person }: Props) {
     });
   }
 
+  console.log('filteredItems:', filteredItems);
   return (
     <>
       <Grid.Col span={12}>

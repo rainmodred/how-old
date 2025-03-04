@@ -5,6 +5,7 @@ import { MediaCard } from '~/components/MediaGrid/MediaCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
 import { Route } from './+types/_index';
 import { tmdbApi } from '~/api/tmdbApi';
+import { z } from 'zod';
 
 export const meta: MetaFunction = () => {
   return [
