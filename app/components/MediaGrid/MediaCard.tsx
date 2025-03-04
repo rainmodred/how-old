@@ -11,6 +11,7 @@ interface Props {
     title: string;
     release_date: string;
     poster_path: string | undefined | null;
+    character?: string;
     media_type: 'movie' | 'tv';
   };
   birthday?: string | null;
@@ -23,6 +24,7 @@ export function MediaCard({ item, birthday }: Props) {
     release_date: releaseDate,
     poster_path: posterPath,
     media_type: mediaType = 'movie',
+    character,
   } = item;
 
   const showAge = birthday && mediaType === 'movie';
@@ -59,9 +61,9 @@ export function MediaCard({ item, birthday }: Props) {
             {title}
           </Title>
 
-          {item.character && (
+          {character && (
             <Text size="sm">
-              as <strong>{item.character}</strong>
+              as <strong>{character}</strong>
             </Text>
           )}
           <Text size="sm">{customFormatDate(releaseDate)}</Text>

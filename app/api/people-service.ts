@@ -42,6 +42,6 @@ export class PeopleService extends Base {
     const result = creditsSchema.parse(data);
     personCreditsCache.set(id, result);
 
-    return data;
+    return result;
   }
 }
