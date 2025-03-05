@@ -1,7 +1,7 @@
 import { Card, Image, Title, Text, Box } from '@mantine/core';
 import { customFormatDate, customFormatDistance } from '~/utils/dates';
-import { PersonDetails } from '~/api/schemas';
 import classes from './PersonCard.module.css';
+import { PersonDetails } from '~/api/person-service';
 
 interface Props {
   person: PersonDetails;

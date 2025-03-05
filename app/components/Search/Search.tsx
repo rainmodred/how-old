@@ -4,8 +4,8 @@ import { useDebounce } from '~/utils/misc';
 import { Box } from '@mantine/core';
 import { Autocomplete } from './Autocomplete';
 import { getLink, transformData } from '~/utils/search';
-import { SearchRes } from '~/api/schemas';
 import { useLocalStorage } from '@mantine/hooks';
+import { SearchRes } from '~/api/search-service';
 
 export function Search() {
   const fetcher = useFetcher<{ results: SearchRes }>();
@@ -38,7 +38,7 @@ export function Search() {
     );
   }, [debouncedQuery, value]);
 
-  const data = transformData(fetcher?.data?.results);
+  const data = transformData(fetcher?.data ? fetcher?.data.results : []);
 
   return (
     <Box style={{ flexGrow: 1, maxWidth: '350px' }}>

@@ -1,10 +1,10 @@
 import { Grid, Group, Title, Select } from '@mantine/core';
 import { MediaCard } from './MediaCard';
 import { useSearchParams } from 'react-router';
-import { PersonCast, PersonDetails } from '~/api/schemas';
+import { PersonCredits, PersonDetails } from '~/api/person-service';
 
 interface Props {
-  mediaItems: PersonCast;
+  mediaItems: PersonCredits['cast'];
   person: PersonDetails;
 }
 

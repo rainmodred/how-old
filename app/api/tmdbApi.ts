@@ -1,21 +1,21 @@
 import { DiscoverService } from './discover-service';
-import { MoviesService } from './movies-service';
-import { PeopleService } from './people-service';
+import { MovieService } from './movie-service';
+import { PersonService } from './person-service';
 import { SearchService } from './search-service';
 import { TvService } from './tv-service';
 
 class TmdbApi {
   public readonly discover: DiscoverService;
   public readonly search: SearchService;
-  public readonly movie: MoviesService;
-  public readonly people: PeopleService;
+  public readonly movie: MovieService;
+  public readonly people: PersonService;
   public readonly tv: TvService;
 
   constructor() {
     this.discover = new DiscoverService();
     this.search = new SearchService();
-    this.movie = new MoviesService();
-    this.people = new PeopleService();
+    this.movie = new MovieService();
+    this.people = new PersonService();
     this.tv = new TvService();
   }
 }

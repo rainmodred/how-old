@@ -1,6 +1,6 @@
+import { z } from 'zod';
 import { Base } from './base';
 import { tvCache, tvCreditsCache } from './cache';
-import { tvCreditsSchema, tvDetailsSchema } from './schemas';
 
 export class TvService extends Base {
   async getDetails(id: number) {
@@ -49,3 +49,52 @@ export class TvService extends Base {
     return result;
   }
 }
+
+const tvDetailsSchema = z
+  .object({
+    id: z.number(),
+    name: z.string(),
+    first_air_date: z.string(),
+    overview: z.string(),
+    poster_path: z.string().nullable(),
+    popularity: z.number(),
+    seasons: z.array(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+        air_date: z.string().nullable(),
+        season_number: z.number(),
+      }),
+    ),
+    genres: z.array(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+      }),
+    ),
+    number_of_seasons: z.number(),
+  })
+  .transform(data => {
+    return {
+      ...data,
+      seasons: data.seasons.filter(
+        season => season.air_date && season.season_number > 0,
+      ),
+    };
+  });
+
+export type TvDetails = z.infer<typeof tvDetailsSchema>;
+
+const tvCreditsSchema = z.object({
+  id: z.number(),
+
+  cast: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      popularity: z.number(),
+      character: z.string().nullable(),
+    }),
+  ),
+});
+export type TvCredits = z.infer<typeof tvCreditsSchema>;
