@@ -5,7 +5,7 @@ import {
   formatMinutes,
 } from '~/utils/dates';
 import classes from './ItemDetails.module.css';
-import { Genre } from '~/api/schemas';
+import { Genre } from '~/api/movie-service';
 
 interface Props {
   title: string;

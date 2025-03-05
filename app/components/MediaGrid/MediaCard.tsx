@@ -4,14 +4,12 @@ import { baseImageUrl } from '~/utils/constants';
 import { customFormatDate, customFormatDistance } from '~/utils/dates';
 
 interface Props {
-  // item: Partial<Pick<NormalizedCast, 'character' | 'media_type'>> &
-  //   Pick<NormalizedCast, 'id' | 'title' | 'release_date' | 'poster_path'>;
   item: {
     id: number;
     title: string;
     release_date: string;
     poster_path: string | undefined | null;
-    character?: string;
+    character?: string | null;
     media_type: 'movie' | 'tv';
   };
   birthday?: string | null;

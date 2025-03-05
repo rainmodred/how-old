@@ -1,5 +1,5 @@
+import { z } from 'zod';
 import { Base } from './base';
-import { discoverMovieSchema } from './schemas';
 
 export class DiscoverService extends Base {
   async movie() {
@@ -24,6 +24,18 @@ export class DiscoverService extends Base {
       title: movie.title,
       release_date: movie.release_date,
       poster_path: movie.poster_path,
+      media_type: 'movie' as const,
     }));
   }
 }
+
+const discoverMovieSchema = z
+  .array(
+    z.object({
+      id: z.number(),
+      title: z.string(),
+      release_date: z.string(),
+      poster_path: z.string().nullable(),
+    }),
+  )
+  .transform(data => data.filter(movie => movie.release_date));
