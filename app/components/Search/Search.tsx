@@ -1,44 +1,38 @@
 import { useFetcher, useNavigate } from 'react-router';
-import { useState, useRef, useEffect } from 'react';
-import { useDebounce } from '~/utils/misc';
 import { Box } from '@mantine/core';
 import { Autocomplete } from './Autocomplete';
-import { getLink, transformData } from '~/utils/search';
+import { getLink, transformData } from '~/components/Search/utils';
 import { useLocalStorage } from '@mantine/hooks';
 import { SearchRes } from '~/api/search-service';
 
+const minSearchLength = 3;
+
 export function Search() {
   const fetcher = useFetcher<{ results: SearchRes }>();
-  const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 300);
 
-  const [value] = useLocalStorage({
+  const [lang] = useLocalStorage({
     key: 'lang',
     defaultValue: 'en',
   });
 
   const navigate = useNavigate();
 
-  const fetcherRef = useRef(fetcher);
-  useEffect(() => {
-    fetcherRef.current = fetcher;
-  }, [fetcher]);
-
-  useEffect(() => {
-    if (debouncedQuery.length <= 2) {
+  function handleSearch(query: string) {
+    if (query.length < minSearchLength) {
       return;
     }
-    fetcherRef.current.submit(
+
+    fetcher.submit(
       {
         intent: 'search',
-        search: debouncedQuery,
-        lang: value,
+        search: query,
+        lang: lang,
       },
       { action: 'action/search', method: 'get' },
     );
-  }, [debouncedQuery, value]);
+  }
 
-  const data = transformData(fetcher?.data ? fetcher?.data.results : []);
+  const data = fetcher.data ? transformData(fetcher?.data?.results) : null;
 
   return (
     <Box style={{ flexGrow: 1, maxWidth: '350px' }}>
@@ -48,10 +42,10 @@ export function Search() {
           fetcher.state !== 'idle' &&
           fetcher.formData?.get('intent') === 'search'
         }
-        value={query}
-        onChange={value => setQuery(value)}
+        onChange={value => {
+          handleSearch(value);
+        }}
         onOptionSubmit={item => {
-          setQuery('');
           navigate(getLink(item));
         }}
       />

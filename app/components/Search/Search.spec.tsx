@@ -61,3 +61,38 @@ it('should search', async () => {
   expect(await screen.findByText('Movie page')).toBeInTheDocument();
   expect(searchbox).toHaveValue('');
 });
+
+it('should show not found', async () => {
+  const user = userEvent.setup();
+  const Stub = createRoutesStub([
+    {
+      path: '/',
+      Component: () => (
+        <>
+          <Search />
+        </>
+      ),
+      children: [
+        {
+          path: 'action/search',
+          loader,
+        },
+      ],
+    },
+  ]);
+
+  render(
+    <MantineProvider>
+      <Stub initialEntries={['/']} />
+    </MantineProvider>,
+  );
+
+  expect(await screen.findByRole('searchbox')).toBeInTheDocument();
+  const searchbox = screen.getByRole('searchbox');
+  await user.type(searchbox, 'invalid search');
+
+  const loading = await screen.findByTestId('loading');
+  expect(loading).toBeInTheDocument();
+  await waitForElementToBeRemoved(loading);
+  expect(await screen.findByText(/nothing found/i)).toBeInTheDocument();
+});
