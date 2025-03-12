@@ -16,7 +16,6 @@ export interface GroupItem {
 interface Props {
   data: IGroup[] | null;
   isLoading: boolean;
-  value: string;
   onChange: (value: string) => void;
   onOptionSubmit: (item: GroupItem) => void;
 }
@@ -24,7 +23,6 @@ interface Props {
 export function Autocomplete({
   data,
   isLoading = false,
-  value,
   onChange,
   onOptionSubmit,
 }: Props) {
@@ -32,14 +30,7 @@ export function Autocomplete({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
   const ref = useRef<HTMLInputElement>(null);
-
-  const [searched, setSearched] = useState(false);
-
-  function openDropdown() {
-    if ((data && data?.length > 0) || searched) {
-      combobox.openDropdown();
-    }
-  }
+  const [value, setValue] = useState('');
 
   const groups =
     data &&
@@ -74,6 +65,7 @@ export function Autocomplete({
     <Combobox
       onOptionSubmit={optionValue => {
         combobox.closeDropdown();
+        setValue('');
         if (!map || !map[optionValue]) {
           return;
         }
@@ -91,19 +83,14 @@ export function Autocomplete({
           placeholder="Search for a movie or tv series"
           value={value}
           onChange={event => {
+            setValue(event.currentTarget.value);
             onChange(event.currentTarget.value);
-            if (event.currentTarget.value === '') {
-              setSearched(false);
-              combobox.closeDropdown();
-            } else {
-              setSearched(true);
-              openDropdown();
-            }
             combobox.resetSelectedOption();
+            combobox.openDropdown();
           }}
-          onClick={() => openDropdown()}
+          onClick={() => combobox.openDropdown()}
           onFocus={() => {
-            openDropdown();
+            combobox.openDropdown();
           }}
           onBlur={() => combobox.closeDropdown()}
           leftSection={
@@ -118,11 +105,9 @@ export function Autocomplete({
 
       <Combobox.Dropdown hidden={data === null}>
         <Combobox.Options>
-          {totalOptions > 0 ? (
-            groups
-          ) : (
-            <Combobox.Empty>Nothing found</Combobox.Empty>
-          )}
+          {totalOptions > 0 && groups}
+
+          {totalOptions === 0 && <Combobox.Empty>Nothing found</Combobox.Empty>}
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>

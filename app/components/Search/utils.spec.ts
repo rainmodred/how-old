@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { transformData } from './search';
+import { transformData } from './utils';
 import { SearchRes } from '~/api/search-service';
 
 it('transformdata', () => {
