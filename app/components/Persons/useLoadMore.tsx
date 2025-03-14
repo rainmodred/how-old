@@ -1,8 +1,8 @@
-import { useFetcher } from 'react-router';
-import { useEffect, useState } from 'react';
-import { loader } from '~/routes/movie.$id.cast';
+import { useFetcher, useNavigation } from 'react-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { loader } from '~/routes/movie.$id';
 import { CastWithDates } from '~/api/getCastWithDates';
-import useSearchParams from '~/hooks/useSearchParams';
+import { useInView } from 'react-intersection-observer';
 
 export default function useLoadMore(
   initialCast: CastWithDates,
@@ -10,41 +10,72 @@ export default function useLoadMore(
 ) {
   const [persons, setPersons] = useState(initialCast);
   const fetcher = useFetcher<typeof loader>();
-  const [, setSearchParams] = useSearchParams();
+  const navigation = useNavigation();
 
-  useEffect(() => {
-    setPersons(initialCast);
-  }, [initialCast]);
+  const lastEnpoint = useRef('');
+
+  const { ref, inView, entry } = useInView({
+    threshold: 1,
+    onChange: inView => {
+      console.log('onChange:', {
+        inView,
+        navigation: navigation.location,
+      });
+
+      if (!moreAvailable || !inView) {
+        return;
+      }
+
+      const newParams = new URLSearchParams({
+        offset: offsetRef.current.toString(),
+        load: 'true',
+      });
+      if (lastEnpoint.current === `?${newParams.toString()}`) {
+        return;
+      }
+
+      lastEnpoint.current = `?${newParams.toString()}`;
+      fetcher.load(`?${newParams.toString()}`);
+    },
+  });
+
+  const moreAvailable = fetcher.data ? fetcher.data.hasMore : hasMore;
+
+  const offsetRef = useRef(persons.length);
+
+  // const { load } = fetcher;
+  // useEffect(() => {
+  //   console.log('meow:', inView, entry);
+  //   if (!moreAvailable || !inView) {
+  //     return;
+  //   }
+
+  //   const newParams = new URLSearchParams({
+  //     offset: offsetRef.current.toString(),
+  //     load: 'true',
+  //   });
+
+  //   load(`?${newParams.toString()}`);
+  // }, [inView, moreAvailable, load]);
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
       return;
     }
 
-    if (fetcher.data) {
-      const newItems = fetcher.data.cast;
-      setPersons(prev => [...prev, ...newItems]);
+    const newItems = fetcher.data.cast;
+    console.log(
+      'newItems:',
 
-      const newParams = new URLSearchParams({
-        limit: String(fetcher.data.offset),
-      });
-      setSearchParams(newParams, { replace: true, preventScrollReset: true });
-    }
-  }, [fetcher.data, fetcher.state, setSearchParams]);
+      newItems.map(i => i.name),
+    );
+    offsetRef.current += newItems.length;
+    setPersons(prev => [...prev, ...newItems]);
+  }, [fetcher.data, fetcher.state]);
 
-  function loadMore() {
-    const newParams = new URLSearchParams({
-      offset: persons.length.toString(),
-    });
-
-    fetcher.load(`cast?${newParams.toString()}`);
-  }
-
-  const moreAvailable = fetcher.data ? fetcher.data.hasMore : hasMore;
   return {
     persons,
-    loadMore,
-    isLoaded: !moreAvailable,
     isLoading: fetcher.state === 'loading',
+    ref,
   };
 }

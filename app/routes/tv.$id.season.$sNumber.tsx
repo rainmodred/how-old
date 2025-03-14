@@ -43,16 +43,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { id, sNumber: seasonNumber } = params;
 
   const url = new URL(request.url);
-  const limit = Number(url.searchParams.get('limit')) || LIMIT;
+  console.log('loader tv:', request.url);
+
+  const offset = Number(url.searchParams.get('offset')) || 0;
+  const load = Boolean(url.searchParams.get('load'));
 
   const { cast } = await tmdbApi.tv.getCredits(
     Number(id),
     Number(seasonNumber),
   );
-  const castWithDates = getCastWithDates(cast, {
-    offset: 0,
-    limit,
-  });
+
+  const limit = offset + LIMIT;
+  let castWithDates;
+  if (load) {
+    castWithDates = await getCastWithDates(cast, {
+      offset,
+      limit,
+    });
+  } else {
+    castWithDates = getCastWithDates(cast, {
+      offset,
+      limit,
+    });
+  }
 
   return data(
     {

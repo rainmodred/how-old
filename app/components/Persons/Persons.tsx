@@ -1,9 +1,11 @@
-import { Box, Image, Table, Text, Button } from '@mantine/core';
+import { Box, Image, Table, Text, Button, Loader, Group } from '@mantine/core';
 import { Link } from 'react-router';
 import { CastWithDates } from '~/api/getCastWithDates';
 import { baseImageUrl } from '~/utils/constants';
 import { calculateAges } from '~/utils/dates';
 import useLoadMore from './useLoadMore';
+import { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 interface ProfileImageProps {
   id: number;
@@ -36,10 +38,7 @@ interface PersonsProps {
 }
 
 export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
-  const { persons, isLoaded, isLoading, loadMore } = useLoadMore(
-    initialCast,
-    hasMore,
-  );
+  const { persons, isLoading, ref } = useLoadMore(initialCast, hasMore);
 
   return (
     <>
@@ -57,51 +56,48 @@ export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {persons.map(
-            ({ id, name, character, birthday, deathday, profile_path }) => {
-              const { ageThen, ageNow } = calculateAges(releaseDate, {
-                birthday,
-                deathday,
-              });
+          {persons.map((person, i) => {
+            const { ageThen, ageNow } = calculateAges(releaseDate, {
+              birthday: person.birthday,
+              deathday: person.deathday,
+            });
 
-              return (
-                <Table.Tr key={id}>
-                  <Table.Td w={'1%'}>
-                    <ProfileImage id={id} src={profile_path} alt={name} />
-                  </Table.Td>
-                  <Table.Td>
-                    <Box>
-                      <Text fw="700">{name}</Text>
-                      <Text>{character ? character : '-'}</Text>
-                      <Text>Birthday: {birthday ? birthday : '-'}</Text>
-                    </Box>
-                  </Table.Td>
-                  <Table.Td ta="center">{ageThen ? ageThen : '-'}</Table.Td>
-                  <Table.Td ta="center">
-                    {deathday
-                      ? ` ${deathday} (${ageNow})`
-                      : ageNow
-                        ? ageNow
-                        : '-'}
-                  </Table.Td>
-                </Table.Tr>
-              );
-            },
-          )}
+            return (
+              <Table.Tr key={person.id} ref={persons.length - 1 ? ref : null}>
+                <Table.Td w={'1%'}>
+                  <ProfileImage
+                    id={person.id}
+                    src={person.profile_path}
+                    alt={person.name}
+                  />
+                </Table.Td>
+                <Table.Td>
+                  <Box>
+                    <Text fw="700">{person.name}</Text>
+                    <Text>{person.character ? person.character : '-'}</Text>
+                    <Text>
+                      Birthday: {person.birthday ? person.birthday : '-'}
+                    </Text>
+                  </Box>
+                </Table.Td>
+                <Table.Td ta="center">{ageThen ? ageThen : '-'}</Table.Td>
+                <Table.Td ta="center">
+                  {person.deathday
+                    ? ` ${person.deathday} (${ageNow})`
+                    : ageNow
+                      ? ageNow
+                      : '-'}
+                </Table.Td>
+              </Table.Tr>
+            );
+          })}
         </Table.Tbody>
       </Table>
 
-      {!isLoaded && (
-        <Button
-          loading={isLoading}
-          disabled={isLoading}
-          variant="default"
-          m={'sm'}
-          size="sm"
-          onClick={loadMore}
-        >
-          load more
-        </Button>
+      {isLoading && (
+        <Group mt="md" justify="center">
+          <Loader data-testid="spinner" />
+        </Group>
       )}
     </>
   );

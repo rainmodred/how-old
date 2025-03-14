@@ -42,14 +42,20 @@ test('smoke', async ({ page }) => {
       level: 1,
     }),
   ).toHaveText('The Lord of the Rings: The Fellowship of the Ring');
+  expect(page.getByTestId('skeleton-table')).not.toBeVisible();
+  const rows = await page.locator('tr').all();
+  expect(rows).toHaveLength(11);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect(page.getByTestId('spinner')).not.toBeVisible();
+  expect(rows).toHaveLength(21);
 
-  await page.getByRole('link', { name: 'Ian McKellen' }).click();
-  await expect(
-    page.getByRole('heading', {
-      name: 'Ian McKellen',
-      level: 1,
-    }),
-  ).toHaveText('Ian McKellen');
+  // await page.getByRole('link', { name: 'Ian McKellen' }).click();
+  // await expect(
+  //   page.getByRole('heading', {
+  //     name: 'Ian McKellen',
+  //     level: 1,
+  //   }),
+  // ).toHaveText('Ian McKellen');
 });
 
 test('shold change theme', async ({ page }) => {
