@@ -17,6 +17,7 @@ import { LIMIT } from '~/utils/constants';
 import ItemDetails from '~/components/ItemDetails/ItemDetails';
 import { getCastWithDates } from '~/api/getCastWithDates';
 import { tmdbApi } from '~/api/tmdbApi';
+import { Route } from './+types/movie.$id';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: data?.movie.title ?? 'Movie' }];
@@ -38,7 +39,7 @@ export function shouldRevalidate({
   return defaultShouldRevalidate;
 }
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
   if (!params.id) {
     throw redirect('/');
   }

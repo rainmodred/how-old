@@ -2,7 +2,6 @@ import {
   Await,
   data,
   HeadersFunction,
-  LoaderFunctionArgs,
   redirect,
   ShouldRevalidateFunctionArgs,
 } from 'react-router';
@@ -35,7 +34,7 @@ export function shouldRevalidate({
   return defaultShouldRevalidate;
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
   if (!params.id || !params.sNumber) {
     throw redirect('/');
   }
@@ -43,29 +42,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const { id, sNumber: seasonNumber } = params;
 
   const url = new URL(request.url);
-  console.log('loader tv:', request.url);
-
   const offset = Number(url.searchParams.get('offset')) || 0;
-  const load = Boolean(url.searchParams.get('load'));
+  const limit = offset + LIMIT;
 
   const { cast } = await tmdbApi.tv.getCredits(
     Number(id),
     Number(seasonNumber),
   );
 
-  const limit = offset + LIMIT;
-  let castWithDates;
-  if (load) {
-    castWithDates = await getCastWithDates(cast, {
-      offset,
-      limit,
-    });
-  } else {
-    castWithDates = getCastWithDates(cast, {
-      offset,
-      limit,
-    });
-  }
+  const castWithDates = getCastWithDates(cast.slice(offset, limit));
 
   return data(
     {
