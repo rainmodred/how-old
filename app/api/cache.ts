@@ -4,7 +4,7 @@ import { PersonCredits, PersonDetails } from './person-service';
 import { MovieCredits, MovieDetails } from './movie-service';
 
 export const personCache = new LRUCache<number, PersonDetails>({
-  max: 50,
+  max: 100,
 });
 export const movieCache = new LRUCache<number, MovieDetails>({
   max: 10,

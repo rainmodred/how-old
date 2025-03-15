@@ -44,33 +44,16 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   }
 
   const url = new URL(request.url);
-  console.log('loader:', request.url);
+  console.log('MOVIE LOADER:', request.url);
   const offset = Number(url.searchParams.get('offset')) || 0;
-  const load = Boolean(url.searchParams.get('load'));
+  const limit = offset + LIMIT;
 
   const [movie, { cast }] = await Promise.all([
     tmdbApi.movie.getDetails(Number(params.id)),
     tmdbApi.movie.getCredits(Number(params.id)),
   ]);
 
-  const limit = offset + LIMIT;
-  let castWithDates;
-  if (load) {
-    castWithDates = await getCastWithDates(cast, {
-      offset,
-      limit,
-    });
-    console.log(
-      'wtf:',
-      { id: params.id },
-      castWithDates.map(c => c.character),
-    );
-  } else {
-    castWithDates = getCastWithDates(cast, {
-      offset,
-      limit,
-    });
-  }
+  const castWithDates = getCastWithDates(cast.slice(offset, limit));
 
   return data(
     {
