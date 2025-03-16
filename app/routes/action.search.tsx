@@ -1,6 +1,12 @@
-import { LoaderFunctionArgs } from 'react-router';
+import { data, LoaderFunctionArgs } from 'react-router';
 import { tmdbApi } from '~/api/tmdbApi';
 import { Route } from './+types/action.search';
+
+export function headers({ loaderHeaders }: Route.HeadersArgs) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control')!,
+  };
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -13,8 +19,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     };
   }
 
-  const data = await tmdbApi.search.multiSearch(query, lang);
-  return data;
+  const results = await tmdbApi.search.multiSearch(query, lang);
+  return data(results, {
+    headers: {
+      'Cache-Control': 'max-age=600, public',
+    },
+  });
 }
 
 export async function clientLoader({
