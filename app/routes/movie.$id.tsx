@@ -2,12 +2,9 @@ import { Title } from '@mantine/core';
 import {
   Await,
   data,
-  HeadersFunction,
-  LoaderFunctionArgs,
   redirect,
   ShouldRevalidateFunctionArgs,
   useLoaderData,
-  MetaFunction,
 } from 'react-router';
 
 import { Persons } from '~/components/Persons/Persons';
@@ -17,14 +14,17 @@ import { LIMIT } from '~/utils/constants';
 import ItemDetails from '~/components/ItemDetails/ItemDetails';
 import { getCastWithDates } from '~/api/getCastWithDates';
 import { tmdbApi } from '~/api/tmdbApi';
+import { Route } from './+types/movie.$id';
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: data?.movie.title ?? 'Movie' }];
-};
+export function meta({ data }: Route.MetaArgs) {
+  return [{ title: data.movie.title }];
+}
 
-export const headers: HeadersFunction = ({ loaderHeaders }) => ({
-  'Cache-Control': loaderHeaders.get('Cache-Control')!,
-});
+export function headers({ loaderHeaders }: Route.HeadersArgs) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control')!,
+  };
+}
 
 export function shouldRevalidate({
   currentParams,
@@ -38,23 +38,22 @@ export function shouldRevalidate({
   return defaultShouldRevalidate;
 }
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
   if (!params.id) {
     throw redirect('/');
   }
 
+  const id = Number(params.id);
   const url = new URL(request.url);
-  const limit = Number(url.searchParams.get('limit')) || LIMIT;
+  const offset = Number(url.searchParams.get('offset')) || 0;
+  const limit = offset + LIMIT;
 
   const [movie, { cast }] = await Promise.all([
-    tmdbApi.movie.getDetails(Number(params.id)),
-    tmdbApi.movie.getCredits(Number(params.id)),
+    tmdbApi.movie.getDetails(id),
+    tmdbApi.movie.getCredits(id),
   ]);
 
-  const castWithDates = getCastWithDates(cast, {
-    offset: 0,
-    limit,
-  });
+  const castWithDates = getCastWithDates(cast.slice(offset, limit));
 
   return data(
     {
@@ -99,6 +98,7 @@ export default function MoviePage() {
                 initialCast={cast}
                 releaseDate={movie.release_date}
                 hasMore={hasMore}
+                key={movie.id}
               />
             );
           }}

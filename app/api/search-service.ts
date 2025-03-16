@@ -1,8 +1,14 @@
 import { z } from 'zod';
 import { Base } from './base';
+import { searchCache } from './cache';
 
 export class SearchService extends Base {
   async multiSearch(query: string, language: string = 'en') {
+    const cached = searchCache.get(query);
+    if (cached) {
+      return cached;
+    }
+
     const { data, error } = await this.client.GET('/3/search/multi', {
       params: {
         query: {
@@ -23,6 +29,9 @@ export class SearchService extends Base {
       };
     }
     const results = searchResSchema.parse(data.results);
+    if (results.length > 0) {
+      searchCache.set(query, results);
+    }
 
     return {
       page: data.page,

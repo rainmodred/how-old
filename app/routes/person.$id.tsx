@@ -2,9 +2,7 @@ import { Grid, Group, Skeleton } from '@mantine/core';
 import {
   Await,
   data,
-  HeadersFunction,
   LoaderFunctionArgs,
-  MetaFunction,
   redirect,
   ShouldRevalidateFunctionArgs,
   useLoaderData,
@@ -14,14 +12,17 @@ import PersonCard from '~/components/PersonCard/PersonCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
 import { MediaGrid } from '~/components/MediaGrid/MediaGrid';
 import { tmdbApi } from '~/api/tmdbApi';
+import { Route } from './+types/person.$id';
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [{ title: data?.person.name ?? 'Person' }];
-};
+export function meta({ data }: Route.MetaArgs) {
+  return [{ title: data.person.name }];
+}
 
-export const headers: HeadersFunction = ({ loaderHeaders }) => ({
-  'Cache-Control': loaderHeaders.get('Cache-Control')!,
-});
+export function header({ loaderHeaders }: Route.HeadersArgs) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control')!,
+  };
+}
 
 export function shouldRevalidate({
   currentParams,

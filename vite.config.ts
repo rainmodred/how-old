@@ -9,7 +9,7 @@ export default defineConfig({
     port: 3000,
   },
   plugins: [
-    reactRouterDevTools(),
+    // reactRouterDevTools(),
     !process.env.VITEST && reactRouter(),
     tsconfigPaths(),
   ],

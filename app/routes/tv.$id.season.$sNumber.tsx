@@ -1,12 +1,9 @@
 import {
   Await,
   data,
-  HeadersFunction,
-  LoaderFunctionArgs,
   redirect,
   ShouldRevalidateFunctionArgs,
 } from 'react-router';
-
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Persons } from '~/components/Persons/Persons';
 import { Suspense } from 'react';
@@ -16,9 +13,11 @@ import { Route } from './+types/tv.$id.season.$sNumber';
 import { getCastWithDates } from '~/api/getCastWithDates';
 import { tmdbApi } from '~/api/tmdbApi';
 
-export const headers: HeadersFunction = ({ loaderHeaders }) => ({
-  'Cache-Control': loaderHeaders.get('Cache-Control')!,
-});
+export function headers({ loaderHeaders }: Route.HeadersArgs) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control')!,
+  };
+}
 
 export function shouldRevalidate({
   currentParams,
@@ -35,29 +34,26 @@ export function shouldRevalidate({
   return defaultShouldRevalidate;
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
   if (!params.id || !params.sNumber) {
     throw redirect('/');
   }
 
-  const { id, sNumber: seasonNumber } = params;
+  const id = Number(params.id);
+  const seasonNumber = Number(params.sNumber);
 
   const url = new URL(request.url);
-  const limit = Number(url.searchParams.get('limit')) || LIMIT;
+  const offset = Number(url.searchParams.get('offset')) || 0;
+  const limit = offset + LIMIT;
 
-  const { cast } = await tmdbApi.tv.getCredits(
-    Number(id),
-    Number(seasonNumber),
-  );
-  const castWithDates = getCastWithDates(cast, {
-    offset: 0,
-    limit,
-  });
+  const { cast } = await tmdbApi.tv.getCredits(id, seasonNumber);
+  const castWithDates = getCastWithDates(cast.slice(offset, limit));
 
   return data(
     {
+      id,
       cast: castWithDates,
-      seasonNumber: Number(seasonNumber),
+      seasonNumber,
       hasMore: limit < cast.length,
     },
     {
@@ -70,7 +66,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function TvPage({ loaderData }: Route.ComponentProps) {
   const data = useTvLoaderData();
-  const { cast, seasonNumber, hasMore } = loaderData;
+  const { id, cast, seasonNumber, hasMore } = loaderData;
 
   const releaseDate = data?.seasons.find(
     season => season.season_number === seasonNumber,
@@ -88,6 +84,7 @@ export default function TvPage({ loaderData }: Route.ComponentProps) {
               initialCast={cast}
               hasMore={hasMore}
               releaseDate={releaseDate}
+              key={id}
             />
           );
         }}

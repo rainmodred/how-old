@@ -1,4 +1,4 @@
-import { Box, Image, Table, Text, Button } from '@mantine/core';
+import { Box, Image, Table, Text, Loader, Group } from '@mantine/core';
 import { Link } from 'react-router';
 import { CastWithDates } from '~/api/getCastWithDates';
 import { baseImageUrl } from '~/utils/constants';
@@ -36,14 +36,11 @@ interface PersonsProps {
 }
 
 export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
-  const { persons, isLoaded, isLoading, loadMore } = useLoadMore(
-    initialCast,
-    hasMore,
-  );
+  const { persons, isLoading, ref } = useLoadMore(initialCast, hasMore);
 
   return (
     <>
-      <Table className="table-sm" stickyHeader id="persons">
+      <Table stickyHeader id="persons">
         <Table.Thead>
           <Table.Tr>
             <Table.Th></Table.Th>
@@ -58,14 +55,14 @@ export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
         </Table.Thead>
         <Table.Tbody>
           {persons.map(
-            ({ id, name, character, birthday, deathday, profile_path }) => {
+            ({ id, name, character, birthday, deathday, profile_path }, i) => {
               const { ageThen, ageNow } = calculateAges(releaseDate, {
                 birthday,
                 deathday,
               });
 
               return (
-                <Table.Tr key={id}>
+                <Table.Tr key={id} ref={persons.length - 1 === i ? ref : null}>
                   <Table.Td w={'1%'}>
                     <ProfileImage id={id} src={profile_path} alt={name} />
                   </Table.Td>
@@ -91,17 +88,10 @@ export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
         </Table.Tbody>
       </Table>
 
-      {!isLoaded && (
-        <Button
-          loading={isLoading}
-          disabled={isLoading}
-          variant="default"
-          m={'sm'}
-          size="sm"
-          onClick={loadMore}
-        >
-          load more
-        </Button>
+      {isLoading && (
+        <Group mt="md" justify="center">
+          <Loader data-testid="spinner" />
+        </Group>
       )}
     </>
   );

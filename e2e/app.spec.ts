@@ -42,6 +42,13 @@ test('smoke', async ({ page }) => {
       level: 1,
     }),
   ).toHaveText('The Lord of the Rings: The Fellowship of the Ring');
+  await expect(page.getByTestId('skeleton-table')).not.toBeVisible();
+  expect(await page.locator('tr').all()).toHaveLength(11);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect(page.getByTestId('spinner')).not.toBeVisible();
+  await expect(page.getByText('Gimli')).toBeVisible();
+
+  expect(await page.locator('tr').all()).toHaveLength(21);
 
   await page.getByRole('link', { name: 'Ian McKellen' }).click();
   await expect(
@@ -69,4 +76,46 @@ test('shold change theme', async ({ page }) => {
     'data-mantine-color-scheme',
     'light',
   );
+});
+
+test('should update persons list on route change', async ({ page }) => {
+  await expect(
+    page.getByRole('heading', { name: 'Popular Movies', level: 1 }),
+  ).toBeVisible();
+
+  const search = page.getByPlaceholder('Search for a movie or tv');
+
+  await search.click();
+  await search.fill('Firefly');
+  await search.click();
+  let option = page.getByRole('option', {
+    name: 'Firefly (2002)',
+  });
+  await expect(option).toBeVisible();
+  await option.click();
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'Firefly',
+      level: 1,
+    }),
+  ).toHaveText('Firefly');
+  await expect(page.getByText('Nathan Fillion')).toBeVisible();
+
+  await search.click();
+  await search.fill('House');
+  await search.click();
+  option = page.getByRole('option', {
+    name: 'House (2004)',
+  });
+  await expect(option).toBeVisible();
+  await option.click();
+
+  await expect(
+    page.getByRole('heading', {
+      name: 'House',
+      level: 1,
+    }),
+  ).toHaveText('House');
+  await expect(page.getByText('Hugh Laurie')).toBeVisible();
 });
