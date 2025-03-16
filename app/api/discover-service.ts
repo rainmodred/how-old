@@ -10,6 +10,8 @@ export class DiscoverService extends Base {
           include_video: false,
           language: 'en-US',
           page: 1,
+          without_genres: '99',
+          'with_runtime.gte': 100,
         },
       },
     });
