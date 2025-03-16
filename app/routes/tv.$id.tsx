@@ -1,7 +1,6 @@
 import { Flex, Text } from '@mantine/core';
 import {
   data,
-  HeadersFunction,
   LoaderFunctionArgs,
   NavLink,
   Outlet,
@@ -14,9 +13,15 @@ import ItemDetails from '~/components/ItemDetails/ItemDetails';
 import { Route } from './+types/tv.$id';
 import { tmdbApi } from '~/api/tmdbApi';
 
-export const headers: HeadersFunction = ({ loaderHeaders }) => ({
-  'Cache-Control': loaderHeaders.get('Cache-Control')!,
-});
+export function meta({ data }: Route.MetaArgs) {
+  return [{ title: data.name }];
+}
+
+export function headers({ loaderHeaders }: Route.HeadersArgs) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control')!,
+  };
+}
 
 export function shouldRevalidate({
   currentParams,

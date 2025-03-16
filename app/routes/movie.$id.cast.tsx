@@ -1,7 +1,14 @@
-import { LoaderFunctionArgs, redirect } from 'react-router';
-import { tmdbApi } from '~/api/tmdbApi';
+import { redirect, data } from 'react-router';
 import { getCastWithDates } from '~/api/getCastWithDates';
+import { tmdbApi } from '~/api/tmdbApi';
 import { LIMIT } from '~/utils/constants';
+import { Route } from './+types/movie.$id.cast';
+
+export function headers({ loaderHeaders }: Route.HeadersArgs) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control')!,
+  };
+}
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   if (!params.id) {
@@ -17,7 +24,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   return data(
     {
-    cast: castWithDates,
+      cast: castWithDates,
       hasMore: limit < cast.length,
     },
     {

@@ -1,7 +1,14 @@
-import { LoaderFunctionArgs, redirect } from 'react-router';
-import { tmdbApi } from '~/api/tmdbApi';
+import { data, redirect } from 'react-router';
+import { Route } from './+types/tv.$id.season.$sNumber.cast';
 import { getCastWithDates } from '~/api/getCastWithDates';
+import { tmdbApi } from '~/api/tmdbApi';
 import { LIMIT } from '~/utils/constants';
+
+export function headers({ loaderHeaders }: Route.HeadersArgs) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control')!,
+  };
+}
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   if (!params.id || !params.sNumber) {
@@ -20,7 +27,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   return data(
     {
-    cast: castWithDates,
+      cast: castWithDates,
       seasonNumber,
       hasMore: limit < cast.length,
     },

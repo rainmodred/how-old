@@ -1,12 +1,9 @@
 import {
   Await,
   data,
-  HeadersFunction,
-  LoaderFunctionArgs,
   redirect,
   ShouldRevalidateFunctionArgs,
 } from 'react-router';
-
 import { SkeletonTable } from '~/components/SkeletonTable';
 import { Persons } from '~/components/Persons/Persons';
 import { Suspense } from 'react';
@@ -16,9 +13,11 @@ import { Route } from './+types/tv.$id.season.$sNumber';
 import { getCastWithDates } from '~/api/getCastWithDates';
 import { tmdbApi } from '~/api/tmdbApi';
 
-export const headers: HeadersFunction = ({ loaderHeaders }) => ({
-  'Cache-Control': loaderHeaders.get('Cache-Control')!,
-});
+export function headers({ loaderHeaders }: Route.HeadersArgs) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control')!,
+  };
+}
 
 export function shouldRevalidate({
   currentParams,

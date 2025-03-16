@@ -1,21 +1,23 @@
 import { Title, Box, Grid } from '@mantine/core';
-import { Await, data, HeadersFunction, MetaFunction } from 'react-router';
+import { Await, data } from 'react-router';
 import { Suspense } from 'react';
 import { MediaCard } from '~/components/MediaGrid/MediaCard';
 import { MoviesSkeleton } from '~/components/MoviesSkeleton/MoviesSkeleton';
 import { Route } from './+types/_index';
 import { tmdbApi } from '~/api/tmdbApi';
 
-export const meta: MetaFunction = () => {
+export function meta() {
   return [
     { title: 'How Old' },
     { name: 'description', content: 'See actor age in movies and tv shows' },
   ];
-};
+}
 
-export const headers: HeadersFunction = ({ loaderHeaders }) => ({
-  'Cache-Control': loaderHeaders.get('Cache-Control')!,
-});
+export function headers({ loaderHeaders }: Route.HeadersArgs) {
+  return {
+    'Cache-Control': loaderHeaders.get('Cache-Control')!,
+  };
+}
 
 export async function loader() {
   const popularMovies = tmdbApi.discover.movie();
