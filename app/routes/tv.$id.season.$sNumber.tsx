@@ -51,6 +51,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   return data(
     {
+      id,
       cast: castWithDates,
       seasonNumber,
       hasMore: limit < cast.length,
@@ -65,7 +66,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 export default function TvPage({ loaderData }: Route.ComponentProps) {
   const data = useTvLoaderData();
-  const { cast, seasonNumber, hasMore } = loaderData;
+  const { id, cast, seasonNumber, hasMore } = loaderData;
 
   const releaseDate = data?.seasons.find(
     season => season.season_number === seasonNumber,
@@ -83,6 +84,7 @@ export default function TvPage({ loaderData }: Route.ComponentProps) {
               initialCast={cast}
               hasMore={hasMore}
               releaseDate={releaseDate}
+              key={id}
             />
           );
         }}
