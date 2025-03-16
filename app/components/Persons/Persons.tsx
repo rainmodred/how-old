@@ -40,7 +40,7 @@ export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
 
   return (
     <>
-      <Table className="table-sm" stickyHeader id="persons">
+      <Table stickyHeader id="persons">
         <Table.Thead>
           <Table.Tr>
             <Table.Th></Table.Th>
