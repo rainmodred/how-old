@@ -21,7 +21,7 @@ export async function clientLoader({
   request,
   serverLoader,
 }: Route.ClientLoaderArgs) {
-  await requestNotCancelled(request, 300);
+  await requestNotCancelled(request, 500);
   return await serverLoader();
 }
 
