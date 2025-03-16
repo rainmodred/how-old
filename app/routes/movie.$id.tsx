@@ -38,23 +38,22 @@ export function shouldRevalidate({
   return defaultShouldRevalidate;
 }
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
   if (!params.id) {
     throw redirect('/');
   }
 
+  const id = Number(params.id);
   const url = new URL(request.url);
-  const limit = Number(url.searchParams.get('limit')) || LIMIT;
+  const offset = Number(url.searchParams.get('offset')) || 0;
+  const limit = offset + LIMIT;
 
   const [movie, { cast }] = await Promise.all([
-    tmdbApi.movie.getDetails(Number(params.id)),
-    tmdbApi.movie.getCredits(Number(params.id)),
+    tmdbApi.movie.getDetails(id),
+    tmdbApi.movie.getCredits(id),
   ]);
 
-  const castWithDates = getCastWithDates(cast, {
-    offset: 0,
-    limit,
-  });
+  const castWithDates = getCastWithDates(cast.slice(offset, limit));
 
   return data(
     {
@@ -99,6 +98,7 @@ export default function MoviePage() {
                 initialCast={cast}
                 releaseDate={movie.release_date}
                 hasMore={hasMore}
+                key={movie.id}
               />
             );
           }}

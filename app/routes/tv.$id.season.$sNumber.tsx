@@ -35,29 +35,25 @@ export function shouldRevalidate({
   return defaultShouldRevalidate;
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
   if (!params.id || !params.sNumber) {
     throw redirect('/');
   }
 
-  const { id, sNumber: seasonNumber } = params;
+  const id = Number(params.id);
+  const seasonNumber = Number(params.sNumber);
 
   const url = new URL(request.url);
-  const limit = Number(url.searchParams.get('limit')) || LIMIT;
+  const offset = Number(url.searchParams.get('offset')) || 0;
+  const limit = offset + LIMIT;
 
-  const { cast } = await tmdbApi.tv.getCredits(
-    Number(id),
-    Number(seasonNumber),
-  );
-  const castWithDates = getCastWithDates(cast, {
-    offset: 0,
-    limit,
-  });
+  const { cast } = await tmdbApi.tv.getCredits(id, seasonNumber);
+  const castWithDates = getCastWithDates(cast.slice(offset, limit));
 
   return data(
     {
       cast: castWithDates,
-      seasonNumber: Number(seasonNumber),
+      seasonNumber,
       hasMore: limit < cast.length,
     },
     {

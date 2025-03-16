@@ -42,6 +42,13 @@ test('smoke', async ({ page }) => {
       level: 1,
     }),
   ).toHaveText('The Lord of the Rings: The Fellowship of the Ring');
+  await expect(page.getByTestId('skeleton-table')).not.toBeVisible();
+  expect(await page.locator('tr').all()).toHaveLength(11);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect(page.getByTestId('spinner')).not.toBeVisible();
+  await expect(page.getByText('Gimli')).toBeVisible();
+
+  expect(await page.locator('tr').all()).toHaveLength(21);
 
   await page.getByRole('link', { name: 'Ian McKellen' }).click();
   await expect(

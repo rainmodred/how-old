@@ -1,8 +1,8 @@
 import { useFetcher } from 'react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { loader } from '~/routes/movie.$id.cast';
 import { CastWithDates } from '~/api/getCastWithDates';
-import useSearchParams from '~/hooks/useSearchParams';
+import { useInView } from 'react-intersection-observer';
 
 export default function useLoadMore(
   initialCast: CastWithDates,
@@ -10,41 +10,46 @@ export default function useLoadMore(
 ) {
   const [persons, setPersons] = useState(initialCast);
   const fetcher = useFetcher<typeof loader>();
-  const [, setSearchParams] = useSearchParams();
+
+  const fetcherRef = useRef(fetcher);
+  const offsetRef = useRef(persons.length);
+
+  const { ref, inView } = useInView({
+    threshold: 1,
+  });
+
+  const moreAvailable = fetcher.data ? fetcher.data.hasMore : hasMore;
 
   useEffect(() => {
-    setPersons(initialCast);
-  }, [initialCast]);
+    fetcherRef.current = fetcher;
+  }, [fetcher]);
+
+  useEffect(() => {
+    if (!moreAvailable || !inView || fetcherRef.current.state === 'loading') {
+      return;
+    }
+
+    const newParams = new URLSearchParams({
+      offset: offsetRef.current.toString(),
+    });
+
+    fetcherRef.current.load(`cast?${newParams.toString()}`);
+    //triggers 2 times if used persons.lenght instead of offsetRef
+  }, [inView, moreAvailable]);
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
       return;
     }
 
-    if (fetcher.data) {
-      const newItems = fetcher.data.cast;
-      setPersons(prev => [...prev, ...newItems]);
+    const newItems = fetcher.data.cast;
+    offsetRef.current += newItems.length;
+    setPersons(prev => [...prev, ...newItems]);
+  }, [fetcher.data, fetcher.state]);
 
-      const newParams = new URLSearchParams({
-        limit: String(fetcher.data.offset),
-      });
-      setSearchParams(newParams, { replace: true, preventScrollReset: true });
-    }
-  }, [fetcher.data, fetcher.state, setSearchParams]);
-
-  function loadMore() {
-    const newParams = new URLSearchParams({
-      offset: persons.length.toString(),
-    });
-
-    fetcher.load(`cast?${newParams.toString()}`);
-  }
-
-  const moreAvailable = fetcher.data ? fetcher.data.hasMore : hasMore;
   return {
     persons,
-    loadMore,
-    isLoaded: !moreAvailable,
     isLoading: fetcher.state === 'loading',
+    ref,
   };
 }
