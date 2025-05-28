@@ -1,4 +1,4 @@
-import { Box, Image, Table, Text, Loader, Group } from '@mantine/core';
+import { Box, Image, Table, Text, Loader, Group, Anchor } from '@mantine/core';
 import { Link } from 'react-router';
 import { CastWithDates } from '~/api/getCastWithDates';
 import { baseImageUrl } from '~/utils/constants';
@@ -68,7 +68,14 @@ export function Persons({ initialCast, releaseDate, hasMore }: PersonsProps) {
                   </Table.Td>
                   <Table.Td>
                     <Box>
-                      <Text fw="700">{name}</Text>
+                      <Anchor
+                        c={'var(--mantine-color-text)'}
+                        underline="never"
+                        component={Link}
+                        to={`/person/${id}`}
+                      >
+                        <Text fw="700">{name}</Text>
+                      </Anchor>
                       <Text>{character ? character : '-'}</Text>
                       <Text>Birthday: {birthday ? birthday : '-'}</Text>
                     </Box>
