@@ -25,7 +25,9 @@ export class TvService extends Base {
   }
 
   async getCredits(id: number, seasonNumber: number) {
-    const cached = tvCreditsCache.get(id);
+    const key = `${id}/${seasonNumber}`;
+
+    const cached = tvCreditsCache.get(key);
     if (cached) {
       return cached;
     }
@@ -44,7 +46,7 @@ export class TvService extends Base {
     }
 
     const result = tvCreditsSchema.parse(data);
-    tvCreditsCache.set(id, result);
+    tvCreditsCache.set(key, result);
 
     return result;
   }

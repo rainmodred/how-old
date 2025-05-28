@@ -75,6 +75,7 @@ export default function TvPage({ loaderData }: Route.ComponentProps) {
     throw new Error('releaseDate is missing');
   }
 
+  const key = `${id}/${seasonNumber}`;
   return (
     <Suspense fallback={<SkeletonTable rows={5} />}>
       <Await resolve={cast}>
@@ -84,7 +85,7 @@ export default function TvPage({ loaderData }: Route.ComponentProps) {
               initialCast={cast}
               hasMore={hasMore}
               releaseDate={releaseDate}
-              key={id}
+              key={key}
             />
           );
         }}

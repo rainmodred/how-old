@@ -12,7 +12,7 @@ export const movieCache = new LRUCache<number, MovieDetails>({
 });
 export const movieCredisCache = new LRUCache<number, MovieCredits>({ max: 10 });
 export const tvCache = new LRUCache<number, TvDetails>({ max: 10 });
-export const tvCreditsCache = new LRUCache<number, TvCredits>({
+export const tvCreditsCache = new LRUCache<string, TvCredits>({
   max: 10,
 });
 export const personCreditsCache = new LRUCache<number, PersonCredits>({
