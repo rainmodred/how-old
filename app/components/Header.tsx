@@ -25,6 +25,7 @@ export default function Header() {
         radius="md"
         type="button"
         px={'xs'}
+        styles={{ root: { flexShrink: 0 } }}
       >
         <Image
           className={classes.darkIcon}
